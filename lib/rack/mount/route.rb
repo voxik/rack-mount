@@ -22,17 +22,21 @@ module Rack
           SegmentString.new(@path, @requirements)
 
         # Mark as dynamic only if the first segment is dynamic
-        @dynamic = segment.dynamic_first_segment?
+        @segments_keys = segment.segments_keys
         @recognizer = segment.recognizer
         @params = segment.params
       end
 
-      def dynamic?
-        @dynamic
+      def first_segment
+        @segments_keys[1]
       end
 
-      def methods
-        Array(@method || HTTP_METHODS)
+      def second_segment
+        @segments_keys[2]
+      end
+
+      def to_s
+        "#{method} #{path}"
       end
 
       def call(env)

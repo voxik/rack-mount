@@ -1,15 +1,14 @@
 module Rack
   module Mount
-    class RouteSet < Bucket
-      include GarbageCompactor
-
+    class RouteSet
       DEFAULT_OPTIONS = {
-        :compactor => true
+        :keys => [:method, :first_segment]
       }.freeze
 
       def initialize(options = {})
         @options = DEFAULT_OPTIONS.dup.merge!(options)
-        super()
+        @keys = @options.delete(:keys)
+        @root = NestedSet.new
       end
 
       def draw(&block)
@@ -30,25 +29,15 @@ module Rack
 
       def add_route(options = {})
         route = Route.new(options)
-
-        if route.dynamic?
-          self << route
-        else
-          path = route.path.slice(SegmentString::FIRST_SEGMENT_REGEXP)
-          route.methods.each do |method|
-            self["#{method} /#{path}"] = route
-          end
-        end
-
+        keys = @keys.map { |key| route.send(key) }
+        @root[*keys] = route
         route
       end
 
       def call(env)
-        method = env["REQUEST_METHOD"]
-        path = env["PATH_INFO"]
-
-        key = "#{method} /#{path.slice(SegmentString::FIRST_SEGMENT_REGEXP)}"
-        self[key].each do |route|
+        env_str = Request.new(env)
+        keys = @keys.map { |key| env_str.send(key) }
+        @root[*keys].each do |route|
           result = route.call(env)
           return result unless result[0] == 404
         end
@@ -56,38 +45,17 @@ module Rack
       end
 
       def freeze
-        compact! if @options[:compactor]
+        @root.freeze
 
         super
       end
 
       def worst_case
-        values.max { |a, b| a.length <=> b.length }.length
+        @root.depth
       end
 
       def to_graph
-        graph = <<-EOS
-digraph G {
-  nodesep=.05;
-  rankdir=LR;
-  node [shape=record,width=.1,height=.1];
-
-  node0 [label = "#{keys.map { |k| "<k#{k.object_id}> #{k}" }.join("|")}",height=2.0];
-
-  node [width = 1.5];
-  #{
-    values.map { |v|
-      "node#{v.object_id} [label = \"{<n> #{v.map { |v| " /#{v.path} " }.join("|")} }\"];"
-    }.join("\n  ")
-  }
-
-  #{
-    map { |k, v|
-      "node0:k#{k.object_id} -> node#{v.object_id}:n;"
-    }.join("\n  ")
-  }
-}
-        EOS
+        @root.to_graph
       end
     end
   end
