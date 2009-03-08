@@ -33,10 +33,10 @@ module Rack
           if keys.empty?
             self << value
           else
-            values.each do |v|
-              v[keys] = value
+            self.default = NestedSet.new(default) if default.is_a?(Bucket)
+            values_with_default.each do |v|
+              v[*keys] = value
             end
-            default << value
           end
         else
           if keys.empty?
@@ -50,7 +50,8 @@ module Rack
       end
 
       def [](*keys)
-        keys.inject(self) do |b, k|
+        padded_keys = keys.flatten + ([nil] * 10)
+        padded_keys.inject(self) do |b, k|
           if b.is_a?(Array)
             return b
           else

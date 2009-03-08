@@ -64,7 +64,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["/admin/accounts/new", "/admin/people", "/admin/people/1", "/admin/:controller/edit", "/admin/people/new", "/:controller/:action"], root["/admin", "/people"]
     assert_equal ["/admin/accounts/new", "/admin/:controller/edit", "/admin/companies", "/:namespace/companies", "/:controller/:action"], root["/admin", "/companies"]
     assert_equal ["/admin/accounts/new", "/admin/:controller/edit", "/:controller/:action"], root["/admin", "/notfound"]
-    assert_equal ["/:namespace/companies", "/:controller/:action"], root["/notfound"]
+    assert_equal ["/:controller/:action"], root["/notfound"]
     assert_equal 6, root.depth
   end
 
@@ -79,9 +79,20 @@ class NestedSetTest < Test::Unit::TestCase
 
     assert_equal ["GET /people", "ANY /people/export", "GET /people/1"], root["GET", "/people"]
     assert_equal ["ANY /people/export"], root["POST", "/people"]
-    assert_equal ["ANY /people/export", "ANY /messages/export"], root["PUT", "/people"]
+    assert_equal ["ANY /people/export"], root["PUT", "/people"]
     assert_equal ["ANY /messages/export"], root["GET", "/messages"]
-    assert_equal ["ANY /people/export", "POST /messages", "ANY /messages/export"], root["POST", "/messages"]
+    assert_equal ["POST /messages", "ANY /messages/export"], root["POST", "/messages"]
+
+    assert_equal 3, root.depth
+  end
+
+  def test_nested_default_bucket
+    root = NestedSet.new
+
+    root[nil, "/people"] = "GET /people"
+    root[nil, "/people"] = "GET /people/1"
+    root[nil, "/messages"] = "POST /messages"
+    root[nil] = "ANY /:controller/:action"
 
     assert_equal 3, root.depth
   end
