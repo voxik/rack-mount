@@ -4,6 +4,13 @@ require 'merb-core/dispatch/router'
 
 module Rack
   module Mount
+    class RouteSet
+      def prepare(*args, &block)
+        Mappers::Merb.new(self).prepare(*args, &block)
+        freeze
+      end
+    end
+
     module Mappers
       class Merb
         class ::Merb::Router::Behavior

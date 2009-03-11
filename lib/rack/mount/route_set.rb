@@ -11,22 +11,6 @@ module Rack
         @root = NestedSet.new
       end
 
-      def draw(&block)
-        Mappers::RailsClassic.new(self).draw(&block)
-        freeze
-      end
-
-      def new_draw(&block)
-        mapper = Mappers::RailsDraft.new(self)
-        mapper.instance_eval(&block)
-        freeze
-      end
-
-      def prepare(*args, &block)
-        Mappers::Merb.new(self).prepare(*args, &block)
-        freeze
-      end
-
       def add_route(options = {})
         route = Route.new(options)
         keys = @keys.map { |key| route.send(key) }

@@ -1,5 +1,12 @@
 module Rack
   module Mount
+    class RouteSet
+      def draw(&block)
+        Mappers::RailsClassic.new(self).draw(&block)
+        freeze
+      end
+    end
+
     module Mappers
       class RailsClassic
         attr_reader :named_routes

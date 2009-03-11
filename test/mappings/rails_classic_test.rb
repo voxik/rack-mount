@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'rack/mount/mappers/rails_classic'
 
 class RailsClassicApiTest < Test::Unit::TestCase
   include TestHelper

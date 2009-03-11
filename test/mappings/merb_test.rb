@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'rack/mount/mappers/merb'
 
 class MerbApiTest < Test::Unit::TestCase
   include TestHelper

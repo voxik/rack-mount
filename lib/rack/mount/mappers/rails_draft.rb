@@ -2,6 +2,14 @@ require 'active_support/inflector'
 
 module Rack
   module Mount
+    class RouteSet
+      def new_draw(&block)
+        mapper = Mappers::RailsDraft.new(self)
+        mapper.instance_eval(&block)
+        freeze
+      end
+    end
+
     module Mappers
       class RailsDraft
         def initialize(set)
