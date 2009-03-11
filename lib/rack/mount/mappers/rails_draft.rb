@@ -11,26 +11,42 @@ module Rack
         end
 
         def get(path, options = {})
-          match(path, options.merge(:method => :get))
+          match(path, options.merge(:via => :get))
         end
 
         def post(path, options = {})
-          match(path, options.merge(:method => :post))
+          match(path, options.merge(:via => :post))
         end
 
         def put(path, options = {})
-          match(path, options.merge(:method => :put))
+          match(path, options.merge(:via => :put))
         end
 
         def delete(path, options = {})
-          match(path, options.merge(:method => :delete))
+          match(path, options.merge(:via => :delete))
         end
 
-        def match(path, options = {})
+        def match(path, options = {}, &block)
+          if block_given?
+            begin
+              @scope_stack.push(options.merge({:path => path}))
+              instance_eval(&block)
+            ensure
+              @scope_stack.pop
+            end
+
+            return
+          end
+
           new_options = {}
-          method = options.delete(:method)
+          method = options.delete(:via)
           requirements = options.delete(:constraints) || {}
           defaults = {}
+
+          if path.is_a?(Symbol) && scope_options.has_key?(:path)
+            defaults[:action] = path.to_s
+            path = scope_options[:path]
+          end
 
           if controller = scope_options[:controller]
             defaults[:controller] = controller.to_s

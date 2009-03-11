@@ -138,6 +138,26 @@ module BasicRecognitionTests
     assert_equal({ :controller => "global", :action => "export", :id => "1", :file => "foo" }, env["rack.routing_args"])
   end
 
+  def test_another_with_controller_scope
+    get "/login"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "sessions", :action => "new" }, env["rack.routing_args"])
+
+    post "/login"
+    assert env
+    assert_equal("POST", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "sessions", :action => "create" }, env["rack.routing_args"])
+
+    get "/logout"
+    assert_nil env
+
+    delete "/logout"
+    assert env
+    assert_equal("DELETE", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "sessions", :action => "destroy" }, env["rack.routing_args"])
+  end
+
   def test_not_found
     get "/admin/widgets/show/random"
     assert_nil env

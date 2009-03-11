@@ -13,6 +13,15 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match 'geocode/:postalcode',  :to => 'geocode#show', :as => :geocode, :constraints => { :postalcode => /\d{5}(-\d{4})?/ }
     match 'geocode2/:postalcode', :to => 'geocode#show', :as => :geocode, :constraints => { :postalcode => /\d{5}(-\d{4})?/ }
 
+    controller :sessions do
+      match 'logout', :via => :delete, :to => :destroy, :as => :logout
+
+      match 'login' do
+        get  :new, :as => :login
+        post :create
+      end
+    end
+
     controller :global do
       match 'global/:action'
       match 'global/export',      :to => :export, :as => :export_request
