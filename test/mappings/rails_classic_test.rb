@@ -19,6 +19,13 @@ class RailsClassicApiTest < Test::Unit::TestCase
     map.geocode2 'geocode2/:postalcode', :controller => 'geocode',
                  :action => 'show', :requirements => { :postalcode => /\d{5}(-\d{4})?/ }
 
+    map.with_options :controller => "global" do |global|
+      global.connect         "global/:action"
+      global.export_request  "global/export",      :action => "export"
+      global.hide_notice     "global/hide_notice", :action => "hide_notice"
+      global.export_download "/export/:id/:file",  :action => "export", :file => /.*/
+    end
+
     map.connect "foo", :controller => "foo", :action => "index"
     map.connect "foo/bar", :controller => "foo_bar", :action => "index"
     map.connect "/baz", :controller => "baz", :action => "index"

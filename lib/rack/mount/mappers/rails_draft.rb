@@ -7,6 +7,7 @@ module Rack
         def initialize(set)
           require 'action_controller'
           @set = set
+          @scope_stack = []
         end
 
         def get(path, options = {})
@@ -31,10 +32,19 @@ module Rack
           requirements = options.delete(:constraints) || {}
           defaults = {}
 
+          if controller = scope_options[:controller]
+            defaults[:controller] = controller.to_s
+          end
+
           if to = options.delete(:to)
-            controller, action = to.split("#")
-            defaults[:controller] = controller if controller
-            defaults[:action] = action if action
+            controller, action = to.to_s.split("#")
+
+            if defaults[:controller]
+              defaults[:action] = controller if controller
+            else
+              defaults[:controller] = controller if controller
+              defaults[:action] = action if action
+            end
           end
 
           if defaults.has_key?(:controller)
@@ -57,12 +67,25 @@ module Rack
           })
         end
 
+        def controller(controller, &block)
+          @scope_stack.push({:controller => controller})
+          instance_eval(&block)
+        ensure
+          @scope_stack.pop
+        end
+
         def resources(*entities, &block)
           options = entities.extract_options!
           entities.each { |entity| map_resource(entity, options.dup, &block) }
         end
 
         private
+          def scope_options
+            options = {}
+            @scope_stack.each { |opts| options.merge!(opts) }
+            options
+          end
+
           def map_resource(entities, options = {}, &block)
             resource = ActionController::Resources::Resource.new(entities, options)
 

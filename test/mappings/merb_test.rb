@@ -19,6 +19,13 @@ class MerbApiTest < Test::Unit::TestCase
     match("geocode/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:controller => "geocode", :action => "show")
     match("geocode2/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:controller => "geocode", :action => "show")
 
+    with(:controller => "global") do
+      match('global/:action').register
+      match('global/export').to(:action => "export")
+      match('global/hide_notice').to(:action => "hide_notice")
+      match('/export/:id/:file', :file => /.*/).to(:action => "export")
+    end
+
     match("foo").to(:controller => "foo", :action => "index")
     match("foo/bar").to(:controller => "foo_bar", :action => "index")
     match("/baz").to(:controller => "baz", :action => "index")

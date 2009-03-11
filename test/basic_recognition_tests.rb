@@ -111,6 +111,33 @@ module BasicRecognitionTests
     assert_equal({ :controller => "files", :action => "index", :files => "images/photo.jpg" }, env["rack.routing_args"])
   end
 
+  def test_with_controller_scope
+    get "/global/index"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "global", :action => "index" }, env["rack.routing_args"])
+
+    get "/global/show"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "global", :action => "show" }, env["rack.routing_args"])
+
+    get "/global/export"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "global", :action => "export" }, env["rack.routing_args"])
+
+    get "/global/hide_notice"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "global", :action => "hide_notice" }, env["rack.routing_args"])
+
+    get "/export/1/foo"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "global", :action => "export", :id => "1", :file => "foo" }, env["rack.routing_args"])
+  end
+
   def test_not_found
     get "/admin/widgets/show/random"
     assert_nil env
