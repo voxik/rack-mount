@@ -18,7 +18,7 @@ module Rack
 
         @path = options.delete(:path)
         @requirements = options.delete(:requirements).freeze
-        @defaults = options.delete(:defaults).freeze
+        @defaults = (options.delete(:defaults) || {}).freeze
 
         segment = @path.is_a?(Regexp) ?
           SegmentRegexp.new(@path, @requirements) :
