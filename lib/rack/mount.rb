@@ -5,7 +5,5 @@ module Rack
     autoload :Request, 'rack/mount/request'
     autoload :Route, 'rack/mount/route'
     autoload :RouteSet, 'rack/mount/route_set'
-    autoload :SegmentRegexp, 'rack/mount/segment_regexp'
-    autoload :SegmentString, 'rack/mount/segment_string'
   end
 end

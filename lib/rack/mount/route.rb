@@ -1,6 +1,9 @@
 module Rack
   module Mount
     class Route
+      autoload :SegmentRegexp, 'rack/mount/route/segment_regexp'
+      autoload :SegmentString, 'rack/mount/route/segment_string'
+
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
       HTTP_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE"]
 
