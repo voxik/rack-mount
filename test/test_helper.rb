@@ -1,14 +1,10 @@
 require 'rubygems'
 require 'test/unit'
-require 'yaml'
-
 require 'rack/mount'
 
-require 'basic_recognition_tests'
-
-EchoApp = lambda { |env|
-  [200, {"Content-Type" => "text/yaml"}, [YAML.dump(env)]]
-}
+autoload :BasicSet, 'fixtures/basic_set'
+autoload :BasicRecognitionTests, 'basic_recognition_tests'
+autoload :EchoApp, 'fixtures/echo_app'
 
 module Admin
 end
