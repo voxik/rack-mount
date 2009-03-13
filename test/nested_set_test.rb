@@ -97,6 +97,17 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal 3, root.depth
   end
 
+  def test_deeply_nested_set
+    set = DeeplyNestedSet
+
+    assert_equal ["a:a:a", "a:a:*", "a:*:*"], set["a", "a", "a"]
+    assert_equal ["a:a:*", "a:*:*"], set["a", "a", "!"]
+    assert_equal ["a:a:*", "a:*:*"], set["a", "a"]
+    assert_equal ["a:*:*"], set["a", "!"]
+    assert_equal ["a:*:*"], set["a"]
+    assert_equal [], set["!"]
+  end
+
   def test_freeze
     root = NestedSet.new
 

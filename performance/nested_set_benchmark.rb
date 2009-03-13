@@ -1,20 +1,10 @@
 require 'rubygems'
 require 'rack/mount'
-
-Set = Rack::Mount::NestedSet.new
-("a".."z").each do |level1|
-  ("a".."z").each do |level2|
-    ("a".."z").each do |level3|
-      Set[level1, level2, level3] = "#{level1}:#{level2}:#{level3}"
-    end
-    Set[level1, level2] = "#{level1}:#{level2}:?"
-  end
-  Set[level1] = "#{level1}:?:?"
-end
-
+require 'fixtures'
 require 'benchmark'
 
 TIMES = 100_000.to_i
+Set = DeeplyNestedSet
 
 Benchmark.bmbm do |x|
   x.report("match 3 levels (hit)")  { TIMES.times { Set["a", "a", "a"] } }

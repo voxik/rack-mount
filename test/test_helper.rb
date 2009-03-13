@@ -1,10 +1,9 @@
 require 'rubygems'
 require 'test/unit'
 require 'rack/mount'
+require 'fixtures'
 
-autoload :BasicSet, 'fixtures/basic_set'
 autoload :BasicRecognitionTests, 'basic_recognition_tests'
-autoload :EchoApp, 'fixtures/echo_app'
 
 module Admin
 end
