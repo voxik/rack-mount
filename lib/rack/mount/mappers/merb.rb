@@ -62,6 +62,12 @@ module Rack
           end
         end
 
+        DynamicController = lambda { |env|
+          app = ActiveSupport::Inflector.camelize("#{env["rack.routing_args"][:controller]}Controller")
+          app = ActiveSupport::Inflector.constantize(app)
+          app.call(env)
+        }
+
         attr_accessor :root_behavior
 
         def initialize(set)
@@ -94,16 +100,9 @@ module Rack
           new_options[:requirements] = requirements
           new_options[:defaults] = params
 
-          if params.has_key?(:controller)
-            app = ActiveSupport::Inflector.camelize("#{params[:controller]}Controller")
-            app = ActiveSupport::Inflector.constantize(app)
-          else
-            app = lambda { |env|
-              app = ActiveSupport::Inflector.camelize("#{env["rack.routing_args"][:controller]}Controller")
-              app = ActiveSupport::Inflector.constantize(app)
-              app.call(env)
-            }
-          end
+          app = params.has_key?(:controller) ?
+            ActiveSupport::Inflector.constantize(ActiveSupport::Inflector.camelize("#{params[:controller]}Controller")) :
+            DynamicController
 
           if deferred_procs.any?
             app = DeferredProc.new(app, deferred_procs.first)

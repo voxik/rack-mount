@@ -9,6 +9,12 @@ module Rack
 
     module Mappers
       class RailsClassic
+        DynamicController = lambda { |env|
+          app = "#{env["rack.routing_args"][:controller].camelize}Controller"
+          app = ActiveSupport::Inflector.constantize(app)
+          app.call(env)
+        }
+
         attr_reader :named_routes
 
         def initialize(set)
@@ -36,16 +42,9 @@ module Rack
             end
           end
 
-          if defaults.has_key?(:controller)
-            app = "#{defaults[:controller].camelize}Controller"
-            app = ActiveSupport::Inflector.constantize(app)
-          else
-            app = lambda { |env|
-              app = "#{env["rack.routing_args"][:controller].camelize}Controller"
-              app = ActiveSupport::Inflector.constantize(app)
-              app.call(env)
-            }
-          end
+          app = defaults.has_key?(:controller) ?
+            ActiveSupport::Inflector.constantize("#{defaults[:controller].camelize}Controller") :
+            DynamicController
 
           @set.add_route(app, {
             :path => path,

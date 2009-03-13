@@ -12,6 +12,12 @@ module Rack
 
     module Mappers
       class RailsDraft
+        DynamicController = lambda { |env|
+          app = "#{env["rack.routing_args"][:controller].camelize}Controller"
+          app = ActiveSupport::Inflector.constantize(app)
+          app.call(env)
+        }
+
         def initialize(set)
           require 'action_controller'
           @set = set
@@ -71,16 +77,9 @@ module Rack
             end
           end
 
-          if defaults.has_key?(:controller)
-            app = "#{defaults[:controller].camelize}Controller"
-            app = ActiveSupport::Inflector.constantize(app)
-          else
-            app = lambda { |env|
-              app = "#{env["rack.routing_args"][:controller].camelize}Controller"
-              app = ActiveSupport::Inflector.constantize(app)
-              app.call(env)
-            }
-          end
+          app = defaults.has_key?(:controller) ?
+            ActiveSupport::Inflector.constantize("#{defaults[:controller].camelize}Controller") :
+            DynamicController
 
           @set.add_route(app, {
             :path => path,
