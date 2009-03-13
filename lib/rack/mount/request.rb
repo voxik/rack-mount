@@ -6,11 +6,11 @@ module Rack
       end
 
       def method
-        @method ||= @env["REQUEST_METHOD"]
+        @method ||= @env["REQUEST_METHOD"] || "GET"
       end
 
       def path
-        @path ||= @env["PATH_INFO"]
+        @path ||= @env["PATH_INFO"] || "/"
       end
 
       def first_segment

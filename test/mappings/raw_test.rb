@@ -36,7 +36,17 @@ class RawApiTest < Test::Unit::TestCase
   Routes.add_route(:path => ":controller/:action/:id", :app => DefaultController)
   Routes.add_route(:path => ":controller/:action/:id.:format", :app => DefaultController)
 
+  Routes.freeze
+
   def setup
     @app = Routes
+  end
+
+  def test_ensure_routeset_needs_to_be_frozen
+    set = Rack::Mount::RouteSet.new
+    assert_raise(RuntimeError) { set.call({}) }
+
+    set.freeze
+    assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 end

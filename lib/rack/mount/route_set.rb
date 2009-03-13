@@ -19,6 +19,8 @@ module Rack
       end
 
       def call(env)
+        raise "route set not finalized" unless frozen?
+
         env_str = Request.new(env)
         keys = @keys.map { |key| env_str.send(key) }
         @root[*keys].each do |route|
@@ -30,7 +32,6 @@ module Rack
 
       def freeze
         @root.freeze
-
         super
       end
 
