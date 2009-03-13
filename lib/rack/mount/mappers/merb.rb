@@ -97,9 +97,8 @@ module Rack
           if params.has_key?(:controller)
             app = ActiveSupport::Inflector.camelize("#{params[:controller]}Controller")
             app = ActiveSupport::Inflector.constantize(app)
-            new_options[:app] = app
           else
-            new_options[:app] = lambda { |env|
+            app = lambda { |env|
               app = ActiveSupport::Inflector.camelize("#{env["rack.routing_args"][:controller]}Controller")
               app = ActiveSupport::Inflector.constantize(app)
               app.call(env)
@@ -107,10 +106,10 @@ module Rack
           end
 
           if deferred_procs.any?
-            new_options[:app] = DeferredProc.new(new_options[:app], deferred_procs.first)
+            app = DeferredProc.new(app, deferred_procs.first)
           end
 
-          @set.add_route(new_options)
+          @set.add_route(app, new_options)
         end
       end
     end

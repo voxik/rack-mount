@@ -11,8 +11,8 @@ module Rack
         @root = NestedSet.new
       end
 
-      def add_route(options = {})
-        route = Route.new(options)
+      def add_route(app, options = {})
+        route = Route.new(app, options)
         keys = @keys.map { |key| route.send(key) }
         @root[*keys] = route
         route

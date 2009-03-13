@@ -9,9 +9,13 @@ module Rack
 
       attr_reader :path, :method
 
-      def initialize(options)
-        @app = options.delete(:app)
-        raise ArgumentError unless @app && @app.respond_to?(:call)
+      def initialize(app, options)
+        @app = app
+
+        unless @app.respond_to?(:call)
+          raise ArgumentError, 'app must be a valid rack application' +
+            ' and respond to call'
+        end
 
         method = options.delete(:method)
         @method = method.to_s.upcase if method

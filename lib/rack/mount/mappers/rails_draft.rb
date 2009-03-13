@@ -82,8 +82,7 @@ module Rack
             }
           end
 
-          @set.add_route({
-            :app => app,
+          @set.add_route(app, {
             :path => path,
             :method => method,
             :requirements => requirements,
