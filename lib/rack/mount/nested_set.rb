@@ -1,10 +1,8 @@
 module Rack
   module Mount
     class NestedSet < Hash
-      class Bucket < Array
-        def [](key)
-          raise ArgumentError, "no random access"
-        end
+      class List < Array
+        undef :[], :[]=
 
         def freeze
           each { |e| e.freeze }
@@ -12,7 +10,7 @@ module Rack
         end
       end
 
-      def initialize(default = Bucket.new)
+      def initialize(default = List.new)
         super(default)
       end
 
@@ -33,7 +31,7 @@ module Rack
           if keys.empty?
             self << value
           else
-            self.default = NestedSet.new(default) if default.is_a?(Bucket)
+            self.default = NestedSet.new(default) if default.is_a?(List)
             values_with_default.each do |v|
               v[*keys] = value
             end
@@ -42,7 +40,7 @@ module Rack
           if keys.empty?
             v << value
           else
-            v = NestedSet.new(v) if v.is_a?(Bucket)
+            v = NestedSet.new(v) if v.is_a?(List)
             v[*keys] = value
           end
           super(key, v)
