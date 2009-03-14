@@ -37,6 +37,8 @@ class MerbApiTest < Test::Unit::TestCase
     match("foo/bar").to(:controller => "foo_bar", :action => "index")
     match("/baz").to(:controller => "baz", :action => "index")
 
+    match("/optional/index(.:format)").to(:controller => "optional")
+
     match(%r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)}, :action => "[1]", :id => "[2]").to(:controller => "foo")
 
     match("defer").defer_to do |request, params|
@@ -55,6 +57,18 @@ class MerbApiTest < Test::Unit::TestCase
   def setup
     @app = Router
   end
+
+  # def test_optional_route
+  #   get "/optional/index"
+  #   assert env
+  #   assert_equal("GET", env["REQUEST_METHOD"])
+  #   assert_equal({}, env["rack.routing_args"])
+  # 
+  #   get "/optional/index.xml"
+  #   assert env
+  #   assert_equal("GET", env["REQUEST_METHOD"])
+  #   assert_equal({}, env["rack.routing_args"])
+  # end
 
   def test_regexp
     get "/regexp/foo/bar/123"
