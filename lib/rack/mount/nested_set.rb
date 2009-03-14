@@ -17,50 +17,49 @@ module Rack
       alias_method :at, :[]
 
       def []=(*args)
-        args.flatten!
-        value = args.pop
-        key   = args.shift
-        keys  = args
+        args  = args.flatten
+        value = args.pop.freeze
+        key   = args.shift.freeze
+        keys  = args.freeze
 
         raise ArgumentError, "missing value" unless value
-
-        v = at(key)
-        v = v.dup if v.equal?(default)
 
         if key.nil?
           if keys.empty?
             self << value
           else
             self.default = NestedSet.new(default) if default.is_a?(List)
+
             values_with_default.each do |v|
-              v[*keys] = value
+              v[keys.dup] = value
             end
           end
         else
+          v = at(key)
+          v = v.dup if v.equal?(default)
+
           if keys.empty?
             v << value
           else
             v = NestedSet.new(v) if v.is_a?(List)
-            v[*keys] = value
+            v[keys.dup] = value
           end
+
           super(key, v)
         end
       end
 
       def [](*keys)
-        padded_keys = keys.flatten + ([nil] * 10)
-        padded_keys.inject(self) do |b, k|
-          if b.is_a?(Array)
-            return b
-          else
-            b.at(k)
-          end
+        result, i = self, 0
+        until result.is_a?(Array)
+          result = result.at(keys[i])
+          i += 1
         end
+        result
       end
 
       def <<(value)
-        default << value
-        values.each { |e| e << value }
+        values_with_default.each { |e| e << value }
         nil
       end
 
