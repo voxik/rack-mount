@@ -15,48 +15,31 @@ module Rack
           super(str)
         end
 
-        def segment_keys
-          segments.join.split("/").map { |segment|
-            if segment == "" || segment =~ PARAM_REGEXP || segment =~ GLOB_REGEXP
-              nil
-            else
-              segment
-            end
-          }
-        end
-
-        def segments
-          @segments ||= scan(SEGMENT_REGEXP).map! { |segment|
-            next if segment == ""
-            Regexp.escape(segment)
-          }.compact
-        end
-
         def to_regexp
           @regexp ||= begin
-            re = segments.map { |segment|
+            names = []
+
+            re = scan(SEGMENT_REGEXP).map { |segment|
+              next if segment == ""
+              segment = Regexp.escape(segment)
+
               if segment =~ PARAM_REGEXP
+                names << $1
                 "(#{@requirements[$1.to_sym] || "[^#{SEPARATORS.join}]+"})"
               elsif segment =~ GLOB_REGEXP
+                names << $1
                 "(.*)"
               else
                 segment
               end
             }.compact.join
-            Regexp.compile("^#{re}$")
+
+            RegexpWithNamedGroups.new("^#{re}$", names)
           end
         end
 
         def names
-          @names ||= begin
-            segments.map { |segment|
-              if segment =~ PARAM_REGEXP
-                $1.to_sym
-              elsif segment =~ GLOB_REGEXP
-                $1.to_sym
-              end
-            }.compact
-          end
+          to_regexp.names
         end
 
         private

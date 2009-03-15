@@ -1,8 +1,9 @@
 module Rack
   module Mount
     class Route
-      autoload :SegmentRegexp, 'rack/mount/route/segment_regexp'
+      autoload :RegexpWithNamedGroups, 'rack/mount/route/regexp_with_named_groups'
       autoload :SegmentString, 'rack/mount/route/segment_string'
+      autoload :Utils, 'rack/mount/route/utils'
 
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
       HTTP_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE"]
@@ -28,14 +29,13 @@ module Rack
         @requirements = options.delete(:requirements).freeze
         @defaults = (options.delete(:defaults) || {}).freeze
 
-        segment = @path.is_a?(Regexp) ?
-          SegmentRegexp.new(@path, @requirements) :
+        recognizer = @path.is_a?(Regexp) ?
+          RegexpWithNamedGroups.new(@path, @requirements) :
           SegmentString.new(@path, @requirements)
 
-        # Mark as dynamic only if the first segment is dynamic
-        @segment_keys = segment.segment_keys
-        @recognizer = segment.to_regexp
-        @params = segment.names.map { |n| n.to_sym }
+        @recognizer = recognizer.to_regexp
+        @segment_keys = Utils.extract_static_segments(@recognizer)
+        @params = @recognizer.names.map { |n| n.to_sym }
       end
 
       def url_for(options = {})
@@ -47,11 +47,11 @@ module Rack
       end
 
       def first_segment
-        @segment_keys[1]
+        @segment_keys[0]
       end
 
       def second_segment
-        @segment_keys[2]
+        @segment_keys[1]
       end
 
       def to_s
