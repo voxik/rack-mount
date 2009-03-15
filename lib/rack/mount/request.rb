@@ -25,7 +25,7 @@ module Rack
 
       private
         def split_segments!
-          _, @first_segment, @second_segment = path.split("/")
+          _, @first_segment, @second_segment = path.split(%r{/|\.|\?})
         end
     end
   end

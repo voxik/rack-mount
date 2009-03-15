@@ -2,7 +2,6 @@ module Rack
   module Mount
     class Route
       autoload :RegexpWithNamedGroups, 'rack/mount/route/regexp_with_named_groups'
-      autoload :SegmentString, 'rack/mount/route/segment_string'
       autoload :Utils, 'rack/mount/route/utils'
 
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
@@ -31,7 +30,7 @@ module Rack
 
         recognizer = @path.is_a?(Regexp) ?
           RegexpWithNamedGroups.new(@path, @requirements) :
-          SegmentString.new(@path, @requirements)
+          Utils.convert_segment_string_to_regexp(@path, @requirements)
 
         @recognizer = recognizer.to_regexp
         @segment_keys = Utils.extract_static_segments(@recognizer)
