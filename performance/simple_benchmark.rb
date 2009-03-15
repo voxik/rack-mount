@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'rack/mount'
+require 'rack/mount/mappers/rails_classic'
 
-FooController = lambda { |env|
-  [200, {"Content-Type" => "text/html"}, []]
-}
+Response = [200, {"Content-Type" => "text/plain"}, []]
+EchoApp = lambda { |env| Response }
 
 def Object.const_missing(name)
   if name.to_s =~ /Controller$/
-    FooController
+    EchoApp
   else
     super
   end
@@ -28,8 +28,7 @@ Env = {
   "PATH_INFO" => "/zz/1"
 }
 
-Routes = Rack::Mount::RouteSet.new(:compactor => false)
-Routes.draw(&Map)
+Routes = Rack::Mount::RouteSet.new.draw(&Map)
 
 require 'benchmark'
 
