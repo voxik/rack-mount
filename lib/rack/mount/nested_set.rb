@@ -18,7 +18,7 @@ module Rack
 
       def []=(*args)
         args  = args.flatten
-        value = args.pop.freeze
+        value = args.pop
         key   = args.shift.freeze
         keys  = args.freeze
 
