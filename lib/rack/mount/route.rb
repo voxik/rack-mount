@@ -7,7 +7,7 @@ module Rack
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
       HTTP_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE"]
 
-      attr_reader :path, :method
+      attr_reader :name, :path, :method
 
       def initialize(app, options)
         @app = app
@@ -15,6 +15,10 @@ module Rack
         unless @app.respond_to?(:call)
           raise ArgumentError, 'app must be a valid rack application' +
             ' and respond to call'
+        end
+
+        if name = options.delete(:name)
+          @name = name.to_sym
         end
 
         method = options.delete(:method)
@@ -32,6 +36,14 @@ module Rack
         @segments_keys = segment.segments_keys
         @recognizer = segment.recognizer
         @params = segment.params
+      end
+
+      def url_for(options = {})
+        path = "/#{@path}"
+        @params.each do |param|
+          path.sub!(":#{param}", options[param.to_sym])
+        end
+        path
       end
 
       def first_segment

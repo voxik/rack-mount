@@ -34,6 +34,8 @@ module Rack
             method = conditions.delete(:method)
           end
 
+          name = options.delete(:name)
+
           requirements = options.delete(:requirements) || {}
           defaults = {}
           options.each do |k, v|
@@ -49,6 +51,7 @@ module Rack
             DynamicController
 
           @set.add_route(app, {
+            :name => name,
             :path => path,
             :method => method,
             :requirements => requirements,
@@ -57,6 +60,7 @@ module Rack
         end
 
         def add_named_route(name, path, options = {})
+          options[:name] = name
           add_route(path, options)
         end
       end

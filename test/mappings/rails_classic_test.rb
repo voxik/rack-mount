@@ -62,6 +62,12 @@ class RailsClassicApiTest < Test::Unit::TestCase
     assert_nil env
   end
 
+  def test_url_for
+    assert_equal "/login", @app.url_for(:login)
+    assert_equal "/logout", @app.url_for(:logout)
+    assert_equal "/geocode/60622", @app.url_for(:geocode, :postalcode => "60622")
+  end
+
   def test_worst_case
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more

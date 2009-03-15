@@ -8,6 +8,7 @@ module Rack
       def initialize(options = {}, &block)
         @options = DEFAULT_OPTIONS.dup.merge!(options)
         @keys = @options.delete(:keys)
+        @named_routes = {}
         @root = NestedSet.new
 
         if block_given?
@@ -20,7 +21,12 @@ module Rack
         route = Route.new(app, options)
         keys = @keys.map { |key| route.send(key) }
         @root[*keys] = route
+        @named_routes[route.name] = route if route.name
         route
+      end
+
+      def url_for(named_route, options = {})
+        @named_routes[named_route.to_sym].url_for(options)
       end
 
       def call(env)
