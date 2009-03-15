@@ -33,9 +33,9 @@ module Rack
           SegmentString.new(@path, @requirements)
 
         # Mark as dynamic only if the first segment is dynamic
-        @segments_keys = segment.segments_keys
+        @segment_keys = segment.segment_keys
         @recognizer = segment.to_regexp
-        @params = segment.names
+        @params = segment.names.map { |n| n.to_sym }
       end
 
       def url_for(options = {})
@@ -47,11 +47,11 @@ module Rack
       end
 
       def first_segment
-        @segments_keys[1]
+        @segment_keys[1]
       end
 
       def second_segment
-        @segments_keys[2]
+        @segment_keys[2]
       end
 
       def to_s

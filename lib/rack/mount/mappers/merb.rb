@@ -92,8 +92,11 @@ module Rack
 
           requirements = {}
           conditions.each do |k, v|
-            if v.is_a?(Regexp) || new_options[:path].is_a?(Regexp)
+            if v.is_a?(Regexp)
               requirements[k.to_sym] = conditions.delete(k)
+            elsif new_options[:path].is_a?(Regexp)
+              index = conditions.delete(k)
+              requirements[k.to_sym] = Integer(index.scan(/\d+/)[0])
             end
           end
 

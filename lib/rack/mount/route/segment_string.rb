@@ -15,7 +15,7 @@ module Rack
           super(str)
         end
 
-        def segments_keys
+        def segment_keys
           segments.join.split("/").map { |segment|
             if segment == "" || segment =~ PARAM_REGEXP || segment =~ GLOB_REGEXP
               nil
@@ -57,14 +57,6 @@ module Rack
               end
             }.compact
           end
-        end
-
-        def freeze
-          segments
-          recognizer
-          params
-
-          super
         end
 
         private
