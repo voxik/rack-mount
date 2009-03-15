@@ -72,6 +72,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
-    assert_equal 39, Routes.worst_case
+    assert_equal 39, Routes.height
+    assert_equal ":controller/:action/:id.:format", Routes.deepest_node.path
   end
 end

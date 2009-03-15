@@ -76,10 +76,12 @@ module Rack
         super
       end
 
-      def depth
-        values_with_default.map { |v|
-          v.is_a?(NestedSet) ? v.depth : v.length
-        }.max { |a, b| a <=> b }
+      def deepest_node
+        longest_list_descendant.last
+      end
+
+      def height
+        longest_list_descendant.length
       end
 
       def to_graph
@@ -97,6 +99,26 @@ module Rack
 
         g
       end
+
+      protected
+        def list_descendants
+          descendants = []
+          values_with_default.each do |v|
+            if v.is_a?(NestedSet)
+              v.list_descendants.each do |descendant|
+                descendants << descendant
+              end
+            else
+              descendants << v
+            end
+          end
+          descendants
+        end
+
+      private
+        def longest_list_descendant
+          list_descendants.max { |a, b| a.length <=> b.length }
+        end
     end
   end
 end

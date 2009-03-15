@@ -46,8 +46,12 @@ module Rack
         super
       end
 
-      def worst_case
-        @root.depth
+      def deepest_node
+        @root.deepest_node
+      end
+
+      def height
+        @root.height
       end
 
       def to_graph
