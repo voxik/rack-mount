@@ -17,8 +17,10 @@ module Rack
 
         def params
           @params ||= begin
-            @requirements.sort { |a,b|
-              a[1].to_i <=> b[1].to_i
+            @requirements.sort { |a, b|
+              a = Integer(a[1].gsub(/(^\[|\]$)/, ""))
+              b = Integer(b[1].gsub(/(^\[|\]$)/, ""))
+              a <=> b
             }.transpose[0]
           end
         end
