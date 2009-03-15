@@ -32,8 +32,8 @@ module Rack
           }.compact
         end
 
-        def recognizer
-          @recognizer ||= begin
+        def to_regexp
+          @regexp ||= begin
             re = segments.map { |segment|
               if segment =~ PARAM_REGEXP
                 "(#{@requirements[$1.to_sym] || "[^#{SEPARATORS.join}]+"})"
@@ -47,8 +47,8 @@ module Rack
           end
         end
 
-        def params
-          @params ||= begin
+        def names
+          @names ||= begin
             segments.map { |segment|
               if segment =~ PARAM_REGEXP
                 $1.to_sym

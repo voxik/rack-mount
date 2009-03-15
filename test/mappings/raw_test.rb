@@ -8,6 +8,15 @@ class RawApiTest < Test::Unit::TestCase
     @app = BasicSet
   end
 
+  if RUBY_VERSION >= '1.9'
+    def test_named_regexp_groups
+      get "/ruby19/foo/1"
+      assert env
+      assert_equal("GET", env["REQUEST_METHOD"])
+      assert_equal({ :action => "foo", :id => "1" }, env["rack.routing_args"])
+    end
+  end
+
   def test_ensure_routeset_needs_to_be_frozen
     set = Rack::Mount::RouteSet.new
     assert_raise(RuntimeError) { set.call({}) }

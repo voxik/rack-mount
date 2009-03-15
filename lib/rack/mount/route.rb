@@ -34,8 +34,8 @@ module Rack
 
         # Mark as dynamic only if the first segment is dynamic
         @segments_keys = segment.segments_keys
-        @recognizer = segment.recognizer
-        @params = segment.params
+        @recognizer = segment.to_regexp
+        @params = segment.names
       end
 
       def url_for(options = {})

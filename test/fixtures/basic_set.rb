@@ -27,6 +27,11 @@ BasicSet = Rack::Mount::RouteSet.new do |set|
 
   set.add_route(EchoApp, :path => "files/*files", :defaults => { :controller => "files", :action => "index" })
 
+  if RUBY_VERSION >= '1.9'
+    regexp = eval('/\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)/')
+    set.add_route(EchoApp, :path => regexp)
+  end
+
   set.add_route(EchoApp, :path => ":controller/:action/:id")
   set.add_route(EchoApp, :path => ":controller/:action/:id.:format")
 end
