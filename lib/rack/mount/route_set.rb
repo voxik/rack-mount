@@ -5,10 +5,15 @@ module Rack
         :keys => [:method, :first_segment]
       }.freeze
 
-      def initialize(options = {})
+      def initialize(options = {}, &block)
         @options = DEFAULT_OPTIONS.dup.merge!(options)
         @keys = @options.delete(:keys)
         @root = NestedSet.new
+
+        if block_given?
+          block.call(self)
+          freeze
+        end
       end
 
       def add_route(app, options = {})
