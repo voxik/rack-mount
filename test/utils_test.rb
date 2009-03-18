@@ -15,22 +15,40 @@ class SegmentStringTest < Test::Unit::TestCase
     assert_equal [], re.names
   end
 
-  def test_string_with_dynamic_segments
+  def test_dynamic_segments
     re = convert_segment_string_to_regexp("/foo/:action/:id")
     assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re.to_regexp
     assert_equal ['action', 'id'], re.names
   end
 
-  def test_string_with_requirements
+  def test_requirements
     re = convert_segment_string_to_regexp("/foo/:action/:id", :action => /bar|baz/, :id => /[a-z0-9]+/)
     assert_equal %r{^/foo/((?-mix:bar|baz))/((?-mix:[a-z0-9]+))$}, re.to_regexp
     assert_equal ['action', 'id'], re.names
   end
 
-  def test_string_with_period_separator
+  def test_period_separator
     re = convert_segment_string_to_regexp("/foo/:id.:format")
     assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re.to_regexp
     assert_equal ['id', 'format'], re.names
+  end
+
+  def test_optional_segment
+    re = convert_segment_string_to_regexp("/people(.:format)")
+    assert_equal %r{^/people\.?([^/.?]+)?$}, re.to_regexp
+    assert_equal ['format'], re.names
+  end
+
+  def test_dynamic_and_optional_segment
+    re = convert_segment_string_to_regexp("/people/:id(.:format)")
+    assert_equal %r{^/people/([^/.?]+)\.?([^/.?]+)?$}, re.to_regexp
+    assert_equal ['id', 'format'], re.names
+  end
+
+  def test_glob
+    re = convert_segment_string_to_regexp("/files/*files")
+    assert_equal %r{^/files/(.*)$}, re.to_regexp
+    assert_equal ['files'], re.names
   end
 end
 

@@ -2,33 +2,42 @@ module Rack
   module Mount
     class Route
       module Utils
-        SEPARATORS   = %w( / . ? )
+        SEPARATORS = %w( / . ? )
+        ESCAPED_SEPARATORS = SEPARATORS.map { |s| Regexp.escape(s) }
+
         PARAM_REGEXP = /^:(\w+)$/
-        GLOB_REGEXP  = /^\\\*(\w+)$/
-        SEGMENT_REGEXP = /[^\/\.\?]+|[\/\.\?]/
+        GLOB_REGEXP = /\/\\\*(\w+)$/
+        OPTIONAL_SEGMENT_REGEX = /^.*(\(.+\))$/
+        SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
         def convert_segment_string_to_regexp(str, requirements = {})
           raise ArgumentError unless str.is_a?(String)
 
-          str = str.dup
+          str = Regexp.escape(str.dup)
           requirements = requirements || {}
           str.replace("/#{str}") unless str =~ /^\//
+
+          re = ""
           names = []
 
-          re = str.scan(SEGMENT_REGEXP).map { |segment|
-            next if segment == ""
-            segment = Regexp.escape(segment)
+          while m = (str.match(SEGMENT_REGEXP))
+            re << m.pre_match unless m.pre_match.empty?
+            re << "(#{requirements[$2.to_sym] || "[^#{SEPARATORS.join}]+"})"
+            names << $2
+            str = m.post_match
+          end
 
-            if segment =~ PARAM_REGEXP
-              names << $1
-              "(#{requirements[$1.to_sym] || "[^#{SEPARATORS.join}]+"})"
-            elsif segment =~ GLOB_REGEXP
-              names << $1
-              "(.*)"
-            else
-              segment
-            end
-          }.compact.join
+          re << str unless str.empty?
+
+          if m = re.match(GLOB_REGEXP)
+            names << $1
+            re.sub!(GLOB_REGEXP, "/(.*)")
+          end
+
+          # Hack in temporary support for optional segments
+          if re =~ /\\\(\\.(.+)\\\)/
+            re.sub!(/\\\(\\.(.+)\\\)/, "\\.?\\1?")
+          end
 
           RegexpWithNamedGroups.new("^#{re}$", names)
         end

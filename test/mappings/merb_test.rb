@@ -58,17 +58,17 @@ class MerbApiTest < Test::Unit::TestCase
     @app = Router
   end
 
-  # def test_optional_route
-  #   get "/optional/index"
-  #   assert env
-  #   assert_equal("GET", env["REQUEST_METHOD"])
-  #   assert_equal({}, env["rack.routing_args"])
-  # 
-  #   get "/optional/index.xml"
-  #   assert env
-  #   assert_equal("GET", env["REQUEST_METHOD"])
-  #   assert_equal({}, env["rack.routing_args"])
-  # end
+  def test_optional_route
+    get "/optional/index"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "optional" }, env["rack.routing_args"])
+
+    get "/optional/index.xml"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "optional", :format => "xml" }, env["rack.routing_args"])
+  end
 
   def test_regexp
     get "/regexp/foo/bar/123"

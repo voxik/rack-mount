@@ -63,7 +63,11 @@ module Rack
 
         if (@method.nil? || method == @method) && path =~ @recognizer
           routing_args, param_matches = {}, $~.captures
-          @params.each_with_index { |p,i| routing_args[p] = param_matches[i] }
+          @params.each_with_index { |p, i|
+            if param_matches[i]
+              routing_args[p] = param_matches[i]
+            end
+          }
           env["rack.routing_args"] = routing_args.merge!(@defaults)
           @app.call(env)
         else
