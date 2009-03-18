@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class SegmentStringTest < Test::Unit::TestCase
-  include Rack::Mount::Route::Utils
+  include Rack::Mount::Utils
 
   def test_simple_string
     re = convert_segment_string_to_regexp("/foo")
@@ -53,7 +53,7 @@ class SegmentStringTest < Test::Unit::TestCase
 end
 
 class RegexpSegmentExtractTest < Test::Unit::TestCase
-  include Rack::Mount::Route::Utils
+  include Rack::Mount::Utils
 
   def test_simple_regexp
     re = %r{^/foo$}

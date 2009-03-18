@@ -1,9 +1,6 @@
 module Rack
   module Mount
     class Route
-      autoload :RegexpWithNamedGroups, 'rack/mount/route/regexp_with_named_groups'
-      autoload :Utils, 'rack/mount/route/utils'
-
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
       HTTP_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE"]
 
