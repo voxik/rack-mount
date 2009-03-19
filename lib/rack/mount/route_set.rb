@@ -2,6 +2,7 @@ module Rack
   module Mount
     class RouteSet
       DEFAULT_OPTIONS = {
+        :optimize => false,
         :keys => [:method, :first_segment]
       }.freeze
 
@@ -10,6 +11,10 @@ module Rack
         @keys = @options.delete(:keys)
         @named_routes = {}
         @root = NestedSet.new
+
+        if @options[:optimize]
+          extend Optimizations::RouteSet
+        end
 
         if block_given?
           block.call(self)
@@ -32,8 +37,7 @@ module Rack
       def call(env)
         raise "route set not finalized" unless frozen?
 
-        env_str = Request.new(env)
-        keys = @keys.map { |key| env_str.send(key) }
+        keys = keys_for(env)
         @root[*keys].each do |route|
           result = route.call(env)
           return result unless result[0] == 404
@@ -57,6 +61,12 @@ module Rack
       def to_graph
         @root.to_graph
       end
+
+      private
+        def keys_for(env)
+          req = Request.new(env)
+          @keys.map { |key| req.send(key) }
+        end
     end
   end
 end

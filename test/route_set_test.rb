@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RawApiTest < Test::Unit::TestCase
+class RouteSetTest < Test::Unit::TestCase
   include TestHelper
   include BasicRecognitionTests
 
@@ -61,5 +61,11 @@ class RawApiTest < Test::Unit::TestCase
     # routes are added to the test fixture.
     assert_equal 14, @app.height
     assert_equal ":controller/:action/:id(.:format)", @app.deepest_node.path
+  end
+end
+
+class OptimizedRouteSetTest < RouteSetTest
+  def setup
+    @app = OptimizedBasicSet
   end
 end
