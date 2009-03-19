@@ -30,14 +30,13 @@ class RailsDraftApiTest < Test::Unit::TestCase
       match '/export/:id/:file',  :to => :export, :as => :export_download, :constraints => { :file => /.*/ }
     end
 
-
     match 'people/:id/update', :to => 'people#update', :as => :update_person
     match '/projects/:project_id/people/:id/update', :to => 'people#update', :as => :update_project_person
 
     match 'articles/:year/:month/:day/:title', :to => "articles#show", :as => :article
 
     namespace :account do
-      resource :subscription, :credit, :credit_card
+      resources :subscription, :credit, :credit_card
     end
 
     controller :articles do
@@ -51,7 +50,6 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match ':access_token', :constraints => { :access_token => /\w{5,5}/ } do
       resources :rooms
     end
-
 
     match 'foo', :to => 'foo#index'
     match 'foo/bar', :to => 'foo_bar#index'
@@ -80,18 +78,6 @@ class RailsDraftApiTest < Test::Unit::TestCase
     assert env
     assert_equal("GET", env["REQUEST_METHOD"])
     assert_equal({ :controller => "articles", :action => "show", :year => "2009", :month => "1", :day => "19", :title => "birthday" }, env["rack.routing_args"])
-  end
-
-  def test_namespaced_resources
-    get "/account/subscription"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "subscription", :action => "index" }, env["rack.routing_args"])
-
-    get "/account/credit"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "credit", :action => "index" }, env["rack.routing_args"])
   end
 
   def test_nested_route

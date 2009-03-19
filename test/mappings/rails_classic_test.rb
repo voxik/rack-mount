@@ -7,10 +7,6 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
   Routes = Rack::Mount::RouteSet.new
   Routes.draw do |map|
-    map.namespace :admin do |admin|
-      admin.resources :accounts
-    end
-
     map.resources :people
 
     map.connect '', :controller => 'homepage'
@@ -33,6 +29,10 @@ class RailsClassicApiTest < Test::Unit::TestCase
       global.export_download "/export/:id/:file",  :action => "export", :file => /.*/
     end
 
+    map.namespace :account do |account|
+      account.resources :subscription, :credit, :credit_card
+    end
+
     map.connect "foo", :controller => "foo", :action => "index"
     map.connect "foo/bar", :controller => "foo_bar", :action => "index"
     map.connect "/baz", :controller => "baz", :action => "index"
@@ -46,21 +46,6 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
   def setup
     @app = Routes
-  end
-
-  def test_namespace
-    get "/admin/accounts"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "admin/accounts", :action => "index" }, env["rack.routing_args"])
-
-    put "/admin/accounts/1"
-    assert env
-    assert_equal("PUT", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "admin/accounts", :action => "update", :id => "1" }, env["rack.routing_args"])
-
-    get "/admin"
-    assert_nil env
   end
 
   def test_url_for

@@ -74,7 +74,10 @@ module Rack
           if to = options.delete(:to)
             controller, action = to.to_s.split("#")
 
-            if defaults[:controller]
+            if controller && action && defaults[:controller]
+              defaults[:controller] = "#{defaults[:controller]}#{controller}"
+              defaults[:action] = action
+            elsif !action && defaults[:controller]
               defaults[:action] = controller if controller
             else
               defaults[:controller] = controller if controller
@@ -95,7 +98,7 @@ module Rack
         end
 
         def controller(controller, &block)
-          @scope_stack.push({:controller => controller})
+          @scope_stack.push(:controller => controller)
           instance_eval(&block)
         ensure
           @scope_stack.pop
@@ -103,7 +106,7 @@ module Rack
 
         def namespace(namespace, &block)
           begin
-            @scope_stack.push(:path => namespace.to_s)
+            @scope_stack.push(:path => namespace.to_s, :controller => "#{namespace}/")
             instance_eval(&block)
           ensure
             @scope_stack.pop
@@ -111,11 +114,6 @@ module Rack
         end
 
         def resources(*entities, &block)
-          options = entities.extract_options!
-          entities.each { |entity| map_resource(entity, options.dup, &block) }
-        end
-
-        def resource(*entities, &block)
           options = entities.extract_options!
           entities.each { |entity| map_resource(entity, options.dup, &block) }
         end

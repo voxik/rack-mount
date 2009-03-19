@@ -170,6 +170,18 @@ module BasicRecognitionTests
     assert_equal({ :controller => "optional", :action => "index", :format => "xml" }, env["rack.routing_args"])
   end
 
+  def test_namespaced_resources
+    get "/account/subscription"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "account/subscription", :action => "index" }, env["rack.routing_args"])
+
+    get "/account/credit"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "account/credit", :action => "index" }, env["rack.routing_args"])
+  end
+
   def test_not_found
     get "/admin/widgets/show/random"
     assert_nil env

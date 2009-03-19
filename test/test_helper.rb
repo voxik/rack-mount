@@ -5,16 +5,11 @@ require 'fixtures'
 
 autoload :BasicRecognitionTests, 'basic_recognition_tests'
 
-module Admin
+module Account
+  extend ControllerConstants
 end
 
-def Object.const_missing(name)
-  if name.to_s =~ /Controller$/
-    EchoApp
-  else
-    super
-  end
-end
+Object.extend(ControllerConstants)
 
 module TestHelper
   private
