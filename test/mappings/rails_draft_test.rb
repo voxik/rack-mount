@@ -31,6 +31,10 @@ class RailsDraftApiTest < Test::Unit::TestCase
     end
 
 
+    namespace :account do
+      resource :subscription, :credit, :credit_card
+    end
+
     controller :articles do
       match 'articles' do
         match ':title', :title => /[a-z]+/, :as => :with_title do
@@ -56,11 +60,23 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match ':controller/:action/:id.:format'
   end
 
+  def test_namespaced_resources
+    get "/account/subscription"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "subscription", :action => "index" }, env["rack.routing_args"])
+
+    get "/account/credit"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "credit", :action => "index" }, env["rack.routing_args"])
+  end
+
   def test_nested_route
     get "/articles/hello/1"
     assert env
     assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1"}, env["rack.routing_args"])
+    assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1" }, env["rack.routing_args"])
   end
 
   def test_nested_resource

@@ -101,7 +101,21 @@ module Rack
           @scope_stack.pop
         end
 
+        def namespace(namespace, &block)
+          begin
+            @scope_stack.push(:path => namespace.to_s)
+            instance_eval(&block)
+          ensure
+            @scope_stack.pop
+          end
+        end
+
         def resources(*entities, &block)
+          options = entities.extract_options!
+          entities.each { |entity| map_resource(entity, options.dup, &block) }
+        end
+
+        def resource(*entities, &block)
           options = entities.extract_options!
           entities.each { |entity| map_resource(entity, options.dup, &block) }
         end
