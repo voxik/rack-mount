@@ -158,6 +158,18 @@ module BasicRecognitionTests
     assert_equal({ :controller => "sessions", :action => "destroy" }, env["rack.routing_args"])
   end
 
+  def test_optional_route
+    get "/optional/index"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "optional", :action => "index" }, env["rack.routing_args"])
+
+    get "/optional/index.xml"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "optional", :action => "index", :format => "xml" }, env["rack.routing_args"])
+  end
+
   def test_not_found
     get "/admin/widgets/show/random"
     assert_nil env

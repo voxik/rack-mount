@@ -25,6 +25,8 @@ BasicSet = Rack::Mount::RouteSet.new do |set|
   set.add_route(EchoApp, :path => "foo/bar", :defaults => { :controller => "foo_bar", :action => "index" })
   set.add_route(EchoApp, :path => "/baz", :defaults => { :controller => "baz", :action => "index" })
 
+  set.add_route(EchoApp, :path => "/optional/index(.:format)", :defaults => { :controller => "optional", :action => "index" })
+
   set.add_route(EchoApp, :path => "files/*files", :defaults => { :controller => "files", :action => "index" })
 
   if RUBY_VERSION >= '1.9'

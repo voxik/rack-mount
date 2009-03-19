@@ -48,6 +48,8 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match 'foo/bar', :to => 'foo_bar#index'
     match '/baz', :to => 'baz#index'
 
+    match '/optional/index(.:format)', :to => 'optional#index'
+
     match 'files/*files', :to => 'files#index'
 
     match ':controller/:action/:id'

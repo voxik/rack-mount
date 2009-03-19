@@ -37,6 +37,8 @@ class RailsClassicApiTest < Test::Unit::TestCase
     map.connect "foo/bar", :controller => "foo_bar", :action => "index"
     map.connect "/baz", :controller => "baz", :action => "index"
 
+    map.connect "/optional/index.:format", :controller => "optional", :action => "index"
+
     map.connect "files/*files", :controller => "files", :action => "index"
 
     map.connect ':controller/:action/:id.:format'
