@@ -3,7 +3,16 @@ require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
 
+autoload :NestedSetGraphing, 'lib/nested_set_graphing'
 autoload :BasicRecognitionTests, 'basic_recognition_tests'
+
+module Rack
+  module Mount
+    class NestedSet < Hash
+      include NestedSetGraphing
+    end
+  end
+end
 
 module Account
   extend ControllerConstants
