@@ -31,6 +31,11 @@ class RailsDraftApiTest < Test::Unit::TestCase
     end
 
 
+    match 'people/:id/update', :to => 'people#update', :as => :update_person
+    match '/projects/:project_id/people/:id/update', :to => 'people#update', :as => :update_project_person
+
+    match 'articles/:year/:month/:day/:title', :to => "articles#show", :as => :article
+
     namespace :account do
       resource :subscription, :credit, :credit_card
     end
@@ -58,6 +63,23 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
     match ':controller/:action/:id'
     match ':controller/:action/:id.:format'
+  end
+
+  def test_misc_routes
+    get "/people/1/update"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "people", :action => "update", :id => "1"}, env["rack.routing_args"])
+
+    get "/projects/1/people/2/update"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :project_id => "1", :controller => "people", :id => "2", :action => "update" }, env["rack.routing_args"])
+
+    get "/articles/2009/1/19/birthday"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "articles", :action => "show", :year => "2009", :month => "1", :day => "19", :title => "birthday" }, env["rack.routing_args"])
   end
 
   def test_namespaced_resources
