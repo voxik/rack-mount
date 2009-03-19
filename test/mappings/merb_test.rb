@@ -7,18 +7,22 @@ class MerbApiTest < Test::Unit::TestCase
 
   Router = Rack::Mount::RouteSet.new
   Router.prepare do
-    match("/people", :method => :get).to(:controller => "people", :action => "index")
-    match("/people", :method => :post).to(:controller => "people", :action => "create")
-    match("/people/new", :method => :get).to(:controller => "people", :action => "new")
-    match("/people/:id/edit", :method => :get).to(:controller => "people", :action => "edit")
-    match("/people/:id", :method => :get).to(:controller => "people", :action => "show")
-    match("/people/:id", :method => :put).to(:controller => "people", :action => "update")
-    match("/people/:id", :method => :delete).to(:controller => "people", :action => "destroy")
+    with(:controller => "people") do
+      match("/people", :method => :get).to(:action => "index")
+      match("/people", :method => :post).to(:action => "create")
+      match("/people/new", :method => :get).to(:action => "new")
+      match("/people/:id/edit", :method => :get).to(:action => "edit")
+      match("/people/:id", :method => :get).to(:action => "show")
+      match("/people/:id", :method => :put).to(:action => "update")
+      match("/people/:id", :method => :delete).to(:action => "destroy")
+    end
 
     match("").to(:controller => "homepage")
 
-    match("geocode/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:controller => "geocode", :action => "show")
-    match("geocode2/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:controller => "geocode", :action => "show")
+    with(:controller => "geocode") do
+      match("geocode/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:action => "show")
+      match("geocode2/:postalcode", :postalcode => /\d{5}(-\d{4})?/).to(:action => "show")
+    end
 
     with(:controller => "sessions") do
       match('/login',  :method => :get).to(:action => "new")
