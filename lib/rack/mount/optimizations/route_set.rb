@@ -3,7 +3,7 @@ module Rack
     module Optimizations
       module RouteSet
         def freeze
-          optimize_call!
+          optimize_call! unless frozen?
 
           super
         end

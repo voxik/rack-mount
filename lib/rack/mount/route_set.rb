@@ -24,6 +24,11 @@ module Rack
 
       def add_route(app, options = {})
         route = Route.new(app, options)
+
+        if @options[:optimize]
+          route.extend Optimizations::Route
+        end
+
         keys = @keys.map { |key| route.send(key) }
         @root[*keys] = route
         @named_routes[route.name] = route if route.name
