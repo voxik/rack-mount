@@ -98,21 +98,6 @@ if RUBY_VERSION < '1.9'
       @app = Router
     end
 
-    def test_regexp
-      get "/regexp/foo/bar/123"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "foo", :action => "bar", :id => "123" }, env["rack.routing_args"])
-
-      get "/regexp/foos/baz/123"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "foo", :action => "baz", :id => "123" }, env["rack.routing_args"])
-
-      get "/regexp/bars/foo/baz"
-      assert_nil env
-    end
-
     def test_defer
       get "/defer"
       assert env

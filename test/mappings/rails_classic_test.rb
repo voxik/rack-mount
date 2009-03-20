@@ -39,6 +39,12 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
     map.connect "/optional/index.:format", :controller => "optional", :action => "index"
 
+    if RUBY_VERSION >= '1.9'
+      map.connect eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}"), :controller => "foo"
+    else
+      map.connect %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :controller => "foo"
+    end
+
     map.connect "files/*files", :controller => "files", :action => "index"
 
     map.connect ':controller/:action/:id.:format'

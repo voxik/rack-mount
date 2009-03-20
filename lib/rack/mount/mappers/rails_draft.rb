@@ -60,6 +60,7 @@ module Rack
           if path.is_a?(Symbol) && scope_options.has_key?(:path)
             defaults[:action] = path.to_s
             path = scope_options[:path]
+          elsif path.is_a?(Regexp)
           else
             scoped_path = @scope_stack.map { |scope| scope[:path] }.compact
             scoped_path << path if path.is_a?(String)

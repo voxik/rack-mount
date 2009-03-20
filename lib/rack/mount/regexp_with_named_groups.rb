@@ -50,11 +50,13 @@ module Rack
           end
         end
 
-        regexp = regexp.source.gsub(/\?:<\w+>/, '')
+        regexp = regexp.source.gsub(/\?:<[^>]+>/, '')
         return Regexp.compile(regexp), names
       end
 
       def initialize(regexp, names = nil)
+        names = nil if names && !names.any?
+
         case names
         when Hash
           @names = []
@@ -66,9 +68,7 @@ module Rack
           regexp, @names = self.class.extract_named_captures(regexp)
         end
 
-        unless @names.any?
-          @names = nil
-        end
+        @names = nil unless @names.any?
 
         if @names
           @named_captures = {}

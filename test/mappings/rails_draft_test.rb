@@ -57,6 +57,12 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
     match '/optional/index(.:format)', :to => 'optional#index'
 
+    if RUBY_VERSION >= '1.9'
+      match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}"), :to => "foo"
+    else
+      match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :to => "foo"
+    end
+
     match 'files/*files', :to => 'files#index'
 
     match ':controller/:action/:id'

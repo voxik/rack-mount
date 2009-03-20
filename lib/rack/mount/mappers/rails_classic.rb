@@ -28,7 +28,7 @@ module Rack
         end
 
         def add_route(path, options = {})
-          path = path.gsub(".:format", "(.:format)")
+          path = path.gsub(".:format", "(.:format)") if path.is_a?(String)
 
           if conditions = options.delete(:conditions)
             method = conditions.delete(:method)

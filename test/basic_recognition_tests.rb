@@ -182,6 +182,21 @@ module BasicRecognitionTests
     assert_equal({ :controller => "account/credit", :action => "index" }, env["rack.routing_args"])
   end
 
+  def test_regexp
+    get "/regexp/foo/bar/123"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "foo", :action => "bar", :id => "123" }, env["rack.routing_args"])
+
+    get "/regexp/foos/baz/123"
+    assert env
+    assert_equal("GET", env["REQUEST_METHOD"])
+    assert_equal({ :controller => "foo", :action => "baz", :id => "123" }, env["rack.routing_args"])
+
+    get "/regexp/bars/foo/baz"
+    assert_nil env
+  end
+
   def test_not_found
     get "/admin/widgets/show/random"
     assert_nil env

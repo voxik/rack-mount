@@ -51,6 +51,8 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, :path => "/optional/index(.:format)", :defaults => { :controller => "optional", :action => "index" })
 
+  set.add_route(EchoApp, :path => %r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)}, :requirements => { :action => 1, :id => 2 }, :defaults => { :controller => "foo" })
+
   set.add_route(EchoApp, :path => "files/*files", :defaults => { :controller => "files", :action => "index" })
 
   if RUBY_VERSION >= '1.9'
