@@ -72,6 +72,24 @@ class RegexpWithNamedGroupsTest < Test::Unit::TestCase
     assert_equal({'name' => [1], 'id' => [3]}, re.named_captures)
     assert_equal(['name', nil, 'id'], re.names)
   end
+
+  if RUBY_VERSION >= '1.9'
+    def test_regexp_with_named_regexp_groups
+      re = eval('%r{/foo/(?<name>[a-z]+)/(?<id>[0-9]+)}')
+      re = RegexpWithNamedGroups.new(re)
+      assert_equal(re, re.to_regexp)
+      assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+      assert_equal(['name', 'id'], re.names)
+    end
+
+    def test_regexp_with_nested_named_regexp_groups
+      re = eval('%r{/foo/(?<name>[a-z]+)(/(?<id>[0-9]+))?}')
+      re = RegexpWithNamedGroups.new(re)
+      assert_equal(re, re.to_regexp)
+      assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+      assert_equal(['name', 'id'], re.names)
+    end
+  end
 end
 
 class SegmentStringTest < Test::Unit::TestCase

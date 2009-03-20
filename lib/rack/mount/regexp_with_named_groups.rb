@@ -63,16 +63,24 @@ module Rack
         self
       end
 
-      def named_captures
-        @named_captures || super
-      rescue NoMethodError
-        {}
+      if RUBY_VERSION >= '1.9'
+        def named_captures
+          @named_captures ||= super
+        end
+      else
+        def named_captures
+          @named_captures ||= {}
+        end
       end
 
-      def names
-        @names || super
-      rescue NoMethodError
-        []
+      if RUBY_VERSION >= '1.9'
+        def names
+          @names ||= super
+        end
+      else
+        def names
+          @names ||= []
+        end
       end
     end
   end
