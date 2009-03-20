@@ -1,5 +1,79 @@
 require 'test_helper'
 
+class RegexpWithNamedGroupsTest < Test::Unit::TestCase
+  RegexpWithNamedGroups = Rack::Mount::RegexpWithNamedGroups
+
+  def test_normal_regexp
+    re = RegexpWithNamedGroups.new(%r{/foo})
+    assert_equal(%r{/foo}, re.to_regexp)
+    assert_equal({}, re.named_captures)
+    assert_equal([], re.names)
+  end
+
+  def test_regexp_with_unnamed_captures
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)/([0-9]+)})
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({}, re.named_captures)
+    assert_equal([], re.names)
+  end
+
+  def test_regexp_with_array_of_captures_string_names
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)/([0-9]+)}, ['name', 'id'])
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+    assert_equal(['name', 'id'], re.names)
+  end
+
+  def test_regexp_with_array_of_captures_symbol_names
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)/([0-9]+)}, [:name, :id])
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+    assert_equal(['name', 'id'], re.names)
+  end
+
+  def test_regexp_with_hash_of_captures_string_names
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)/([0-9]+)}, {'name' => 1, 'id' => 2})
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+    assert_equal(['name', 'id'], re.names)
+  end
+
+  def test_regexp_with_hash_of_captures_symbol_names
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)/([0-9]+)}, {:name => 1, :id => 2})
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+    assert_equal(['name', 'id'], re.names)
+  end
+
+  def test_regexp_with_nested_captures_with_array_of_name_captures
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(/([0-9]+))?}, ['name', nil, 'id'])
+    assert_equal(%r{/foo/([a-z]+)(/([0-9]+))?}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [3]}, re.named_captures)
+    assert_equal(['name', nil, 'id'], re.names)
+  end
+
+  def test_regexp_with_nested_captures_with_hash_of_name_captures
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(/([0-9]+))?}, {'name' => 1, 'id' => 3})
+    assert_equal(%r{/foo/([a-z]+)(/([0-9]+))?}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [3]}, re.named_captures)
+    assert_equal(['name', nil, 'id'], re.names)
+  end
+
+  def test_regexp_with_comment_captures
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(?#:name)/([0-9]+)(?#:id)})
+    assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
+    assert_equal(['name', 'id'], re.names)
+  end
+
+  def test_regexp_with_nested_comment_captures
+    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(?#:name)(/([0-9]+)(?#:id))?})
+    assert_equal(%r{/foo/([a-z]+)(/([0-9]+))?}, re.to_regexp)
+    assert_equal({'name' => [1], 'id' => [3]}, re.named_captures)
+    assert_equal(['name', nil, 'id'], re.names)
+  end
+end
+
 class SegmentStringTest < Test::Unit::TestCase
   include Rack::Mount::Utils
 
