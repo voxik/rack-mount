@@ -7,48 +7,56 @@ class SegmentStringTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp("/foo")
     assert_equal %r{^/foo$}, re.to_regexp
     assert_equal [], re.names
+    assert_equal({}, re.named_captures)
   end
 
   def test_another_simple_string
     re = convert_segment_string_to_regexp("/people/show/1")
     assert_equal %r{^/people/show/1$}, re.to_regexp
     assert_equal [], re.names
+    assert_equal({}, re.named_captures)
   end
 
   def test_dynamic_segments
     re = convert_segment_string_to_regexp("/foo/:action/:id")
     assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re.to_regexp
     assert_equal ['action', 'id'], re.names
+    assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
   end
 
   def test_requirements
     re = convert_segment_string_to_regexp("/foo/:action/:id", :action => /bar|baz/, :id => /[a-z0-9]+/)
     assert_equal %r{^/foo/((?-mix:bar|baz))/((?-mix:[a-z0-9]+))$}, re.to_regexp
     assert_equal ['action', 'id'], re.names
+    assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
   end
 
   def test_period_separator
     re = convert_segment_string_to_regexp("/foo/:id.:format")
     assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re.to_regexp
     assert_equal ['id', 'format'], re.names
+    assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
   end
 
   def test_optional_segment
     re = convert_segment_string_to_regexp("/people(.:format)")
     assert_equal %r{^/people\.?([^/.?]+)?$}, re.to_regexp
     assert_equal ['format'], re.names
+    assert_equal({ 'format' => [1] }, re.named_captures)
   end
 
   def test_dynamic_and_optional_segment
     re = convert_segment_string_to_regexp("/people/:id(.:format)")
     assert_equal %r{^/people/([^/.?]+)\.?([^/.?]+)?$}, re.to_regexp
     assert_equal ['id', 'format'], re.names
+    assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
   end
 
   def test_glob
     re = convert_segment_string_to_regexp("/files/*files")
     assert_equal %r{^/files/(.*)$}, re.to_regexp
     assert_equal ['files'], re.names
+    assert_equal({ 'files' => [1] }, re.named_captures)
   end
 end
 

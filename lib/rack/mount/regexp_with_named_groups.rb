@@ -11,10 +11,21 @@ module Rack
         elsif names.is_a?(Array)
           @names = names.map { |n| n.to_s }
         end
+
+        if @names
+          @named_captures = {}
+          @names.each_with_index { |n, i| @named_captures[n] = [i+1] }
+        end
       end
 
       def to_regexp
         self
+      end
+
+      def named_captures
+        @named_captures || super
+      rescue NoMethodError
+        {}
       end
 
       def names
