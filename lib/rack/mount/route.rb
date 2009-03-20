@@ -21,7 +21,7 @@ module Rack
         method = options.delete(:method)
         @method = method.to_s.upcase if method
 
-        @path = options.delete(:path)
+        @path = options.delete(:path).freeze
         @requirements = options.delete(:requirements).freeze
         @defaults = (options.delete(:defaults) || {}).freeze
 
@@ -30,13 +30,16 @@ module Rack
           Utils.convert_segment_string_to_regexp(@path, @requirements)
 
         @recognizer = recognizer.to_regexp
-        @segment_keys = Utils.extract_static_segments(@recognizer)
+        @segment_keys = Utils.extract_static_segments(@recognizer).freeze
 
-        @params = @recognizer.names.compact.map { |n| n.to_sym }
+        @params = @recognizer.names.compact.map { |n| n.to_sym }.freeze
         @indexed_params = {}
         @recognizer.named_captures.each { |k, v|
           @indexed_params[k.to_sym] = v.last - 1
         }
+        @indexed_params.freeze
+
+        @recognizer.freeze
       end
 
       def url_for(options = {})
