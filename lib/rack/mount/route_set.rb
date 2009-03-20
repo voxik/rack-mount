@@ -37,7 +37,8 @@ module Rack
       def call(env)
         raise "route set not finalized" unless frozen?
 
-        keys = keys_for(env)
+        req = Request.new(env)
+        keys = @keys.map { |key| req.send(key) }
         @root[*keys].each do |route|
           result = route.call(env)
           return result unless result[0] == 404
@@ -61,12 +62,6 @@ module Rack
       def to_graph
         @root.to_graph
       end
-
-      private
-        def keys_for(env)
-          req = Request.new(env)
-          @keys.map { |key| req.send(key) }
-        end
     end
   end
 end

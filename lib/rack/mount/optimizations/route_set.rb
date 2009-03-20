@@ -3,17 +3,22 @@ module Rack
     module Optimizations
       module RouteSet
         def freeze
-          optimize_keys_for!
+          optimize_call!
 
           super
         end
 
         private
-          def optimize_keys_for!
+          def optimize_call!
             instance_eval(<<-EOS, __FILE__, __LINE__)
-              def keys_for(env)
-                req = Rack::Mount::Request.new(env)
-                return #{@keys.map { |key| "req.#{key}" }.join(", ")}
+              def call(env)
+                req = Request.new(env)
+                keys = [#{@keys.map { |key| "req.#{key}" }.join(", ")}]
+                @root[*keys].each do |route|
+                  result = route.call(env)
+                  return result unless result[0] == 404
+                end
+                nil
               end
             EOS
           end
