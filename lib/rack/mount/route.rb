@@ -31,12 +31,13 @@ module Rack
 
         @recognizer = recognizer.to_regexp
         @segment_keys = Utils.extract_static_segments(@recognizer)
-        @params = @recognizer.names.map { |n| n.to_sym }
+        @params = @recognizer.names.map { |n| n && n.to_sym }
       end
 
       def url_for(options = {})
         path = "/#{@path}"
         @params.each do |param|
+          next unless param
           path.sub!(":#{param}", options[param.to_sym])
         end
         path
@@ -61,7 +62,7 @@ module Rack
         if (@method.nil? || method == @method) && path =~ @recognizer
           routing_args, param_matches = {}, $~.captures
           @params.each_with_index { |p, i|
-            if param_matches[i]
+            if p && param_matches[i]
               routing_args[p] = param_matches[i]
             end
           }

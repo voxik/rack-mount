@@ -43,6 +43,7 @@ module Rack
         when Array
           @names = names.map { |n| n && n.to_s }
         else
+          regexp = Regexp.compile(regexp)
           @names = self.class.extract_comment_capture_names(regexp)
           regexp = regexp.source.gsub(/\(\?#:[a-z]+\)/, '')
         end

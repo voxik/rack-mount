@@ -118,7 +118,7 @@ class SegmentStringTest < Test::Unit::TestCase
 
   def test_requirements
     re = convert_segment_string_to_regexp("/foo/:action/:id", :action => /bar|baz/, :id => /[a-z0-9]+/)
-    assert_equal %r{^/foo/((?-mix:bar|baz))/((?-mix:[a-z0-9]+))$}, re.to_regexp
+    assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re.to_regexp
     assert_equal ['action', 'id'], re.names
     assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
   end
@@ -132,16 +132,16 @@ class SegmentStringTest < Test::Unit::TestCase
 
   def test_optional_segment
     re = convert_segment_string_to_regexp("/people(.:format)")
-    assert_equal %r{^/people\.?([^/.?]+)?$}, re.to_regexp
-    assert_equal ['format'], re.names
-    assert_equal({ 'format' => [1] }, re.named_captures)
+    assert_equal %r{^/people(\.([^/.?]+))?$}, re.to_regexp
+    assert_equal [nil, 'format'], re.names
+    assert_equal({ 'format' => [2] }, re.named_captures)
   end
 
   def test_dynamic_and_optional_segment
     re = convert_segment_string_to_regexp("/people/:id(.:format)")
-    assert_equal %r{^/people/([^/.?]+)\.?([^/.?]+)?$}, re.to_regexp
-    assert_equal ['id', 'format'], re.names
-    assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
+    assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, re.to_regexp
+    assert_equal ['id', nil, 'format'], re.names
+    assert_equal({ 'id' => [1], 'format' => [3] }, re.named_captures)
   end
 
   def test_glob

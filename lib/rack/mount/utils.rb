@@ -17,28 +17,30 @@ module Rack
         str.replace("/#{str}") unless str =~ /^\//
 
         re = ""
-        names = []
 
         while m = (str.match(SEGMENT_REGEXP))
           re << m.pre_match unless m.pre_match.empty?
-          re << "(#{requirements[$2.to_sym] || "[^#{SEPARATORS.join}]+"})"
-          names << $2
+          if requirement = requirements[$2.to_sym]
+            re << "(#{requirement.source})"
+          else
+            re << "([^#{SEPARATORS.join}]+)"
+          end
+          re << "(?#:#{$2})"
           str = m.post_match
         end
 
         re << str unless str.empty?
 
         if m = re.match(GLOB_REGEXP)
-          names << $1
-          re.sub!(GLOB_REGEXP, "/(.*)")
+          re.sub!(GLOB_REGEXP, "/(.*)(?#:#{$1})")
         end
 
         # Hack in temporary support for optional segments
-        if re =~ /\\\(\\.(.+)\\\)/
-          re.sub!(/\\\(\\.(.+)\\\)/, "\\.?\\1?")
+        if re =~ /\\\((.+)\\\)/
+          re.sub!(/\\\((.+)\\\)/, "\(\\1\)?")
         end
 
-        RegexpWithNamedGroups.new("^#{re}$", names)
+        RegexpWithNamedGroups.new("^#{re}$")
       end
       module_function :convert_segment_string_to_regexp
 
