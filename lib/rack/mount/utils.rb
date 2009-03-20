@@ -35,7 +35,7 @@ module Rack
           re.sub!(GLOB_REGEXP, "/(.*)(?#:#{$1})")
         end
 
-        # Hack in temporary support for optional segments
+        # Hack in temporary support for one level of optional segments
         if re =~ /\\\((.+)\\\)/
           re.sub!(/\\\((.+)\\\)/, "\(\\1\)?")
         end

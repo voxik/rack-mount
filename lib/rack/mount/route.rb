@@ -31,14 +31,18 @@ module Rack
 
         @recognizer = recognizer.to_regexp
         @segment_keys = Utils.extract_static_segments(@recognizer)
-        @params = @recognizer.names.map { |n| n && n.to_sym }
+
+        @params = @recognizer.names.compact.map { |n| n.to_sym }
+        @indexed_params = {}
+        @recognizer.named_captures.each { |k, v|
+          @indexed_params[k.to_sym] = v.last - 1
+        }
       end
 
       def url_for(options = {})
         path = "/#{@path}"
         @params.each do |param|
-          next unless param
-          path.sub!(":#{param}", options[param.to_sym])
+          path.sub!(":#{param}", options[param])
         end
         path
       end
@@ -61,9 +65,9 @@ module Rack
 
         if (@method.nil? || method == @method) && path =~ @recognizer
           routing_args, param_matches = {}, $~.captures
-          @params.each_with_index { |p, i|
-            if p && param_matches[i]
-              routing_args[p] = param_matches[i]
+          @indexed_params.each { |k, i|
+            if v = param_matches[i]
+              routing_args[k] = v
             end
           }
           env["rack.routing_args"] = routing_args.merge!(@defaults)
