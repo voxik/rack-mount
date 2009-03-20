@@ -60,14 +60,14 @@ class RegexpWithNamedGroupsTest < Test::Unit::TestCase
   end
 
   def test_regexp_with_comment_captures
-    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(?#:name)/([0-9]+)(?#:id)})
+    re = RegexpWithNamedGroups.new(%r{/foo/(?:<name>[a-z]+)/(?:<id>[0-9]+)})
     assert_equal(%r{/foo/([a-z]+)/([0-9]+)}, re.to_regexp)
     assert_equal({'name' => [1], 'id' => [2]}, re.named_captures)
     assert_equal(['name', 'id'], re.names)
   end
 
   def test_regexp_with_nested_comment_captures
-    re = RegexpWithNamedGroups.new(%r{/foo/([a-z]+)(?#:name)(/([0-9]+)(?#:id))?})
+    re = RegexpWithNamedGroups.new(%r{/foo/(?:<name>[a-z]+)(/(?:<id>[0-9]+))?})
     assert_equal(%r{/foo/([a-z]+)(/([0-9]+))?}, re.to_regexp)
     assert_equal({'name' => [1], 'id' => [3]}, re.named_captures)
     assert_equal(['name', nil, 'id'], re.names)
@@ -111,42 +111,77 @@ class SegmentStringTest < Test::Unit::TestCase
 
   def test_dynamic_segments
     re = convert_segment_string_to_regexp("/foo/:action/:id")
-    assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re.to_regexp
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}"), re.to_regexp
+    else
+      assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re.to_regexp
+    end
     assert_equal ['action', 'id'], re.names
     assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
   end
 
   def test_requirements
     re = convert_segment_string_to_regexp("/foo/:action/:id", :action => /bar|baz/, :id => /[a-z0-9]+/)
-    assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re.to_regexp
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/foo/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}"), re.to_regexp
+    else
+      assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re.to_regexp
+    end
     assert_equal ['action', 'id'], re.names
     assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
   end
 
   def test_period_separator
     re = convert_segment_string_to_regexp("/foo/:id.:format")
-    assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re.to_regexp
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/foo/(?<id>[^/.?]+)\\.(?<format>[^/.?]+)$}"), re.to_regexp
+    else
+      assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re.to_regexp
+    end
     assert_equal ['id', 'format'], re.names
     assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
   end
 
   def test_optional_segment
     re = convert_segment_string_to_regexp("/people(.:format)")
-    assert_equal %r{^/people(\.([^/.?]+))?$}, re.to_regexp
-    assert_equal [nil, 'format'], re.names
-    assert_equal({ 'format' => [2] }, re.named_captures)
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re.to_regexp
+      assert_equal ['format'], re.names
+      assert_equal({ 'format' => [1] }, re.named_captures)
+    else
+      assert_equal %r{^/people(\.([^/.?]+))?$}, re.to_regexp
+      assert_equal [nil, 'format'], re.names
+      assert_equal({ 'format' => [2] }, re.named_captures)
+    end
   end
 
   def test_dynamic_and_optional_segment
     re = convert_segment_string_to_regexp("/people/:id(.:format)")
-    assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, re.to_regexp
-    assert_equal ['id', nil, 'format'], re.names
-    assert_equal({ 'id' => [1], 'format' => [3] }, re.named_captures)
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re.to_regexp
+      assert_equal ['id', 'format'], re.names
+      assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
+    else
+      assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, re.to_regexp
+      assert_equal ['id', nil, 'format'], re.names
+      assert_equal({ 'id' => [1], 'format' => [3] }, re.named_captures)
+    end
   end
 
   def test_glob
     re = convert_segment_string_to_regexp("/files/*files")
-    assert_equal %r{^/files/(.*)$}, re.to_regexp
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal eval("%r{^/files/(?<files>.*)$}"), re.to_regexp
+    else
+      assert_equal %r{^/files/(.*)$}, re.to_regexp
+    end
+
     assert_equal ['files'], re.names
     assert_equal({ 'files' => [1] }, re.named_captures)
   end

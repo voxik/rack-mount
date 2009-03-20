@@ -3,6 +3,7 @@ require 'strscan'
 module Rack
   module Mount
     class RegexpWithNamedGroups < Regexp
+      # Old parser that extracted named captures from comments
       def self.extract_comment_capture_names(regexp)
         names, scanner, last_close = [], StringScanner.new(regexp.source), nil
 
@@ -32,7 +33,25 @@ module Rack
           end
         end
 
-        return names
+        regexp = regexp.source.gsub(/\(\?#:[a-z]+\)/, '')
+        return Regexp.compile(regexp), names
+      end
+
+      def self.extract_named_captures(regexp)
+        names, scanner = [], StringScanner.new(regexp.source)
+
+        while scanner.skip_until(/\(/)
+          next if scanner.pre_match =~ /\\$/
+
+          if scanner.scan(/\?:<([^>]+)>/)
+            names << scanner[1]
+          else
+            names << nil
+          end
+        end
+
+        regexp = regexp.source.gsub(/\?:<\w+>/, '')
+        return Regexp.compile(regexp), names
       end
 
       def initialize(regexp, names = nil)
@@ -44,8 +63,7 @@ module Rack
           @names = names.map { |n| n && n.to_s }
         else
           regexp = Regexp.compile(regexp)
-          @names = self.class.extract_comment_capture_names(regexp)
-          regexp = regexp.source.gsub(/\(\?#:[a-z]+\)/, '')
+          regexp, @names = self.class.extract_named_captures(regexp)
         end
 
         unless @names.any?

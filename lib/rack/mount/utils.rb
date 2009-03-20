@@ -9,6 +9,12 @@ module Rack
       OPTIONAL_SEGMENT_REGEX = /^.*(\(.+\))$/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
+      if RUBY_VERSION >= '1.9'
+        NAMED_CAPTURE = "(?<%s>%s)"
+      else
+        NAMED_CAPTURE = "(?:<%s>%s)"
+      end
+
       def convert_segment_string_to_regexp(str, requirements = {})
         raise ArgumentError unless str.is_a?(String)
 
@@ -21,18 +27,17 @@ module Rack
         while m = (str.match(SEGMENT_REGEXP))
           re << m.pre_match unless m.pre_match.empty?
           if requirement = requirements[$2.to_sym]
-            re << "(#{requirement.source})"
+            re << NAMED_CAPTURE % [$2, requirement.source]
           else
-            re << "([^#{SEPARATORS.join}]+)"
+            re << NAMED_CAPTURE % [$2, "[^#{SEPARATORS.join}]+"]
           end
-          re << "(?#:#{$2})"
           str = m.post_match
         end
 
         re << str unless str.empty?
 
         if m = re.match(GLOB_REGEXP)
-          re.sub!(GLOB_REGEXP, "/(.*)(?#:#{$1})")
+          re.sub!(GLOB_REGEXP, "/#{NAMED_CAPTURE % [$1, ".*"]}")
         end
 
         # Hack in temporary support for one level of optional segments
