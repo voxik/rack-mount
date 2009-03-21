@@ -4,7 +4,6 @@ module Rack
       module Route
         def freeze
           optimize_call! unless frozen?
-
           super
         end
 

@@ -2,9 +2,14 @@ module Rack
   module Mount
     module Optimizations
       module RouteSet
+        def add_route(*args)
+          route = super
+          route.extend Optimizations::Route
+          route
+        end
+
         def freeze
           optimize_call! unless frozen?
-
           super
         end
 
