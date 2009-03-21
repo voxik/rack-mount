@@ -2,7 +2,7 @@ require 'rubygems'
 require 'ruby-prof'
 
 require 'rack/mount'
-require 'performance_helper'
+require 'lib/performance_helper'
 require 'fixtures'
 
 Env = {
