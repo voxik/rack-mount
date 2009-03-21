@@ -89,6 +89,8 @@ if RUBY_VERSION < '1.9'
         false
       end
 
+      match(:path => "/referer", :referer => "http://www.google.com/").to(:controller => "search", :action => "index")
+
       match("files/*files").to(:controller => "files", :action => "index")
       match(":controller/:action/:id").to()
       match(":controller/:action/:id.:format").to()
@@ -105,6 +107,16 @@ if RUBY_VERSION < '1.9'
       assert_equal({ :controller => "defer" }, env["rack.routing_args"])
 
       get "/defer_no_match"
+      assert_nil env
+    end
+
+    def test_request_conditions
+      get "/referer", "HTTP_REFERER" => "http://www.google.com/"
+      assert env
+      assert_equal("GET", env["REQUEST_METHOD"])
+      assert_equal({ :controller => "search", :action => "index" }, env["rack.routing_args"])
+
+      get "/referer", "HTTP_REFERER" => "http://www.yahoo.com/"
       assert_nil env
     end
   end

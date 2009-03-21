@@ -26,27 +26,27 @@ module TestHelper
       @env
     end
 
-    def get(path)
-      process(:get, path)
+    def get(path, options = {})
+      process(:get, path, options)
     end
 
-    def post(path)
-      process(:post, path)
+    def post(path, options = {})
+      process(:post, path, options)
     end
 
-    def put(path)
-      process(:put, path)
+    def put(path, options = {})
+      process(:put, path, options)
     end
 
-    def delete(path)
-      process(:delete, path)
+    def delete(path, options = {})
+      process(:delete, path, options)
     end
 
-    def process(method, path)
+    def process(method, path, options = {})
       result = @app.call({
         "REQUEST_METHOD" => method.to_s.upcase,
         "PATH_INFO" => path
-      })
+      }.merge(options))
 
       if result
         @env = YAML.load(result[2][0])

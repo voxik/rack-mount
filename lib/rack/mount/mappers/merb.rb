@@ -62,6 +62,25 @@ module Rack
           end
         end
 
+        class RequestConditions
+          def initialize(app, conditions)
+            @app, @conditions = app, conditions
+          end
+
+          def call(env)
+            # TODO: Change this to a Merb request
+            request = Rack::Request.new(env)
+
+            @conditions.each do |method, expected|
+              unless request.send(method) == expected
+                return Route::SKIP_RESPONSE
+              end
+            end
+
+            @app.call(env)
+          end
+        end
+
         DynamicController = lambda { |env|
           app = ActiveSupport::Inflector.camelize("#{env["rack.routing_args"][:controller]}Controller")
           app = ActiveSupport::Inflector.constantize(app)
@@ -111,6 +130,10 @@ module Rack
 
           if deferred_procs.any?
             app = DeferredProc.new(app, deferred_procs.first)
+          end
+
+          if conditions.any?
+            app = RequestConditions.new(app, conditions)
           end
 
           @set.add_route(app, new_options)
