@@ -9,8 +9,10 @@ module Rack
       def initialize(options = {})
         @options = DEFAULT_OPTIONS.dup.merge!(options)
         @keys = @options.delete(:keys)
+
         @named_routes = {}
-        @root = NestedSet.new
+        @recognition_graph = NestedSet.new
+        @generation_graph = NestedSet.new
 
         if @options[:optimize]
           extend Optimizations::RouteSet
@@ -29,14 +31,31 @@ module Rack
           route.extend Optimizations::Route
         end
 
-        keys = @keys.map { |key| route.send(key) }
-        @root[*keys] = route
         @named_routes[route.name] = route if route.name
+
+        keys = @keys.map { |key| route.send(key) }
+        @recognition_graph[*keys] = route
+
+        controller = route.defaults[:controller]
+        action     = route.defaults[:action]
+        @generation_graph[controller, action] = route
+
         route
       end
 
-      def url_for(named_route, options = {})
-        @named_routes[named_route.to_sym].url_for(options)
+      def url_for(*args)
+        params = args.pop if args.last.is_a?(Hash)
+        named_route = args.shift
+
+        if named_route
+          route = @named_routes[named_route.to_sym]
+        else
+          controller = params[:controller]
+          action     = params[:action]
+          route = @generation_graph[controller, action].first
+        end
+
+        route.url_for(params)
       end
 
       def call(env)
@@ -44,7 +63,7 @@ module Rack
 
         req = Request.new(env)
         keys = @keys.map { |key| req.send(key) }
-        @root[*keys].each do |route|
+        @recognition_graph[*keys].each do |route|
           result = route.call(env)
           return result unless result[0] == 404
         end
@@ -52,20 +71,23 @@ module Rack
       end
 
       def freeze
-        @root.freeze
+        @named_routes.freeze
+        @recognition_graph.freeze
+        @generation_graph.freeze
+
         super
       end
 
       def deepest_node
-        @root.deepest_node
+        @recognition_graph.deepest_node
       end
 
       def height
-        @root.height
+        @recognition_graph.height
       end
 
       def to_graph
-        @root.to_graph
+        @recognition_graph.to_graph
       end
     end
   end

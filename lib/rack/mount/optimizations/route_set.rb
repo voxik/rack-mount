@@ -14,7 +14,7 @@ module Rack
               def call(env)
                 req = Request.new(env)
                 keys = [#{@keys.map { |key| "req.#{key}" }.join(", ")}]
-                @root[*keys].each do |route|
+                @recognition_graph[*keys].each do |route|
                   result = route.call(env)
                   return result unless result[0] == 404
                 end

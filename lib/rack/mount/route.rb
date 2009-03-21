@@ -15,7 +15,7 @@ module Rack
 
       HTTP_METHODS = [HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_DELETE].freeze
 
-      attr_reader :name, :path, :method
+      attr_reader :name, :params, :defaults, :path, :method
 
       def initialize(app, options)
         @app = app
@@ -53,10 +53,10 @@ module Rack
         @recognizer.freeze
       end
 
-      def url_for(options = {})
+      def url_for(params = {})
         path = "/#{@path}"
         @params.each do |param|
-          path.sub!(":#{param}", options[param])
+          path.sub!(":#{param}", params[param])
         end
         path
       end
