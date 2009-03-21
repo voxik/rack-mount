@@ -69,3 +69,13 @@ class OptimizedRouteSetTest < RouteSetTest
     @app = OptimizedBasicSet
   end
 end
+
+class LinearBasicSetTest < RouteSetTest
+  def setup
+    @app = LinearBasicSet
+  end
+
+  def test_worst_case
+    # Skip assertions
+  end
+end
