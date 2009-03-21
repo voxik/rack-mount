@@ -12,13 +12,13 @@ module Rack
           def optimize_call!
             instance_eval(<<-EOS, __FILE__, __LINE__)
               def call(env)
-                method = env["REQUEST_METHOD"]
-                path = env["PATH_INFO"]
+                method = env[HTTP_REQUEST_METHOD]
+                path = env[HTTP_PATH_INFO]
 
                 if #{@method ? "method == @method && " : ""}path =~ @recognizer
                   routing_args, param_matches = {}, $~.captures
                   #{assign_index_params}
-                  env["rack.routing_args"] = routing_args.merge!(@defaults)
+                  env[RACK_ROUTING_ARGS] = routing_args.merge!(@defaults)
                   @app.call(env)
                 else
                   SKIP_RESPONSE

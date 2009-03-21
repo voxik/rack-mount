@@ -2,7 +2,18 @@ module Rack
   module Mount
     class Route
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
-      HTTP_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE"]
+      RACK_ROUTING_ARGS = "rack.routing_args".freeze
+
+      HTTP_REQUEST_METHOD = "REQUEST_METHOD".freeze
+      HTTP_PATH_INFO      = "PATH_INFO".freeze
+
+      HTTP_GET    = "GET".freeze
+      HTTP_HEAD   = "HEAD".freeze
+      HTTP_POST   = "POST".freeze
+      HTTP_PUT    = "PUT".freeze
+      HTTP_DELETE = "DELETE".freeze
+
+      HTTP_METHODS = [HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_DELETE].freeze
 
       attr_reader :name, :path, :method
 
@@ -63,8 +74,8 @@ module Rack
       end
 
       def call(env)
-        method = env["REQUEST_METHOD"]
-        path = env["PATH_INFO"]
+        method = env[HTTP_REQUEST_METHOD]
+        path = env[HTTP_PATH_INFO]
 
         if (@method.nil? || method == @method) && path =~ @recognizer
           routing_args, param_matches = {}, $~.captures
@@ -73,7 +84,7 @@ module Rack
               routing_args[k] = v
             end
           }
-          env["rack.routing_args"] = routing_args.merge!(@defaults)
+          env[RACK_ROUTING_ARGS] = routing_args.merge!(@defaults)
           @app.call(env)
         else
           SKIP_RESPONSE
