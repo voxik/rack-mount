@@ -8,7 +8,6 @@ module Rack
 
       include Base
       include Generation, Recognition
-      include Optimizations
     end
   end
 end
