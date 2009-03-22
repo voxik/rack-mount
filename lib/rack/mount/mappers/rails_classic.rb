@@ -9,11 +9,27 @@ module Rack
 
     module Mappers
       class RailsClassic
-        DynamicController = lambda { |env|
-          app = "#{env["rack.routing_args"][:controller].camelize}Controller"
-          app = ActiveSupport::Inflector.constantize(app)
-          app.call(env)
-        }
+        class Dispatcher
+          def initialize(options = {})
+            defaults = options[:defaults]
+            @app = controller(defaults)
+          end
+
+          def call(env)
+            app = @app || controller(env["rack.routing_args"])
+
+            # TODO: Rails response is not finalized by the controller
+            app.call(env).to_a
+          end
+
+          private
+            def controller(params)
+              if params && params.has_key?(:controller)
+                controller = "#{params[:controller].camelize}Controller"
+                ActiveSupport::Inflector.constantize(controller)
+              end
+            end
+        end
 
         attr_reader :named_routes
 
@@ -46,9 +62,7 @@ module Rack
             end
           end
 
-          app = defaults.has_key?(:controller) ?
-            ActiveSupport::Inflector.constantize("#{defaults[:controller].camelize}Controller") :
-            DynamicController
+          app = Dispatcher.new(:defaults => defaults)
 
           @set.add_route(app, {
             :name => name,
