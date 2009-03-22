@@ -2,11 +2,7 @@ module Rack
   module Mount
     module Utils
       SEPARATORS = %w( / . ? )
-      ESCAPED_SEPARATORS = SEPARATORS.map { |s| Regexp.escape(s) }
-
-      PARAM_REGEXP = /^:(\w+)$/
       GLOB_REGEXP = /\/\\\*(\w+)$/
-      OPTIONAL_SEGMENT_REGEX = /^.*(\(.+\))$/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
       if RUBY_VERSION >= '1.9'
