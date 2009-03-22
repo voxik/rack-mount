@@ -6,12 +6,19 @@ module Rack
       def new_draw(&block)
         mapper = Mappers::RailsDraft.new(self)
         mapper.instance_eval(&block)
+        add_route(Mappers::RailsDraft::NotFound, :path => /.*/)
         freeze
       end
     end
 
     module Mappers
       class RailsDraft
+        class RoutingError < StandardError; end
+
+        NotFound = lambda { |env|
+          raise RoutingError, "No route matches #{env["PATH_INFO"].inspect} with #{env.inspect}"
+        }
+
         DynamicController = lambda { |env|
           app = "#{env[Const::RACK_ROUTING_ARGS][:controller].camelize}Controller"
           app = ActiveSupport::Inflector.constantize(app)

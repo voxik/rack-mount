@@ -5,6 +5,22 @@ class RailsDraftApiTest < Test::Unit::TestCase
   include TestHelper
   include BasicRecognitionTests
 
+  class CatchRoutingErrors
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      @app.call(env)
+    rescue Rack::Mount::Mappers::RailsDraft::RoutingError
+      Rack::Mount::Const::NOT_FOUND_RESPONSE
+    end
+
+    def method_missing(*args, &block)
+      @app.send(*args, &block)
+    end
+  end
+
   Routes = Rack::Mount::RouteSet.new
   Routes.new_draw do |map|
     resources :people
@@ -100,6 +116,6 @@ class RailsDraftApiTest < Test::Unit::TestCase
   end
 
   def setup
-    @app = Routes
+    @app = CatchRoutingErrors.new(Routes)
   end
 end

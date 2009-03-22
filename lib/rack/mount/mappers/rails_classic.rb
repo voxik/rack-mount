@@ -9,6 +9,12 @@ module Rack
 
     module Mappers
       class RailsClassic
+        class RoutingError < StandardError; end
+
+        NotFound = lambda { |env|
+          raise RoutingError, "No route matches #{env["PATH_INFO"].inspect} with #{env.inspect}"
+        }
+
         class Dispatcher
           def initialize(options = {})
             defaults = options[:defaults]
@@ -41,6 +47,8 @@ module Rack
         def draw(&block)
           require 'action_controller'
           yield ActionController::Routing::RouteSet::Mapper.new(self)
+          @set.add_route(NotFound, :path => /.*/)
+          self
         end
 
         def add_route(path, options = {})
