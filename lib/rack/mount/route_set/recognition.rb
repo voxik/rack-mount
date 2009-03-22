@@ -3,8 +3,13 @@ module Rack
     class RouteSet
       module Recognition
         DEFAULT_KEYS = [:method, :first_segment].freeze
+        DEFAULT_CATCH_STATUS = 404
 
         def initialize(options = {})
+          @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
+          @route_throw = Const::NOT_FOUND_RESPONSE.dup
+          @route_throw[0] = @catch
+
           @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
           @recognition_graph = NestedSet.new
           super
@@ -12,6 +17,7 @@ module Rack
 
         def add_route(*args)
           route = super
+          route.throw = @route_throw
 
           keys = @recognition_keys.map { |key| route.send(key) }
           @recognition_graph[*keys] = route
@@ -26,7 +32,7 @@ module Rack
           keys = @recognition_keys.map { |key| req.send(key) }
           @recognition_graph[*keys].each do |route|
             result = route.call(env)
-            return result unless result[0] == 404
+            return result unless result[0] == @catch
           end
           nil
         end

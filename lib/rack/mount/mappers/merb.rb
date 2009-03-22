@@ -51,13 +51,13 @@ module Rack
           def call(env)
             # TODO: Change this to a Merb request
             request = Rack::Request.new(env)
-            params  = env["rack.routing_args"]
+            params  = env[Const::RACK_ROUTING_ARGS]
             result  = @proc.call(request, params)
 
             if result
               @app.call(env)
             else
-              Route::SKIP_RESPONSE
+              Const::NOT_FOUND_RESPONSE
             end
           end
         end
@@ -73,7 +73,7 @@ module Rack
 
             @conditions.each do |method, expected|
               unless request.send(method) == expected
-                return Route::SKIP_RESPONSE
+                return Const::NOT_FOUND_RESPONSE
               end
             end
 
@@ -82,7 +82,7 @@ module Rack
         end
 
         DynamicController = lambda { |env|
-          app = ActiveSupport::Inflector.camelize("#{env["rack.routing_args"][:controller]}Controller")
+          app = ActiveSupport::Inflector.camelize("#{env[Const::RACK_ROUTING_ARGS][:controller]}Controller")
           app = ActiveSupport::Inflector.constantize(app)
           app.call(env)
         }

@@ -1,5 +1,6 @@
 module Rack
   module Mount
+    autoload :Const, 'rack/mount/const'
     autoload :NestedSet, 'rack/mount/nested_set'
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'
     autoload :Request, 'rack/mount/request'

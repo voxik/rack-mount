@@ -3,21 +3,9 @@ module Rack
     class Route
       autoload :Optimizations, 'rack/mount/route/optimizations'
 
-      SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
-      RACK_ROUTING_ARGS = "rack.routing_args".freeze
-
-      HTTP_REQUEST_METHOD = "REQUEST_METHOD".freeze
-      HTTP_PATH_INFO      = "PATH_INFO".freeze
-
-      HTTP_GET    = "GET".freeze
-      HTTP_HEAD   = "HEAD".freeze
-      HTTP_POST   = "POST".freeze
-      HTTP_PUT    = "PUT".freeze
-      HTTP_DELETE = "DELETE".freeze
-
-      HTTP_METHODS = [HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_DELETE].freeze
-
-      attr_reader :name, :params, :defaults, :path, :method
+      attr_reader :name, :params, :defaults
+      attr_reader :path, :method
+      attr_writer :throw
 
       def initialize(app, options)
         @app = app
@@ -26,6 +14,8 @@ module Rack
           raise ArgumentError, 'app must be a valid rack application' +
             ' and respond to call'
         end
+
+        @throw = Const::NOT_FOUND_RESPONSE
 
         if name = options.delete(:name)
           @name = name.to_sym
@@ -76,8 +66,8 @@ module Rack
       end
 
       def call(env)
-        method = env[HTTP_REQUEST_METHOD]
-        path = env[HTTP_PATH_INFO]
+        method = env[Const::REQUEST_METHOD]
+        path = env[Const::PATH_INFO]
 
         if (@method.nil? || method == @method) && path =~ @recognizer
           routing_args, param_matches = {}, $~.captures
@@ -86,10 +76,10 @@ module Rack
               routing_args[k] = v
             end
           }
-          env[RACK_ROUTING_ARGS] = routing_args.merge!(@defaults)
+          env[Const::RACK_ROUTING_ARGS] = routing_args.merge!(@defaults)
           @app.call(env)
         else
-          SKIP_RESPONSE
+          @throw
         end
       end
     end

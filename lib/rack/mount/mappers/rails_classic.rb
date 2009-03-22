@@ -16,7 +16,7 @@ module Rack
           end
 
           def call(env)
-            app = @app || controller(env["rack.routing_args"])
+            app = @app || controller(env[Const::RACK_ROUTING_ARGS])
 
             # TODO: Rails response is not finalized by the controller
             app.call(env).to_a

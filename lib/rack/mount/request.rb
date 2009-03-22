@@ -6,11 +6,11 @@ module Rack
       end
 
       def method
-        @method ||= @env[Route::HTTP_REQUEST_METHOD] || Route::HTTP_GET
+        @method ||= @env[Const::REQUEST_METHOD] || Const::GET
       end
 
       def path
-        @path ||= @env[Route::HTTP_PATH_INFO] || "/"
+        @path ||= @env[Const::PATH_INFO] || Const::SLASH
       end
 
       def first_segment

@@ -13,7 +13,7 @@ module Rack
     module Mappers
       class RailsDraft
         DynamicController = lambda { |env|
-          app = "#{env["rack.routing_args"][:controller].camelize}Controller"
+          app = "#{env[Const::RACK_ROUTING_ARGS][:controller].camelize}Controller"
           app = ActiveSupport::Inflector.constantize(app)
           app.call(env)
         }
