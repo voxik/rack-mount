@@ -2,7 +2,10 @@ module Rack
   module Mount
     class RouteSet
       module Recognition
-        def initialize(*args)
+        DEFAULT_KEYS = [:method, :first_segment].freeze
+
+        def initialize(options = {})
+          @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
           @recognition_graph = NestedSet.new
           super
         end
@@ -10,7 +13,7 @@ module Rack
         def add_route(*args)
           route = super
 
-          keys = @keys.map { |key| route.send(key) }
+          keys = @recognition_keys.map { |key| route.send(key) }
           @recognition_graph[*keys] = route
 
           route
@@ -20,7 +23,7 @@ module Rack
           raise "route set not finalized" unless frozen?
 
           req = Request.new(env)
-          keys = @keys.map { |key| req.send(key) }
+          keys = @recognition_keys.map { |key| req.send(key) }
           @recognition_graph[*keys].each do |route|
             result = route.call(env)
             return result unless result[0] == 404
@@ -29,6 +32,7 @@ module Rack
         end
 
         def freeze
+          @recognition_keys.freeze
           @recognition_graph.freeze
           super
         end

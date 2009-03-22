@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    module Optimizations
-      module Route
+    class Route
+      module Optimizations
         def freeze
           optimize_call! unless frozen?
           super

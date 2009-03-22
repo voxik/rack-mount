@@ -1,10 +1,10 @@
 module Rack
   module Mount
-    module Optimizations
-      module RouteSet
+    class RouteSet
+      module Optimizations
         def add_route(*args)
           route = super
-          route.extend Optimizations::Route
+          route.extend Route::Optimizations
           route
         end
 
@@ -18,7 +18,7 @@ module Rack
             instance_eval(<<-EOS, __FILE__, __LINE__)
               def call(env)
                 req = Request.new(env)
-                keys = [#{@keys.map { |key| "req.#{key}" }.join(", ")}]
+                keys = [#{@recognition_keys.map { |key| "req.#{key}" }.join(", ")}]
                 @recognition_graph[*keys].each do |route|
                   result = route.call(env)
                   return result unless result[0] == 404

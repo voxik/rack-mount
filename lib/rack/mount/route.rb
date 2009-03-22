@@ -1,6 +1,8 @@
 module Rack
   module Mount
     class Route
+      autoload :Optimizations, 'rack/mount/route/optimizations'
+
       SKIP_RESPONSE = [404, {"Content-Type" => "text/html"}, "Not Found"]
       RACK_ROUTING_ARGS = "rack.routing_args".freeze
 
