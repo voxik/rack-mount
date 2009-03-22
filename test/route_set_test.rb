@@ -11,33 +11,28 @@ class RouteSetTest < Test::Unit::TestCase
   if RUBY_VERSION >= '1.9'
     def test_named_regexp_groups
       get "/ruby19/foo/1"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "ruby19", :action => "foo", :id => "1" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "ruby19", :action => "foo", :id => "1" }, routing_args)
     end
 
     def test_optional_segments_with_period
       get "/ruby19/index"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "ruby19", :action => "index" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "ruby19", :action => "index" }, routing_args)
 
       get "/ruby19/index.xml"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "ruby19", :action => "index", :format => "xml" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "ruby19", :action => "index", :format => "xml" }, routing_args)
     end
 
     def test_optional_segments_with_slash
       get "/ruby19/foo"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "ruby19", :action => "foo" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "ruby19", :action => "foo" }, routing_args)
 
       get "/ruby19/foo/123"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "ruby19", :action => "foo", :id => "123" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "ruby19", :action => "foo", :id => "123" }, routing_args)
     end
   end
 

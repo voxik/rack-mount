@@ -26,6 +26,14 @@ module TestHelper
       @env
     end
 
+    def response
+      @response
+    end
+
+    def routing_args
+      @env[Rack::Mount::Const::RACK_ROUTING_ARGS]
+    end
+
     def get(path, options = {})
       process(:get, path, options)
     end
@@ -43,15 +51,25 @@ module TestHelper
     end
 
     def process(method, path, options = {})
-      result = @app.call({
-        "REQUEST_METHOD" => method.to_s.upcase,
-        "PATH_INFO" => path
+      @response = @app.call({
+        Rack::Mount::Const::REQUEST_METHOD => method.to_s.upcase,
+        Rack::Mount::Const::PATH_INFO => path
       }.merge(options))
 
-      if result
-        @env = YAML.load(result[2][0])
+      if @response && @response[0] == 200
+        @env = YAML.load(@response[2][0])
       else
         @env = nil
       end
+    end
+
+    def assert_success
+      assert(@response)
+      assert_equal(200, @response[0])
+    end
+
+    def assert_not_found
+      assert(@response)
+      assert_equal(404, @response[0])
     end
 end

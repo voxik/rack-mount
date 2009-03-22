@@ -23,7 +23,7 @@ module Rack
                   result = route.call(env)
                   return result unless result[0] == @catch
                 end
-                nil
+                @throw
               end
             EOS
           end

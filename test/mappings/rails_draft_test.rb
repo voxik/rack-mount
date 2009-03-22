@@ -71,38 +71,32 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
   def test_misc_routes
     get "/people/1/update"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "people", :action => "update", :id => "1"}, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :controller => "people", :action => "update", :id => "1"}, routing_args)
 
     get "/projects/1/people/2/update"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :project_id => "1", :controller => "people", :id => "2", :action => "update" }, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :project_id => "1", :controller => "people", :id => "2", :action => "update" }, routing_args)
 
     get "/articles/2009/1/19/birthday"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "articles", :action => "show", :year => "2009", :month => "1", :day => "19", :title => "birthday" }, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :controller => "articles", :action => "show", :year => "2009", :month => "1", :day => "19", :title => "birthday" }, routing_args)
   end
 
   def test_nested_route
     get "/articles/hello/1"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1" }, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1" }, routing_args)
   end
 
   def test_nested_resource
     get "/12345/rooms"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "rooms", :action => "index", :access_token => "12345" }, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :controller => "rooms", :action => "index", :access_token => "12345" }, routing_args)
 
     get "/12345/rooms/1"
-    assert env
-    assert_equal("GET", env["REQUEST_METHOD"])
-    assert_equal({ :controller => "rooms", :action => "show", :access_token => "12345", :id => "1" }, env["rack.routing_args"])
+    assert_success
+    assert_equal({ :controller => "rooms", :action => "show", :access_token => "12345", :id => "1" }, routing_args)
   end
 
   def setup

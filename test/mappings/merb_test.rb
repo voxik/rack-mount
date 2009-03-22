@@ -102,22 +102,20 @@ if RUBY_VERSION < '1.9'
 
     def test_defer
       get "/defer"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "defer" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "defer" }, routing_args)
 
       get "/defer_no_match"
-      assert_nil env
+      assert_not_found
     end
 
     def test_request_conditions
       get "/referer", "HTTP_REFERER" => "http://www.google.com/"
-      assert env
-      assert_equal("GET", env["REQUEST_METHOD"])
-      assert_equal({ :controller => "search", :action => "index" }, env["rack.routing_args"])
+      assert_success
+      assert_equal({ :controller => "search", :action => "index" }, routing_args)
 
       get "/referer", "HTTP_REFERER" => "http://www.yahoo.com/"
-      assert_nil env
+      assert_not_found
     end
   end
 end

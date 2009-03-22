@@ -7,8 +7,8 @@ module Rack
 
         def initialize(options = {})
           @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
-          @route_throw = Const::NOT_FOUND_RESPONSE.dup
-          @route_throw[0] = @catch
+          @throw = Const::NOT_FOUND_RESPONSE.dup
+          @throw[0] = @catch
 
           @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
           @recognition_graph = NestedSet.new
@@ -17,7 +17,7 @@ module Rack
 
         def add_route(*args)
           route = super
-          route.throw = @route_throw
+          route.throw = @throw
 
           keys = @recognition_keys.map { |key| route.send(key) }
           @recognition_graph[*keys] = route
@@ -34,7 +34,7 @@ module Rack
             result = route.call(env)
             return result unless result[0] == @catch
           end
-          nil
+          @throw
         end
 
         def freeze
