@@ -92,7 +92,7 @@ if RUBY_VERSION < '1.9'
       match(:path => "/referer", :referer => "http://www.google.com/").to(:controller => "search", :action => "index")
 
       match("files/*files").to(:controller => "files", :action => "index")
-      match("default/:controller/:action/:id(.:format)").to()
+      match("default/:controller(/:action(/:id(.:format)))").to()
     end
 
     def setup

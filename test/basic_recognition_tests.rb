@@ -54,13 +54,13 @@ module BasicRecognitionTests
     assert_success
     assert_equal({ :controller => "foo", :action => "bar", :id => "1" }, routing_args)
 
-    # get "/default/foo/bar"
-    # assert_success
-    # assert_equal({ :controller => "foo", :action => "bar" }, routing_args)
+    get "/default/foo/bar"
+    assert_success
+    assert_equal({ :controller => "foo", :action => "bar" }, routing_args)
 
-    # get "/default/foo"
-    # assert_success
-    # assert_equal({ :controller => "foo", :action => "index" }, routing_args)
+    get "/default/foo"
+    assert_success
+    assert_equal({ :controller => "foo" }, routing_args)
   end
 
   def test_extracts_id

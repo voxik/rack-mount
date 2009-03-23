@@ -46,9 +46,10 @@ module Rack
       end
 
       def url_for(params = {})
-        path = "/#{@path}"
+        path = @path.dup
         @params.each do |param|
           path.sub!(":#{param}", params[param])
+          path.sub!(/\(\/(.+)\)/, '/\1')
         end
         path
       end

@@ -66,5 +66,5 @@ BasicSetMap = Proc.new do |set|
     set.add_route(EchoApp, :path => regexp, :defaults => { :controller => "ruby19" })
   end
 
-  set.add_route(EchoApp, :path => "default/:controller/:action/:id(.:format)")
+  set.add_route(EchoApp, :path => "default/:controller(/:action(/:id(.:format)))")
 end

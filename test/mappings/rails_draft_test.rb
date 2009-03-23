@@ -56,7 +56,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
     end
 
     controller :articles do
-      match 'articles' do
+      match 'articles2' do
         match ':title', :title => /[a-z]+/, :as => :with_title do
           match ':id', :to => :with_id
         end
@@ -100,7 +100,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
   end
 
   def test_nested_route
-    get "/articles/hello/1"
+    get "/articles2/hello/1"
     assert_success
     assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1" }, routing_args)
   end

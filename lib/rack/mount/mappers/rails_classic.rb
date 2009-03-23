@@ -52,7 +52,10 @@ module Rack
         end
 
         def add_route(path, options = {})
-          path = path.gsub(".:format", "(.:format)") if path.is_a?(String)
+          if path.is_a?(String)
+            path = path.gsub(".:format", "(.:format)")
+            path = optionalize_trailing_dynamic_segments(path)
+          end
 
           if conditions = options.delete(:conditions)
             method = conditions.delete(:method)
@@ -85,6 +88,31 @@ module Rack
           options[:name] = name
           add_route(path, options)
         end
+
+        private
+          def optionalize_trailing_dynamic_segments(path)
+            path = (path =~ /^\//) ? path.dup : "/#{path}"
+            optional, segments = true, []
+
+            old_segments = path.split('/')
+            old_segments.shift
+            length = old_segments.length
+
+            old_segments.reverse.each_with_index do |segment, index|
+              if optional && !(segment =~ /^:\w+$/) && !(segment =~ /^:\w+\(\.:format\)$/)
+                optional = false
+              end
+
+              if optional && index < length - 1
+                segments.unshift('(/', segment)
+                segments.push(')')
+              else
+                segments.unshift('/', segment)
+              end
+            end
+
+            segments.join
+          end
       end
     end
   end
