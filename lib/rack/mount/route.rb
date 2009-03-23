@@ -24,7 +24,12 @@ module Rack
         method = options.delete(:method)
         @method = method.to_s.upcase if method
 
-        @path = options.delete(:path).freeze
+        @path = options.delete(:path)
+        if @path.is_a?(String)
+          @path = "/#{path}" unless path =~ /^\//
+        end
+        @path.freeze
+
         @requirements = options.delete(:requirements).freeze
         @defaults = (options.delete(:defaults) || {}).freeze
 
