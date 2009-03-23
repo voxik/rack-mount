@@ -4,6 +4,7 @@ require 'rack/mount'
 require 'fixtures'
 
 autoload :NestedSetGraphing, 'lib/nested_set_graphing'
+autoload :BasicGenerationTests, 'basic_generation_tests'
 autoload :BasicRecognitionTests, 'basic_recognition_tests'
 
 module Rack

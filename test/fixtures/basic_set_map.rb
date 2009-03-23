@@ -9,12 +9,12 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, :path => "/", :defaults => { :controller => "homepage" })
 
-  set.add_route(EchoApp, :path => "/geocode/:postalcode", :defaults => { :controller => "geocode", :action => "show" }, :requirements => { :postalcode => /\d{5}(-\d{4})?/ })
-  set.add_route(EchoApp, :path => "/geocode2/:postalcode", :defaults => { :controller => "geocode", :action => "show" }, :requirements => { :postalcode => /\d{5}(-\d{4})?/ })
+  set.add_route(EchoApp, :name => :geocode, :path => "/geocode/:postalcode", :defaults => { :controller => "geocode", :action => "show" }, :requirements => { :postalcode => /\d{5}(-\d{4})?/ })
+  set.add_route(EchoApp, :name => :geocode2, :path => "/geocode2/:postalcode", :defaults => { :controller => "geocode", :action => "show" }, :requirements => { :postalcode => /\d{5}(-\d{4})?/ })
 
-  set.add_route(EchoApp, :path => "/login", :method => "get", :defaults => { :controller => "sessions", :action => "new" })
+  set.add_route(EchoApp, :name => :login, :path => "/login", :method => "get", :defaults => { :controller => "sessions", :action => "new" })
   set.add_route(EchoApp, :path => "/login", :method => "post", :defaults => { :controller => "sessions", :action => "create" })
-  set.add_route(EchoApp, :path => "/logout", :method => "delete", :defaults => { :controller => "sessions", :action => "destroy" })
+  set.add_route(EchoApp, :name => :logout, :path => "/logout", :method => "delete", :defaults => { :controller => "sessions", :action => "destroy" })
 
   set.add_route(EchoApp, :path => "/global/:action", :defaults => { :controller => "global" })
   set.add_route(EchoApp, :path => "/global/export", :defaults => { :controller => "global", :action => "export" })

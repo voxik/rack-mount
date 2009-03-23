@@ -4,6 +4,7 @@ require 'rack/mount/mappers/rails_classic'
 class RailsClassicApiTest < Test::Unit::TestCase
   include TestHelper
   include BasicRecognitionTests
+  include BasicGenerationTests
 
   class CatchRoutingErrors
     def initialize(app)
@@ -68,15 +69,5 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
   def setup
     @app = CatchRoutingErrors.new(Routes)
-  end
-
-  def test_url_for_with_named_route
-    assert_equal "/login", @app.url_for(:login)
-    assert_equal "/logout", @app.url_for(:logout)
-    assert_equal "/geocode/60622", @app.url_for(:geocode, :postalcode => "60622")
-  end
-
-  def test_url_for_with_hash
-    assert_equal "/login", @app.url_for(:controller => "sessions", :action => "new")
   end
 end

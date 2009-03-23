@@ -3,6 +3,7 @@ require 'test_helper'
 class RouteSetTest < Test::Unit::TestCase
   include TestHelper
   include BasicRecognitionTests
+  include BasicGenerationTests
 
   def setup
     @app = BasicSet
