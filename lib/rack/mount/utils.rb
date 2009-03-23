@@ -5,6 +5,7 @@ module Rack
     module Utils
       SEPARATORS = %w( / . ? )
       GLOB_REGEXP = /\/\\\*(\w+)$/
+      OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
       if RUBY_VERSION >= '1.9'
@@ -38,9 +39,8 @@ module Rack
           re.sub!(GLOB_REGEXP, "/#{NAMED_CAPTURE % [$1, ".*"]}")
         end
 
-        # Hack in temporary support for one level of optional segments
-        if re =~ /\\\((.+)\\\)/
-          re.sub!(/\\\((.+)\\\)/, "\(\\1\)?")
+        while re =~ OPTIONAL_SEGMENT_REGEXP
+          re.gsub!(OPTIONAL_SEGMENT_REGEXP, '(\1)?')
         end
 
         RegexpWithNamedGroups.new("^#{re}$")

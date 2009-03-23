@@ -173,6 +173,20 @@ class SegmentStringTest < Test::Unit::TestCase
     end
   end
 
+  def test_nested_optional_segment
+    re = convert_segment_string_to_regexp("/:controller(/:action(/:id(.:format)))")
+
+    if RUBY_VERSION >= '1.9'
+      assert_equal %r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\.(?<format>[^/.?]+))?)?)?$}, re.to_regexp
+      assert_equal ['controller', 'action', 'id', 'format'], re.names
+      assert_equal({ 'controller' => [1], 'action' => [2], 'id' => [3], 'format' => [4] }, re.named_captures)
+    else
+      assert_equal %r{^/([^/.?]+)(/([^/.?]+)(/([^/.?]+)(\.([^/.?]+))?)?)?$}, re.to_regexp
+      assert_equal ['controller', nil, 'action', nil, 'id', nil, 'format'], re.names
+      assert_equal({ 'controller' => [1], 'action' => [3], 'id' => [5], 'format' => [7] }, re.named_captures)
+    end
+  end
+
   def test_glob
     re = convert_segment_string_to_regexp("/files/*files")
 
