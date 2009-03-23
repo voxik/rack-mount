@@ -177,7 +177,7 @@ class SegmentStringTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp("/:controller(/:action(/:id(.:format)))")
 
     if RUBY_VERSION >= '1.9'
-      assert_equal %r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\.(?<format>[^/.?]+))?)?)?$}, re.to_regexp
+      assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re.to_regexp
       assert_equal ['controller', 'action', 'id', 'format'], re.names
       assert_equal({ 'controller' => [1], 'action' => [2], 'id' => [3], 'format' => [4] }, re.named_captures)
     else
