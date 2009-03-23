@@ -81,8 +81,8 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
     match 'files/*files', :to => 'files#index'
 
-    match ':controller/:action/:id'
-    match ':controller/:action/:id.:format'
+    match 'default/:controller/:action/:id'
+    match 'default/:controller/:action/:id.:format'
   end
 
   def test_misc_routes

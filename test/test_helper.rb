@@ -51,6 +51,9 @@ module TestHelper
     end
 
     def process(method, path, options = {})
+      @method = method
+      @path   = path
+
       @response = @app.call({
         Rack::Mount::Const::REQUEST_METHOD => method.to_s.upcase,
         Rack::Mount::Const::PATH_INFO => path
@@ -65,7 +68,7 @@ module TestHelper
 
     def assert_success
       assert(@response)
-      assert_equal(200, @response[0])
+      assert_equal(200, @response[0], "No route matches #{@path.inspect}")
     end
 
     def assert_not_found

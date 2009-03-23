@@ -45,16 +45,22 @@ module BasicRecognitionTests
     assert_equal({ :controller => "homepage" }, routing_args)
   end
 
-  def test_extracts_parameters
-    get "/foo/bar/1"
+  def test_default_route_extracts_parameters
+    get "/default/foo/bar/1.xml"
     assert_success
-    assert_equal({ :controller => "foo", :action => "bar", :id => "1" },
-      routing_args)
+    assert_equal({ :controller => "foo", :action => "bar", :id => "1", :format => "xml" }, routing_args)
 
-    get "/foo/bar/1.xml"
+    get "/default/foo/bar/1"
     assert_success
-    assert_equal({ :controller => "foo", :action => "bar", :id => "1", :format => "xml" },
-      routing_args)
+    assert_equal({ :controller => "foo", :action => "bar", :id => "1" }, routing_args)
+
+    # get "/default/foo/bar"
+    # assert_success
+    # assert_equal({ :controller => "foo", :action => "bar" }, routing_args)
+
+    # get "/default/foo"
+    # assert_success
+    # assert_equal({ :controller => "foo", :action => "index" }, routing_args)
   end
 
   def test_extracts_id
