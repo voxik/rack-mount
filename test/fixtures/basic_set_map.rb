@@ -17,9 +17,9 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, :name => :logout, :path => "/logout", :method => "delete", :defaults => { :controller => "sessions", :action => "destroy" })
 
   set.add_route(EchoApp, :path => "/global/:action", :defaults => { :controller => "global" })
-  set.add_route(EchoApp, :path => "/global/export", :defaults => { :controller => "global", :action => "export" })
-  set.add_route(EchoApp, :path => "/global/hide_notice", :defaults => { :controller => "global", :action => "hide_notice" })
-  set.add_route(EchoApp, :path => "/export/:id/:file", :defaults => { :controller => "global", :action => "export" }, :requirements => { :file => /.*/ })
+  set.add_route(EchoApp, :name => :export_request, :path => "/global/export", :defaults => { :controller => "global", :action => "export" })
+  set.add_route(EchoApp, :name => :hide_notice, :path => "/global/hide_notice", :defaults => { :controller => "global", :action => "hide_notice" })
+  set.add_route(EchoApp, :name => :export_download, :path => "/export/:id/:file", :defaults => { :controller => "global", :action => "export" }, :requirements => { :file => /.*/ })
 
   set.add_route(EchoApp, :path => "/account/subscription", :method => "get", :defaults => { :controller => "account/subscription", :action => "index" })
   set.add_route(EchoApp, :path => "/account/subscription", :method => "post", :defaults => { :controller => "account/subscription", :action => "create" })

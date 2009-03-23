@@ -5,6 +5,20 @@ module Rack
         Mappers::RailsClassic.new(self).draw(&block)
         freeze
       end
+
+      def generate(options, recall = {}, method = :generate)
+      end
+
+      def add_configuration_file(path)
+        load(path)
+      end
+
+      def load!
+      end
+      alias reload! load!
+
+      def reload
+      end
     end
 
     module Mappers
