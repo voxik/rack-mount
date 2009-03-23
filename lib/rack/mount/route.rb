@@ -1,7 +1,9 @@
 module Rack
   module Mount
     class Route
+      autoload :Generation, 'rack/mount/route/generation'
       autoload :Optimizations, 'rack/mount/route/optimizations'
+      autoload :Recognition, 'rack/mount/route/recognition'
 
       attr_reader :name, :params, :defaults
       attr_reader :path, :method
@@ -50,24 +52,6 @@ module Rack
         @recognizer.freeze
       end
 
-      def url_for(params = {})
-        params = (params || {}).dup
-        path = @path.dup
-        @params.each do |param|
-          path.sub!(":#{param}", params.delete(param))
-          path.sub!(/\(\/(.+)\)/, '/\1')
-        end
-        @defaults.each do |key, value|
-          params.delete(key)
-        end
-        qs = params.map { |params| "#{params[0]}=#{params[1]}" }.join("&")
-        if qs != ""
-          "#{path}?#{qs}"
-        else
-          path
-        end
-      end
-
       def first_segment
         @segment_keys[0]
       end
@@ -80,23 +64,7 @@ module Rack
         "#{method} #{path}"
       end
 
-      def call(env)
-        method = env[Const::REQUEST_METHOD]
-        path = env[Const::PATH_INFO]
-
-        if (@method.nil? || method == @method) && path =~ @recognizer
-          routing_args, param_matches = {}, $~.captures
-          @indexed_params.each { |k, i|
-            if v = param_matches[i]
-              routing_args[k] = v
-            end
-          }
-          env[Const::RACK_ROUTING_ARGS] = routing_args.merge!(@defaults)
-          @app.call(env)
-        else
-          @throw
-        end
-      end
+      include Generation, Recognition
     end
   end
 end
