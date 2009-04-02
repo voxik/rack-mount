@@ -13,6 +13,17 @@ module Rack
           super
         end
 
+        if ENV[Const::RACK_MOUNT_DEBUG]
+          def instance_eval(*args)
+            puts
+            puts "#{args[1]}##{args[2]}"
+            puts args[0]
+            puts
+
+            super
+          end
+        end
+
         private
           def optimize_call!
             instance_eval(<<-EOS, __FILE__, __LINE__)

@@ -2,6 +2,7 @@ module Rack
   module Mount
     module Const
       RACK_ROUTING_ARGS = 'rack.routing_args'.freeze
+      RACK_MOUNT_DEBUG  = 'RACKMOUNT_DEBUG'.freeze
 
       CONTENT_TYPE    = 'Content-Type'.freeze
       DELETE          = 'PUT'.freeze
