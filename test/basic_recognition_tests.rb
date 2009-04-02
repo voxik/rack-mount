@@ -63,6 +63,16 @@ module BasicRecognitionTests
     assert_equal({ :controller => "foo" }, routing_args)
   end
 
+  def test_params_override_defaults
+    get "/params_with_defaults/bar"
+    assert_success
+    assert_equal({ :controller => "bar" }, routing_args)
+
+    get "/params_with_defaults"
+    assert_success
+    assert_equal({ :controller => "foo" }, routing_args)
+  end
+
   def test_extracts_id
     get "/people/1"
     assert_success

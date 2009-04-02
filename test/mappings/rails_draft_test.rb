@@ -81,6 +81,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
     match 'files/*files', :to => 'files#index'
 
+    match 'params_with_defaults(/:controller)', :to => "foo"
     match 'default/:controller/:action/:id'
     match 'default/:controller/:action/:id.:format'
   end

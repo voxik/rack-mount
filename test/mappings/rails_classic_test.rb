@@ -64,6 +64,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
     map.connect "files/*files", :controller => "files", :action => "index"
 
+    map.connect 'params_with_defaults/:controller', :controller => "foo"
     map.connect 'default/:controller/:action/:id.:format'
   end
 

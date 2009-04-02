@@ -55,8 +55,8 @@ class RouteSetTest < Test::Unit::TestCase
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
-    assert_equal 13, @app.height
-    assert_equal "/account/credit_card/:id", @app.deepest_node.path
+    assert_equal 14, @app.height
+    assert_equal "/params_with_defaults(/:controller)", @app.deepest_node.path
   end
 end
 
