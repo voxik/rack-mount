@@ -16,25 +16,28 @@ module Rack
 
       alias_method :at, :[]
 
+      WILD_REGEXP = /.*/.freeze
+
       def []=(*args)
         args  = args.flatten
         value = args.pop
         key   = args.shift.freeze
+        key   = WILD_REGEXP if key.nil?
         keys  = args.freeze
 
         raise ArgumentError, "missing value" unless value
 
-        if key.nil?
+        case key
+        when Regexp
           if keys.empty?
-            self << value
+            each { |k, v| v << value if key =~ k }
+            default << value
           else
+            each { |k, v| v[keys.dup] = value if key =~ k }
             self.default = NestedSet.new(default) if default.is_a?(List)
-
-            values_with_default.each do |v|
-              v[keys.dup] = value
-            end
+            default[keys.dup] = value
           end
-        else
+        when String
           v = at(key)
           v = v.dup if v.equal?(default)
 
@@ -46,6 +49,8 @@ module Rack
           end
 
           super(key, v)
+        else
+          raise ArgumentError, "unsupported key"
         end
       end
 

@@ -37,6 +37,26 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal "/:controller/:action", root.deepest_node
   end
 
+  def test_regexp
+    root = NestedSet.new
+
+    root["/abc"] = "/abc"
+    root["/abc"] = "/abc/show"
+    root["/123"] = "/123"
+    root["/456"] = "/456"
+    root[/\d{3}/] = "/:id"
+    root[nil] = "/:action"
+
+    assert_equal ["/abc", "/abc/show", "/:action"], root["/abc"]
+    assert_equal ["/123", "/:id", "/:action"], root["/123"]
+    assert_equal ["/456", "/:id", "/:action"], root["/456"]
+    assert_equal ["/:id", "/:action"], root["/789"]
+    assert_equal ["/:id", "/:action"], root["/notfound"]
+
+    assert_equal 3, root.height
+    assert_equal "/:action", root.deepest_node
+  end
+
   def test_nested_buckets
     root = NestedSet.new
 
@@ -93,6 +113,27 @@ class NestedSetTest < Test::Unit::TestCase
 
     assert_equal 3, root.height
     assert_equal "GET /people/1", root.deepest_node
+  end
+
+  def test_nested_with_regexp
+    root = NestedSet.new
+
+    root["GET", "people"] = "GET /people"
+    root["POST", "people"] = "POST /people"
+    root["GET", "people", "new"] = "GET /people/new"
+    root["GET", "people", /\d+/] = "GET /people/:id"
+    root["GET", "people", /\d+/, "edit"] = "GET /people/:id/edit"
+    root["POST", "people", /\d+/] = "POST /people/:id"
+    root["PUT", "people", /\d+/] = "PUT /people/:id"
+    root["DELETE", "people", /\d+/] = "DELETE /people/:id"
+
+    assert_equal ["GET /people", "GET /people/:id"], root["GET", "people"]
+    assert_equal ["GET /people", "GET /people/new"], root["GET", "people", "new"]
+    assert_equal ["GET /people", "GET /people/:id"], root["GET", "people", "1"]
+    assert_equal ["GET /people", "GET /people/:id", "GET /people/:id/edit"], root["GET", "people", "1", "edit"]
+
+    assert_equal 3, root.height
+    assert_equal "GET /people/:id/edit", root.deepest_node
   end
 
   def test_nested_default_bucket
