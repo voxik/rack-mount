@@ -56,7 +56,6 @@ class RouteSetTest < Test::Unit::TestCase
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
     assert_equal 14, @app.height
-    assert_equal "/params_with_defaults(/:controller)", @app.deepest_node.path
   end
 end
 

@@ -43,10 +43,6 @@ module Rack
           super
         end
 
-        def deepest_node
-          @recognition_graph.deepest_node
-        end
-
         def height
           @recognition_graph.height
         end

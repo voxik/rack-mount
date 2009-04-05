@@ -81,10 +81,6 @@ module Rack
         super
       end
 
-      def deepest_node
-        longest_list_descendant.last
-      end
-
       def height
         longest_list_descendant.length
       end

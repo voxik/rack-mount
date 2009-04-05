@@ -16,7 +16,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal [], root["/notfound"]
 
     assert_equal 3, root.height
-    assert_equal "/people/new", root.deepest_node
   end
 
   def test_one_level_with_defaults
@@ -34,7 +33,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["/:controller/edit", "/:controller/:action"], root["/notfound"]
 
     assert_equal 5, root.height
-    assert_equal "/:controller/:action", root.deepest_node
   end
 
   def test_regexp
@@ -54,7 +52,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["/:id", "/:action"], root["/notfound"]
 
     assert_equal 3, root.height
-    assert_equal "/:action", root.deepest_node
   end
 
   def test_nested_buckets
@@ -72,7 +69,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal [], root["/notfound"]
 
     assert_equal 3, root.height
-    assert_equal "/admin/people/new", root.deepest_node
   end
 
   def test_nested_buckets_with_defaults
@@ -93,7 +89,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["/:controller/:action"], root["/notfound"]
 
     assert_equal 6, root.height
-    assert_equal "/:controller/:action", root.deepest_node
   end
 
   def test_another_nested_buckets_with_defaults
@@ -112,7 +107,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["POST /messages", "ANY /messages/export"], root["POST", "/messages"]
 
     assert_equal 3, root.height
-    assert_equal "GET /people/1", root.deepest_node
   end
 
   def test_nested_with_regexp
@@ -133,7 +127,6 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ["GET /people", "GET /people/:id", "GET /people/:id/edit"], root["GET", "people", "1", "edit"]
 
     assert_equal 3, root.height
-    assert_equal "GET /people/:id/edit", root.deepest_node
   end
 
   def test_nested_default_bucket
@@ -145,7 +138,6 @@ class NestedSetTest < Test::Unit::TestCase
     root[nil] = "ANY /:controller/:action"
 
     assert_equal 3, root.height
-    assert_equal "ANY /:controller/:action", root.deepest_node
   end
 
   def test_deeply_nested_set
