@@ -55,6 +55,8 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, :path => "files/*files", :defaults => { :controller => "files", :action => "index" })
 
+  set.add_route(Rack::Mount::PathPrefix.new(DefaultSet, "/prefix"), :path => %r{/prefix/.*})
+
   if RUBY_VERSION >= '1.9'
     regexp = eval('/\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)/')
     set.add_route(EchoApp, :path => regexp, :defaults => { :controller => "ruby19" })

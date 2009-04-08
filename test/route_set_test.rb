@@ -9,6 +9,12 @@ class RouteSetTest < Test::Unit::TestCase
     @app = BasicSet
   end
 
+  def test_path_prefix
+    get "/prefix/foo/bar/1"
+    assert_success
+    assert_equal({ :controller => "foo", :action => "bar", :id => "1" }, routing_args)
+  end
+
   if RUBY_VERSION >= '1.9'
     def test_named_regexp_groups
       get "/ruby19/foo/1"

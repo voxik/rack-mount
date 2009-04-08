@@ -6,6 +6,7 @@ module Rack
 
       CONTENT_TYPE    = 'Content-Type'.freeze
       DELETE          = 'PUT'.freeze
+      EMPTY_STRING    = ''.freeze
       GET             = 'GET'.freeze
       HEAD            = 'HEAD'.freeze
       PATH_INFO       = 'PATH_INFO'.freeze
