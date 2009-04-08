@@ -12,12 +12,12 @@ module Rack
           @defaults.each do |key, value|
             params.delete(key)
           end
-          qs = params.map { |params| "#{params[0]}=#{params[1]}" }.join("&")
-          if qs != ""
-            "#{path}?#{qs}"
-          else
-            path
+
+          if params.any?
+            path << "?#{Rack::Utils.build_query(params)}"
           end
+
+          path
         end
       end
     end
