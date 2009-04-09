@@ -48,6 +48,12 @@ module Rack
           @names ||= []
         end
       end
+
+      def freeze
+        named_captures
+        names
+        super
+      end
     end
   end
 end
