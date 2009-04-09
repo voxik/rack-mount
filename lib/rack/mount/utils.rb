@@ -88,6 +88,49 @@ module Rack
         end
       end
       module_function :extract_static_segments
+
+      def parse_segments_with_optionals(pattern, nest_level = 0)
+        segments = []
+
+        while segment = pattern.slice!(/^(?:|.*?[^\\])(?:\\\\)*([\(\)])/)
+          segments.concat parse_segments(segment[0..-2]) if segment.length > 1
+          if segment[-1, 1] == '('
+            segments << parse_segments_with_optionals(pattern, nest_level + 1)
+          else
+            raise ArgumentError, "There are too many closing parentheses" if nest_level == 0
+            return segments
+          end
+        end
+
+        segments.concat parse_segments(pattern) unless pattern.empty?
+
+        raise ArgumentError, "You have too many opening parentheses" unless nest_level == 0
+
+        segments
+      end
+      module_function :parse_segments_with_optionals
+
+      def parse_segments(path)
+        segments = []
+
+        while match = (path.match(/(?:(:|\*)([a-z](?:_?[a-z0-9])*))/i))
+          segment_name = match[2].to_sym
+
+          # Handle false-positives due to escaped special characters
+          if match.pre_match =~ /(?:^|[^\\])\\(?:\\\\)*$/
+            segments << "#{match.pre_match[0..-2]}#{match[0]}"
+          else
+            segments << match.pre_match unless match.pre_match.empty?
+            segments << segment_name
+          end
+
+          path = match.post_match
+        end
+
+        segments << path unless path.empty?
+        segments
+      end
+      module_function :parse_segments
     end
   end
 end

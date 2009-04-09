@@ -35,6 +35,10 @@ module Rack
         @requirements = options.delete(:requirements).freeze
         @defaults = (options.delete(:defaults) || {}).freeze
 
+        if @path.is_a?(String)
+          @segments = Utils.parse_segments_with_optionals(@path.dup)
+        end
+
         recognizer = @path.is_a?(Regexp) ?
           RegexpWithNamedGroups.new(@path, @requirements) :
           Utils.convert_segment_string_to_regexp(@path, @requirements)
