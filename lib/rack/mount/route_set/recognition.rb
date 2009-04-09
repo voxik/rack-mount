@@ -46,10 +46,6 @@ module Rack
         def height
           @recognition_graph.height
         end
-
-        def to_graph
-          @recognition_graph.to_graph
-        end
       end
     end
   end

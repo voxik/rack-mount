@@ -10,7 +10,7 @@ module NestedSetGraphing
     g.node[:width] = ".1"
     g.node[:height] = ".1"
 
-    g.add_object(self)
+    g.add_object(@recognition_graph)
 
     g
   end

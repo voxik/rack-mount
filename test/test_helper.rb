@@ -9,7 +9,7 @@ autoload :BasicRecognitionTests, 'basic_recognition_tests'
 
 module Rack
   module Mount
-    class NestedSet < Hash
+    class RouteSet
       include NestedSetGraphing
     end
   end
