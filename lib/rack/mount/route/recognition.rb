@@ -12,13 +12,8 @@ module Rack
           @recognizer = recognizer.to_regexp
           @recognizer.freeze
 
-          @segment_keys = Utils.extract_static_segments(@recognizer).freeze
-
-          @indexed_params = {}
-          @recognizer.named_captures.each { |k, v|
-            @indexed_params[k.to_sym] = v.last - 1
-          }
-          @indexed_params.freeze
+          @path_keys      = path_keys(@recognizer, '/')
+          @named_captures = named_captures(@recognizer)
         end
 
         def call(env)
@@ -27,7 +22,7 @@ module Rack
 
           if (@method.nil? || method == @method) && path =~ @recognizer
             routing_args, param_matches = @defaults.dup, $~.captures
-            @indexed_params.each { |k, i|
+            @named_captures.each { |k, i|
               if v = param_matches[i]
                 routing_args[k] = v
               end
@@ -39,13 +34,26 @@ module Rack
           end
         end
 
-        def first_segment
-          @segment_keys[0]
+        def path_keys_at(index)
+          @path_keys[index]
         end
 
-        def second_segment
-          @segment_keys[1]
-        end
+        private
+          # Keys for inserting into NestedSet
+          # #=> ['people', /[0-9]+/, 'edit']
+          def path_keys(regexp, separators)
+            Utils.extract_static_segments(regexp).freeze
+          end
+
+          # Maps named captures to their capture index
+          # #=> { :controller => 0, :action => 1, :id => 2, :format => 4 }
+          def named_captures(regexp)
+            named_captures = {}
+            regexp.named_captures.each { |k, v|
+              named_captures[k.to_sym] = v.last - 1
+            }
+            named_captures.freeze
+          end
       end
     end
   end

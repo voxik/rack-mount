@@ -39,7 +39,7 @@ module Rack
           end
 
           def assign_index_params
-            @indexed_params.map { |k, i|
+            @named_captures.map { |k, i|
               "routing_args[#{k.inspect}] = param_matches[#{i}] if param_matches[#{i}]"
             }.join("\n                  ")
           end
