@@ -1,5 +1,3 @@
-require 'strscan'
-
 module Rack
   module Mount
     module Utils
@@ -46,24 +44,6 @@ module Rack
         RegexpWithNamedGroups.new("^#{re}$")
       end
       module_function :convert_segment_string_to_regexp
-
-      def extract_named_captures(regexp)
-        names, scanner = [], StringScanner.new(regexp.source)
-
-        while scanner.skip_until(/\(/)
-          next if scanner.pre_match =~ /\\$/
-
-          if scanner.scan(/\?:<([^>]+)>/)
-            names << scanner[1]
-          else
-            names << nil
-          end
-        end
-
-        regexp = regexp.source.gsub(/\?:<[^>]+>/, '')
-        return Regexp.compile(regexp), names
-      end
-      module_function :extract_named_captures
 
       def extract_static_segments(regexp)
         if regexp.to_s =~ %r{\(\?-mix:?(.+)?\)}

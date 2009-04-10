@@ -11,8 +11,7 @@ module Rack
         when Array
           @names = names.map { |n| n && n.to_s }
         else
-          regexp = Regexp.compile(regexp)
-          regexp, @names = Utils.extract_named_captures(regexp)
+          regexp, @names = extract_shim_named_captures(regexp)
         end
 
         @names = nil unless @names.any?
@@ -23,10 +22,6 @@ module Rack
         end
 
         super(regexp)
-      end
-
-      def to_regexp
-        self
       end
 
       if RUBY_VERSION >= '1.9'
@@ -54,6 +49,26 @@ module Rack
         names
         super
       end
+
+      private
+        SHIM_NAMED_CAPTURE = /\?:<([^>]+)>/.freeze
+
+        def extract_shim_named_captures(regexp)
+          require 'strscan'
+          source = Regexp.compile(regexp).source
+          names, scanner = [], StringScanner.new(source)
+
+          while scanner.skip_until(/\(/)
+            if scanner.scan(SHIM_NAMED_CAPTURE)
+              names << scanner[1]
+            else
+              names << nil
+            end
+          end
+
+          regexp = source.gsub(SHIM_NAMED_CAPTURE, '')
+          return Regexp.compile(regexp), names
+        end
     end
   end
 end
