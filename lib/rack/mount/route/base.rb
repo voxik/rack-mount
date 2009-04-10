@@ -29,7 +29,8 @@ module Rack
           end
           @path.freeze
 
-          @requirements = options.delete(:requirements).freeze
+          @requirements = (options.delete(:requirements) || {}).freeze
+          @capture_names = (options.delete(:capture_names) || {}).freeze
           @defaults = (options.delete(:defaults) || {}).freeze
         end
 

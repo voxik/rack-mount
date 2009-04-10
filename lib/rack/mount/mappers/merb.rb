@@ -111,16 +111,18 @@ module Rack
           new_options[:path] = conditions.delete(:path)[0]
           new_options[:method] = conditions.delete(:method)
 
+          capture_names = {}
           requirements = {}
           conditions.each do |k, v|
             if v.is_a?(Regexp)
               requirements[k.to_sym] = conditions.delete(k)
             elsif new_options[:path].is_a?(Regexp)
               index = conditions.delete(k)
-              requirements[k.to_sym] = Integer(index.scan(/\d+/)[0])
+              capture_names[k.to_sym] = Integer(index.scan(/\d+/)[0])
             end
           end
 
+          new_options[:capture_names] = capture_names
           new_options[:requirements] = requirements
           new_options[:defaults] = params
 
