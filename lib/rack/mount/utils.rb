@@ -45,27 +45,37 @@ module Rack
       end
       module_function :convert_segment_string_to_regexp
 
-      def extract_static_segments(regexp)
-        if regexp.to_s =~ %r{\(\?-mix:?(.+)?\)}
-          m = $1
-          m.gsub!(/^(\^)|(\$)$/, "")
-          segments = m.split(%r{\\/|\\\.|\\\?}).map { |segment|
-            if segment =~ /^(\w+)$/
-              $1
-            else
-              nil
-            end
-          }
+      def extract_static_segments(regexp, separators)
+        separators = separators.map { |s| Regexp.escape(s) }
+        separators = Regexp.compile(separators.join('|'))
 
-          segments.shift
-          while segments.length > 0 && segments.last.nil?
-            segments.pop
+        source = regexp.source
+        source.gsub!(/^\^|\$$/, '')
+
+        segments = []
+        while m = source.match(separators)
+          unless (s = m.pre_match) == ''
+            if !s.empty? && s =~ /^\w+$/
+              segments << s
+            else
+              segments << nil
+            end
           end
 
-          segments
-        else
-          []
+          source = m.post_match
         end
+
+        if !source.empty? && source =~ /^\w+$/
+          segments << source
+        else
+          segments << nil
+        end
+
+        while segments.length > 0 && segments.last.nil?
+          segments.pop
+        end
+
+        segments
       end
       module_function :extract_static_segments
     end

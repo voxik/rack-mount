@@ -13,7 +13,7 @@ module Rack
           end
           @recognizer.freeze
 
-          @path_keys      = path_keys(@recognizer, '/')
+          @path_keys      = path_keys(@recognizer, %w( / ))
           @named_captures = named_captures(@recognizer)
         end
 
@@ -43,7 +43,7 @@ module Rack
           # Keys for inserting into NestedSet
           # #=> ['people', /[0-9]+/, 'edit']
           def path_keys(regexp, separators)
-            Utils.extract_static_segments(regexp).freeze
+            Utils.extract_static_segments(regexp, separators).freeze
           end
 
           # Maps named captures to their capture index
