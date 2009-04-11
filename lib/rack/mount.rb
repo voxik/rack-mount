@@ -1,3 +1,5 @@
+require 'rack/utils'
+
 module Rack
   module Mount
     autoload :Const, 'rack/mount/const'
