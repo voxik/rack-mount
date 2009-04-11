@@ -1,6 +1,11 @@
 require 'graphviz'
 
 class GraphViz
+  def self.escape(str)
+    str.to_str.gsub(/\|/, '\\|')
+    str.to_str.gsub(/\|/, '\\|').gsub(/\</, "\\<").gsub(/\>/, "\\>")
+  end
+
   def self.to_node(obj)
     "node#{obj.object_id}"
   end
@@ -19,10 +24,13 @@ class GraphViz
       "#{obj.keys.map { |e|
         "<#{to_node(e)}> #{e.to_s}"
       }.join("|")}|<default>"
+    when Regexp
+      obj.source
     when String
       obj.to_str
     when Rack::Mount::Route
-      "#{obj.method} #{obj.path}".gsub(/\|/, '\\|')
+      label = escape(to_label(obj.path))
+      obj.method ? "#{obj.method} #{label}" : label
     else
       raise "unsupported class: #{obj.class}"
     end
