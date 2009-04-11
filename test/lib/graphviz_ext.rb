@@ -14,13 +14,15 @@ class GraphViz
     when nil
       "nil"
     when Array
-      "{#{obj.map { |e| e.to_s }.join("|")}}"
+      "{#{obj.map { |e| to_label(e) }.join("|")}}"
     when Hash
       "#{obj.keys.map { |e|
         "<#{to_node(e)}> #{e.to_s}"
       }.join("|")}|<default>"
     when String
       obj.to_str
+    when Rack::Mount::Route
+      "#{obj.method} #{obj.path}".gsub(/\|/, '\\|')
     else
       raise "unsupported class: #{obj.class}"
     end

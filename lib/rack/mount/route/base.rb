@@ -33,10 +33,6 @@ module Rack
           @capture_names = (options.delete(:capture_names) || {}).freeze
           @defaults = (options.delete(:defaults) || {}).freeze
         end
-
-        def to_s
-          "#{method} #{path}"
-        end
       end
     end
   end
