@@ -231,5 +231,10 @@ class RegexpSegmentExtractTest < Test::Unit::TestCase
       re = eval('%r{/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)}')
       assert_equal [], extract_static_segments(re, @separators)
     end
+
+    def test_leading_static_segment
+      re = eval('/\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)/')
+      assert_equal ['ruby19'], extract_static_segments(re, @separators)
+    end
   end
 end

@@ -51,6 +51,7 @@ module Rack
 
         source = regexp.source
         source.gsub!(/^\^|\$$/, '')
+        source.gsub!(%r{\\/}, '/')
 
         segments = []
         while m = source.match(separators)
