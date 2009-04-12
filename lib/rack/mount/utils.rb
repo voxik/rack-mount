@@ -42,11 +42,27 @@ module Rack
       module_function :convert_segment_string_to_regexp
 
       def extract_static_segments(regexp, separators)
+        separators = Regexp.compile(separators.map { |s| Regexp.escape(s) }.join('|'))
         segments = []
 
         begin
-          generate_regexp_parts(regexp, separators) do |part|
-            segments << part
+          extract_regexp_parts(regexp).each do |part|
+            break if part.is_a?(Capture)
+
+            part.gsub!(/\\\//, '/')
+            part.gsub!(/^\//, '')
+
+            scanner = StringScanner.new(part)
+
+            until scanner.eos?
+              unless s = scanner.scan_until(separators)
+                s = scanner.rest
+                scanner.terminate
+              end
+
+              s.gsub!(/\/$/, '')
+              segments << (s =~ /^\w+$/ ? s : nil)
+            end
           end
         rescue ArgumentError
           # generation failed somewhere, but lets take what we can get
@@ -61,37 +77,74 @@ module Rack
       end
       module_function :extract_static_segments
 
-      def generate_regexp_parts(regexp, separators)
-        separators = separators.map { |s| Regexp.escape(s) }
-        separators = Regexp.compile(separators.join('|'))
+      class Capture < Array
+        attr_reader :name, :optional
+        alias_method :optional?, :optional
 
-        source = regexp.source
+        def initialize(*args)
+          options = args.last.is_a?(Hash) ? args.pop : {}
 
-        source =~ /^\^/ ? source.gsub!(/^\^/, '') :
-          raise(ArgumentError, "#{source} needs to match the start of the string")
+          @name = options.delete(:name)
+          @name = @name.to_s if @name
 
-        source.gsub!(/\$$/, '')
-        source.gsub!(%r{\\/}, '/')
-        source.gsub!(/^\//, '')
+          @optional = options.delete(:optional) || false
 
-        scanner = StringScanner.new(source)
+          super(args)
+        end
 
-        until scanner.eos?
-          unless s = scanner.scan_until(separators)
-            s = scanner.rest
-            scanner.terminate
-          end
+        def ==(obj)
+          @name == obj.name && @optional == obj.optional && super
+        end
 
-          s.gsub!(/\/$/, '')
+        def optionalize!
+          @optional = true
+          self
+        end
 
-          if s =~ /^\w+$/
-            yield s
-          else
-            yield nil
-          end
+        def named?
+          name && name != ''
         end
       end
-      module_function :generate_regexp_parts
+
+      def extract_regexp_parts(regexp)
+        unless regexp.is_a?(RegexpWithNamedGroups)
+          regexp = RegexpWithNamedGroups.new(regexp)
+        end
+
+        source = regexp.source
+        source =~ /^\^/ ? source.gsub!(/^\^/, '') :
+          raise(ArgumentError, "#{source} needs to match the start of the string")
+        source.gsub!(/\$$/, '')
+
+        scanner = StringScanner.new(source)
+        stack = [[]]
+
+        capture_index = 0
+        until scanner.eos?
+          char = scanner.getch
+          cur  = stack.last
+
+          if char == '('
+            name = regexp.names[capture_index]
+            capture = Capture.new(:name => name)
+            capture_index += 1
+            cur.push(capture)
+            stack.push(capture)
+          elsif char == ')'
+            capture = stack.pop
+            if scanner.peek(1) == '?'
+              scanner.pos += 1
+              capture.optionalize!
+            end
+          else
+            cur.push('') unless cur.last.is_a?(String)
+            cur.last << char
+          end
+        end
+
+        stack.pop
+      end
+      module_function :extract_regexp_parts
     end
   end
 end

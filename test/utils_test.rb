@@ -209,37 +209,55 @@ class RegexpSegmentExtractTest < Test::Unit::TestCase
   def test_requires_to_match_start_of_string
     re = %r{/foo$}
     assert_equal [], extract_static_segments(re, @separators)
+    assert_raise(ArgumentError) { extract_regexp_parts(re) }
   end
 
   def test_simple_regexp
     re = %r{^/foo$}
-    assert_equal ["foo"], extract_static_segments(re, @separators)
+    assert_equal ['foo'], extract_static_segments(re, @separators)
+    assert_equal ['/foo'], extract_regexp_parts(re)
   end
 
   def test_another_simple_regexp
     re = %r{^/people/show/1$}
-    assert_equal ["people", "show", "1"], extract_static_segments(re, @separators)
+    assert_equal ['people', 'show', '1'], extract_static_segments(re, @separators)
+    assert_equal ['/people/show/1'], extract_regexp_parts(re)
+  end
+
+  def test_optional_capture
+    re = %r{^/people/(.+)?$}
+    assert_equal ['people'], extract_static_segments(re, @separators)
+    assert_equal ['/people/', Capture.new('.+', :optional => true)], extract_regexp_parts(re)
   end
 
   def test_regexp_with_hash_of_requirements
     re = %r{^/foo/(bar|baz)/([a-z0-9]+)}
-    assert_equal ["foo"], extract_static_segments(re, @separators)
+    assert_equal ['foo'], extract_static_segments(re, @separators)
+    assert_equal ['/foo/', Capture.new('bar|baz'), '/', Capture.new('[a-z0-9]+')], extract_regexp_parts(re)
   end
 
   def test_regexp_with_period_separator
     re = %r{^/foo\.([a-z]+)$}
     assert_equal [], extract_static_segments(re, @separators)
+    assert_equal ['/foo\\.', Capture.new('[a-z]+')], extract_regexp_parts(re)
   end
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_regexp_with_named_regexp_groups
       re = eval('%r{^/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)$}')
       assert_equal [], extract_static_segments(re, @separators)
+      assert_equal ['/', Capture.new('?<controller>[a-z0-9]+', :name => 'controller'),
+        '/', Capture.new('?<action>[a-z0-9]+', :name => 'action'),
+        '/', Capture.new('?<id>[0-9]+', :name => 'id')
+      ], extract_regexp_parts(re)
     end
 
     def test_leading_static_segment
       re = eval('/^\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)$/')
       assert_equal ['ruby19'], extract_static_segments(re, @separators)
+      assert_equal ['\\/ruby19\\/', Capture.new('?<action>[a-z]+', :name => 'action'),
+        '\\/', Capture.new('?<id>[0-9]+', :name => 'id')
+      ], extract_regexp_parts(re)
     end
   end
 end
