@@ -1,3 +1,5 @@
+require 'strscan'
+
 module Rack
   module Mount
     module Utils
@@ -46,26 +48,27 @@ module Rack
         source = regexp.source
         source.gsub!(/^\^|\$$/, '')
         source.gsub!(%r{\\/}, '/')
+        source.gsub!(/^\//, '')
+
+        scanner = StringScanner.new(source)
 
         segments = []
-        while m = source.match(separators)
-          unless (s = m.pre_match) == ''
-            if !s.empty? && s =~ /^\w+$/
-              segments << s
-            else
-              segments << nil
-            end
+        until scanner.eos?
+          unless s = scanner.scan_until(separators)
+            s = scanner.rest
+            scanner.terminate
           end
 
-          source = m.post_match
+          s.gsub!(/\/$/, '')
+
+          if s =~ /^\w+$/
+            segments << s
+          else
+            segments << nil
+          end
         end
 
-        if !source.empty? && source =~ /^\w+$/
-          segments << source
-        else
-          segments << nil
-        end
-
+        # Pop off trailing nils
         while segments.length > 0 && segments.last.nil?
           segments.pop
         end
