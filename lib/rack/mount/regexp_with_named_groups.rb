@@ -1,3 +1,5 @@
+require 'strscan'
+
 module Rack
   module Mount
     class RegexpWithNamedGroups < Regexp
@@ -54,7 +56,6 @@ module Rack
         SHIM_NAMED_CAPTURE = /\?:<([^>]+)>/.freeze
 
         def extract_shim_named_captures(regexp)
-          require 'strscan'
           source = Regexp.compile(regexp).source
           names, scanner = [], StringScanner.new(source)
 
@@ -66,8 +67,8 @@ module Rack
             end
           end
 
-          regexp = source.gsub(SHIM_NAMED_CAPTURE, '')
-          return Regexp.compile(regexp), names
+          source.gsub!(SHIM_NAMED_CAPTURE, '')
+          return Regexp.compile(source), names
         end
     end
   end
