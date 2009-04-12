@@ -51,20 +51,20 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, :path => "/optional/index(.:format)", :defaults => { :controller => "optional", :action => "index" })
 
-  set.add_route(EchoApp, :path => %r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)}, :capture_names => { :action => 1, :id => 2 }, :defaults => { :controller => "foo" })
+  set.add_route(EchoApp, :path => %r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)$}, :capture_names => { :action => 1, :id => 2 }, :defaults => { :controller => "foo" })
 
   set.add_route(EchoApp, :path => "files/*files", :defaults => { :controller => "files", :action => "index" })
 
-  set.add_route(Rack::Mount::PathPrefix.new(DefaultSet, "/prefix"), :path => %r{/prefix/.*})
+  set.add_route(Rack::Mount::PathPrefix.new(DefaultSet, "/prefix"), :path => %r{^/prefix/.*$})
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-    regexp = eval('/\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)/')
+    regexp = eval('/^\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)$/')
     set.add_route(EchoApp, :path => regexp, :defaults => { :controller => "ruby19" })
 
-    regexp = eval('/\/ruby19\/index(\.(?<format>[a-z]+))?/')
+    regexp = eval('/^\/ruby19\/index(\.(?<format>[a-z]+))?$/')
     set.add_route(EchoApp, :path => regexp, :defaults => { :controller => "ruby19", :action => "index" })
 
-    regexp = eval('/\/ruby19\/(?<action>[a-z]+)(\/(?<id>[0-9]+))?/')
+    regexp = eval('/^\/ruby19\/(?<action>[a-z]+)(\/(?<id>[0-9]+))?$/')
     set.add_route(EchoApp, :path => regexp, :defaults => { :controller => "ruby19" })
   end
 

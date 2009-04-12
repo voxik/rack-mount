@@ -206,6 +206,11 @@ class RegexpSegmentExtractTest < Test::Unit::TestCase
     @separators = %w( / )
   end
 
+  def test_requires_to_match_start_of_string
+    re = %r{/foo$}
+    assert_equal [], extract_static_segments(re, @separators)
+  end
+
   def test_simple_regexp
     re = %r{^/foo$}
     assert_equal ["foo"], extract_static_segments(re, @separators)
@@ -228,12 +233,12 @@ class RegexpSegmentExtractTest < Test::Unit::TestCase
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_regexp_with_named_regexp_groups
-      re = eval('%r{/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)}')
+      re = eval('%r{^/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)$}')
       assert_equal [], extract_static_segments(re, @separators)
     end
 
     def test_leading_static_segment
-      re = eval('/\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)/')
+      re = eval('/^\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)$/')
       assert_equal ['ruby19'], extract_static_segments(re, @separators)
     end
   end

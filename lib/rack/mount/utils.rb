@@ -42,30 +42,14 @@ module Rack
       module_function :convert_segment_string_to_regexp
 
       def extract_static_segments(regexp, separators)
-        separators = separators.map { |s| Regexp.escape(s) }
-        separators = Regexp.compile(separators.join('|'))
-
-        source = regexp.source
-        source.gsub!(/^\^|\$$/, '')
-        source.gsub!(%r{\\/}, '/')
-        source.gsub!(/^\//, '')
-
-        scanner = StringScanner.new(source)
-
         segments = []
-        until scanner.eos?
-          unless s = scanner.scan_until(separators)
-            s = scanner.rest
-            scanner.terminate
-          end
 
-          s.gsub!(/\/$/, '')
-
-          if s =~ /^\w+$/
-            segments << s
-          else
-            segments << nil
+        begin
+          generate_regexp_parts(regexp, separators) do |part|
+            segments << part
           end
+        rescue ArgumentError
+          # generation failed somewhere, but lets take what we can get
         end
 
         # Pop off trailing nils
@@ -76,6 +60,38 @@ module Rack
         segments
       end
       module_function :extract_static_segments
+
+      def generate_regexp_parts(regexp, separators)
+        separators = separators.map { |s| Regexp.escape(s) }
+        separators = Regexp.compile(separators.join('|'))
+
+        source = regexp.source
+
+        source =~ /^\^/ ? source.gsub!(/^\^/, '') :
+          raise(ArgumentError, "#{source} needs to match the start of the string")
+
+        source.gsub!(/\$$/, '')
+        source.gsub!(%r{\\/}, '/')
+        source.gsub!(/^\//, '')
+
+        scanner = StringScanner.new(source)
+
+        until scanner.eos?
+          unless s = scanner.scan_until(separators)
+            s = scanner.rest
+            scanner.terminate
+          end
+
+          s.gsub!(/\/$/, '')
+
+          if s =~ /^\w+$/
+            yield s
+          else
+            yield nil
+          end
+        end
+      end
+      module_function :generate_regexp_parts
     end
   end
 end
