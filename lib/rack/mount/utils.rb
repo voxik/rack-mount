@@ -49,6 +49,7 @@ module Rack
           extract_regexp_parts(regexp).each do |part|
             break if part.is_a?(Capture)
 
+            part = part.dup
             part.gsub!(/\\\//, '/')
             part.gsub!(/^\//, '')
 
@@ -104,6 +105,15 @@ module Rack
         def named?
           name && name != ''
         end
+
+        def freeze
+          each do |e|
+            e.gsub!(/\?<([^>]+)>/, '') if e.is_a?(String)
+            e.freeze
+          end
+
+          super
+        end
       end
 
       def extract_regexp_parts(regexp)
@@ -142,7 +152,9 @@ module Rack
           end
         end
 
-        stack.pop
+        result = stack.pop
+        result.each { |e| e.freeze }
+        result
       end
       module_function :extract_regexp_parts
     end
