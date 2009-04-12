@@ -74,10 +74,13 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match '/optional/index(.:format)', :to => 'optional#index'
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}"), :to => "foo"
+      match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}"), :to => "foo"
+      match eval("%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}"), :to => "foo"
     else
-      match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :to => "foo"
+      match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)$}, :to => "foo"
+      match %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :to => "foo"
     end
+    match %r{^/regexp/baz/[a-z]+/[0-9]+$}, :to => "foo"
 
     match 'files/*files', :to => 'files#index'
 

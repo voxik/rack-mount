@@ -178,6 +178,14 @@ module BasicRecognitionTests
     assert_success
     assert_equal({ :controller => "foo", :action => "baz", :id => "123" }, routing_args)
 
+    get "/regexp/bar/abc/123"
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'abc', :id => '123' }, routing_args)
+
+    get "/regexp/baz/abc/123"
+    assert_success
+    assert_equal({ :controller => 'foo' }, routing_args)
+
     get "/regexp/bars/foo/baz"
     assert_not_found
   end

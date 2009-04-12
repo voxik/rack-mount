@@ -80,6 +80,8 @@ if RUBY_VERSION < '1.9'
       match("/optional/index(.:format)").to(:controller => "optional", :action => "index")
 
       match(%r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)$}, :action => "[1]", :id => "[2]").to(:controller => "foo")
+      match(%r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}).to(:controller => "foo")
+      match(%r{^/regexp/baz/[a-z]+/[0-9]+$}).to(:controller => "foo")
 
       match("defer").defer_to do |request, params|
         params[:controller] = "defer"
