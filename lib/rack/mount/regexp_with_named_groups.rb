@@ -24,7 +24,7 @@ module Rack
         super(regexp)
       end
 
-      if RUBY_VERSION >= '1.9'
+      if instance_methods.include?(:named_captures)
         def named_captures
           @named_captures ||= super
         end
@@ -34,7 +34,7 @@ module Rack
         end
       end
 
-      if RUBY_VERSION >= '1.9'
+      if instance_methods.include?(:names)
         def names
           @names ||= super
         end
