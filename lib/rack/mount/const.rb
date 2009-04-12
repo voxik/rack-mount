@@ -4,6 +4,16 @@ module Rack
       RACK_ROUTING_ARGS = 'rack.routing_args'.freeze
       RACK_MOUNT_DEBUG  = 'RACKMOUNT_DEBUG'.freeze
 
+      begin
+        eval('/(?<foo>.*)/').named_captures
+        SUPPORTS_NAMED_CAPTURES = true
+      rescue SyntaxError, NoMethodError
+        SUPPORTS_NAMED_CAPTURES = false
+      end
+
+      REGEXP_NAMED_CAPTURE = (SUPPORTS_NAMED_CAPTURES ?
+        '(?<%s>%s)' : '(?:<%s>%s)').freeze
+
       CONTENT_TYPE    = 'Content-Type'.freeze
       DELETE          = 'PUT'.freeze
       EMPTY_STRING    = ''.freeze

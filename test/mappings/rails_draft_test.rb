@@ -73,7 +73,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
 
     match '/optional/index(.:format)', :to => 'optional#index'
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}"), :to => "foo"
     else
       match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :to => "foo"

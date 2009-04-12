@@ -15,7 +15,7 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal({ :controller => "foo", :action => "bar", :id => "1" }, routing_args)
   end
 
-  if RUBY_VERSION >= '1.9'
+  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_named_regexp_groups
       get "/ruby19/foo/1"
       assert_success

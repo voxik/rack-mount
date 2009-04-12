@@ -73,7 +73,7 @@ class RegexpWithNamedGroupsTest < Test::Unit::TestCase
     assert_equal(['name', nil, 'id'], re.names)
   end
 
-  if RUBY_VERSION >= '1.9'
+  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_regexp_with_named_regexp_groups
       re = eval('%r{/foo/(?<name>[a-z]+)/(?<id>[0-9]+)}')
       re = RegexpWithNamedGroups.new(re)
@@ -110,7 +110,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_dynamic_segments
     re = convert_segment_string_to_regexp("/foo/:action/:id")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}"), re
     else
       assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re
@@ -122,7 +122,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_requirements
     re = convert_segment_string_to_regexp("/foo/:action/:id", :action => /bar|baz/, :id => /[a-z0-9]+/)
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}"), re
     else
       assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re
@@ -134,7 +134,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_period_separator
     re = convert_segment_string_to_regexp("/foo/:id.:format")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<id>[^/.?]+)\\.(?<format>[^/.?]+)$}"), re
     else
       assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re
@@ -146,7 +146,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_optional_segment
     re = convert_segment_string_to_regexp("/people(.:format)")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re
       assert_equal ['format'], re.names
       assert_equal({ 'format' => [1] }, re.named_captures)
@@ -160,7 +160,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_dynamic_and_optional_segment
     re = convert_segment_string_to_regexp("/people/:id(.:format)")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re
       assert_equal ['id', 'format'], re.names
       assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
@@ -174,7 +174,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_nested_optional_segment
     re = convert_segment_string_to_regexp("/:controller(/:action(/:id(.:format)))")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re
       assert_equal ['controller', 'action', 'id', 'format'], re.names
       assert_equal({ 'controller' => [1], 'action' => [2], 'id' => [3], 'format' => [4] }, re.named_captures)
@@ -188,7 +188,7 @@ class SegmentStringTest < Test::Unit::TestCase
   def test_glob
     re = convert_segment_string_to_regexp("/files/*files")
 
-    if RUBY_VERSION >= '1.9'
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/files/(?<files>.*)$}"), re
     else
       assert_equal %r{^/files/(.*)$}, re
@@ -226,7 +226,7 @@ class RegexpSegmentExtractTest < Test::Unit::TestCase
     assert_equal [], extract_static_segments(re, @separators)
   end
 
-  if RUBY_VERSION >= '1.9'
+  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_regexp_with_named_regexp_groups
       re = eval('%r{/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)}')
       assert_equal [], extract_static_segments(re, @separators)
