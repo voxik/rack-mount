@@ -78,6 +78,35 @@ module Rack
       end
       module_function :extract_static_segments
 
+      def build_generation_segments(regexp)
+        parse_segments(extract_regexp_parts(regexp))
+      rescue ArgumentError
+        []
+      end
+      module_function :build_generation_segments
+
+      def parse_segments(segments)
+        s = []
+        segments.each do |part|
+          if part.is_a?(Capture)
+            if part.named?
+              s << part.name.to_sym
+            else
+              s << parse_segments(part)
+            end
+          else
+            source = part.gsub('\\.', '.').gsub('\\/', '/')
+            if Regexp.compile("^(#{part})$") =~ source
+              s << source
+            else
+              raise ArgumentError
+            end
+          end
+        end
+        s
+      end
+      module_function :parse_segments
+
       class Capture < Array
         attr_reader :name, :optional
         alias_method :optional?, :optional
