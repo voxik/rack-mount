@@ -99,7 +99,7 @@ module Rack
             if Regexp.compile("^(#{part})$") =~ source
               s << source
             else
-              raise ArgumentError
+              raise ArgumentError, "failed to parse #{part.inspect}"
             end
           end
         end

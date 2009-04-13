@@ -5,14 +5,6 @@ module Rack
         def initialize(*args)
           super
 
-          if @path.is_a?(Regexp)
-            @recognizer = RegexpWithNamedGroups.new(@path, @capture_names)
-          else
-            # TODO: Remove this and push conversion into the mapper
-            @recognizer = Utils.convert_segment_string_to_regexp(@path, @requirements)
-          end
-          @recognizer.freeze
-
           @path_keys      = path_keys(@recognizer, %w( / ))
           @named_captures = named_captures(@recognizer)
         end

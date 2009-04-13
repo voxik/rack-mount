@@ -32,6 +32,14 @@ module Rack
           @requirements = (options.delete(:requirements) || {}).freeze
           @capture_names = (options.delete(:capture_names) || {}).freeze
           @defaults = (options.delete(:defaults) || {}).freeze
+
+          if @path.is_a?(Regexp)
+            @recognizer = RegexpWithNamedGroups.new(@path, @capture_names)
+          else
+            # TODO: Remove this and push conversion into the mapper
+            @recognizer = Utils.convert_segment_string_to_regexp(@path, @requirements)
+          end
+          @recognizer.freeze
         end
       end
     end
