@@ -107,11 +107,7 @@ module Rack
         end
 
         def freeze
-          each do |e|
-            e.gsub!(/\?<([^>]+)>/, '') if e.is_a?(String)
-            e.freeze
-          end
-
+          each { |e| e.freeze }
           super
         end
       end
@@ -121,7 +117,13 @@ module Rack
           regexp = RegexpWithNamedGroups.new(regexp)
         end
 
+        if Const::SUPPORTS_NAMED_CAPTURES
+          regexp = regexp.source.gsub(/\?<([^>]+)>/, '?:<\1>')
+          regexp = RegexpWithNamedGroups.new(regexp)
+        end
+
         source = regexp.source
+
         source =~ /^\^/ ? source.gsub!(/^\^/, '') :
           raise(ArgumentError, "#{source} needs to match the start of the string")
         source.gsub!(/\$$/, '')
