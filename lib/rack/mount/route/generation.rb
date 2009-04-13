@@ -26,19 +26,6 @@ module Rack
         end
 
         private
-          class Capture
-            attr_reader :name, :regexp
-            alias_method :to_regexp, :regexp
-
-            def initialize(name, regexp)
-              @name, @regexp = name.to_sym, regexp
-            end
-
-            def inspect
-              "/?<#{name}>#{regexp}/"
-            end
-          end
-
           def parse_segments_with_optionals(pattern, nest_level = 0)
             segments = []
 
@@ -69,7 +56,7 @@ module Rack
               else
                 segments << match.pre_match unless match.pre_match.empty?
                 name = match[2].to_sym
-                segments << Capture.new(name, @requirements[name])
+                segments << name
               end
 
               path = match.post_match
@@ -89,15 +76,15 @@ module Rack
               case segment
               when String
                 segment
-              when Capture
-                params[segment.name] || defaults[segment.name]
+              when Symbol
+                params[segment] || defaults[segment]
               when Array
                 generate_from_segments(segment, params, defaults, true) || ""
               end
             end
 
             # Delete any used items from the params
-            segments.each { |s| params.delete(s.name) if s.is_a?(Capture) }
+            segments.each { |s| params.delete(s) if s.is_a?(Symbol) }
 
             generated.join
           end
