@@ -7,6 +7,9 @@ module BasicGenerationTests
     assert_equal '/global/export', @app.url_for(:export_request)
     assert_equal '/global/hide_notice', @app.url_for(:hide_notice)
     assert_equal '/export/1/file.txt', @app.url_for(:export_download, :id => '1', :file => 'file.txt')
+
+    assert_equal '/regexp/bar/abc/123', @app.url_for(:complex_regexp, :action => 'abc', :id => '123')
+    assert_equal nil, @app.url_for(:complex_regexp_fail)
   end
 
   def test_url_for_with_hash

@@ -9,6 +9,8 @@ module Rack
         end
 
         def url_for(params = {})
+          return nil if @segments.empty?
+
           params = (params || {}).dup
           path = generate_from_segments(@segments, params, @defaults)
 

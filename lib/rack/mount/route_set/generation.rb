@@ -27,10 +27,14 @@ module Rack
           named_route = args.shift
 
           if named_route
-            route = @named_routes[named_route.to_sym]
+            unless route = @named_routes[named_route.to_sym]
+              raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
+            end
           else
             keys = @generation_keys.map { |key| params[key] }
-            route = @generation_graph[*keys].first
+            unless route = @generation_graph[*keys].first
+              raise RoutingError, "No route matches #{params.inspect}"
+            end
           end
 
           route.url_for(params)

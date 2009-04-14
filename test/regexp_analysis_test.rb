@@ -168,6 +168,15 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       Capture.new('[a-z0-9]+')], extract_regexp_parts(re)
   end
 
+  def test_another_regexp_with_requirements
+    re = Rack::Mount::RegexpWithNamedGroups.new(%r{^/regexp/bar/([a-z]+)/([0-9]+)$}, [:action, :id])
+
+    assert_equal ['regexp', 'bar'], extract_static_segments(re, @separators)
+    assert_equal ['/regexp/bar/', :action, '/', :id], build_generation_segments(re)
+    assert_equal ['/regexp/bar/', Capture.new('[a-z]+', :name => 'action'),
+      '/', Capture.new('[0-9]+', :name => 'id')], extract_regexp_parts(re)
+  end
+
   def test_period_separator
     re = convert_segment_string_to_regexp("/foo/:id.:format")
 

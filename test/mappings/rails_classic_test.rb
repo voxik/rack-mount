@@ -58,12 +58,12 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       map.connect eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}"), :controller => "foo"
-      map.connect eval("%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}"), :controller => "foo"
+      map.complex_regexp eval("%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}"), :controller => "foo"
     else
       map.connect %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :controller => "foo"
-      map.connect %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :controller => "foo"
+      map.complex_regexp %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :controller => "foo"
     end
-    map.connect %r{^/regexp/baz/[a-z]+/[0-9]+$}, :controller => "foo"
+    map.complex_regexp_fail %r{^/regexp/baz/[a-z]+/[0-9]+$}, :controller => "foo"
 
     map.connect "files/*files", :controller => "files", :action => "index"
 

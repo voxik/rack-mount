@@ -146,7 +146,7 @@ module Rack
           regexp = RegexpWithNamedGroups.new(regexp)
         end
 
-        if Const::SUPPORTS_NAMED_CAPTURES
+        if regexp.source =~ /\?<([^>]+)>/
           regexp = regexp.source.gsub(/\?<([^>]+)>/, '?:<\1>')
           regexp = RegexpWithNamedGroups.new(regexp)
         end

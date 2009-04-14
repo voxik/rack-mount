@@ -1,4 +1,5 @@
 require 'rack/utils'
+require 'rack/mount/exceptions'
 
 module Rack
   module Mount
