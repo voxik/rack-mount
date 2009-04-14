@@ -1,7 +1,7 @@
 module ControllerConstants
   def const_missing(name)
     if name.to_s =~ /Controller$/
-      EchoApp
+      const_set(name, EchoApp)
     else
       super
     end
