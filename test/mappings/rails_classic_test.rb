@@ -74,4 +74,59 @@ class RailsClassicApiTest < Test::Unit::TestCase
   def setup
     @app = CatchRoutingErrors.new(Routes)
   end
+
+  def test_root_path
+    get '/'
+    assert_success
+    assert_equal({ :controller => 'homepage', :action => 'index' }, routing_args)
+  end
+
+  def test_default_route_extracts_parameters
+    get '/default/foo/bar/1.xml'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1', :format => 'xml' }, routing_args)
+
+    get '/default/foo/bar/1'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
+
+    get '/default/foo/bar'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'bar' }, routing_args)
+
+    get '/default/foo'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'index' }, routing_args)
+  end
+
+  def test_params_override_defaults
+    get '/params_with_defaults/bar'
+    assert_success
+    assert_equal({ :controller => 'bar', :action => 'index' }, routing_args)
+
+    get '/params_with_defaults'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'index' }, routing_args)
+  end
+
+  def test_regexp
+    get '/regexp/foo/bar/123'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'bar', :id => '123' }, routing_args)
+
+    get '/regexp/foos/baz/123'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'baz', :id => '123' }, routing_args)
+
+    get '/regexp/bar/abc/123'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'abc', :id => '123' }, routing_args)
+
+    get '/regexp/baz/abc/123'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'index' }, routing_args)
+
+    get '/regexp/bars/foo/baz'
+    assert_not_found
+  end
 end

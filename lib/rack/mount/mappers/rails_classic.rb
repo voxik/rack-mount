@@ -36,7 +36,9 @@ module Rack
           end
 
           def call(env)
-            app = @app || controller(env[Const::RACK_ROUTING_ARGS])
+            params = env[Const::RACK_ROUTING_ARGS]
+            app = @app || controller(params)
+            merge_default_action!(params)
 
             # TODO: Rails response is not finalized by the controller
             app.call(env).to_a
@@ -48,6 +50,10 @@ module Rack
                 controller = "#{params[:controller].camelize}Controller"
                 ActiveSupport::Inflector.constantize(controller)
               end
+            end
+
+            def merge_default_action!(params)
+              params[:action] ||= 'index'
             end
         end
 
