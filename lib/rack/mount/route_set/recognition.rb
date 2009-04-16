@@ -2,13 +2,14 @@ module Rack
   module Mount
     class RouteSet
       module Recognition
-        DEFAULT_KEYS = [:method, [:path_keys_at, 0]].freeze
+        DEFAULT_KEYS = [:method, [:path_keys_at, 0].freeze].freeze
         DEFAULT_CATCH_STATUS = 404
 
         def initialize(options = {})
           @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
           @throw = Const::NOT_FOUND_RESPONSE.dup
           @throw[0] = @catch
+          @throw.freeze
 
           @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
           @recognition_graph = NestedSet.new

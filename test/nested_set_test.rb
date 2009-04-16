@@ -163,12 +163,6 @@ class NestedSetTest < Test::Unit::TestCase
 
     root.freeze
 
-    assert root.frozen?
-    assert root['/admin'].frozen?
-    assert root['/notfound'].frozen?
-    assert root['/admin', '/people'].frozen?
-    root['/admin', '/people'].each { |e|
-      assert e.frozen?
-    }
+    assert_frozen(root)
   end
 end
