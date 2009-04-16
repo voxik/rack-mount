@@ -26,7 +26,7 @@ module Rack
         class RoutingError < StandardError; end
 
         NotFound = lambda { |env|
-          raise RoutingError, "No route matches #{env['PATH_INFO'].inspect} with #{env.inspect}"
+          raise RoutingError, "No route matches #{env[Const::PATH_INFO].inspect} with #{env.inspect}"
         }
 
         class Dispatcher

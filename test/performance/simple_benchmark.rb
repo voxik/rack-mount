@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rack/mount'
 require 'rack/mount/mappers/rails_classic'
 
-Response = [200, {'Content-Type' => 'text/plain'}, []]
+Response = [200, {Rack::Mount::Const::CONTENT_TYPE => 'text/plain'}, []]
 EchoApp = lambda { |env| Response }
 
 def Object.const_missing(name)
@@ -24,8 +24,8 @@ Map = lambda do |map|
 end
 
 Env = {
-  'REQUEST_METHOD' => 'GET',
-  'PATH_INFO' => '/zz/1'
+  Rack::Mount::Const::REQUEST_METHOD => 'GET',
+  Rack::Mount::Const::PATH_INFO => '/zz/1'
 }
 
 Routes = Rack::Mount::RouteSet.new.draw(&Map)
