@@ -105,8 +105,6 @@ module BasicRecognitionTests
     get '/files/images/photo.jpg'
     assert_success
 
-    # TODO
-    # assert_equal({:files => ['images', 'photo.jpg']}, routing_args)
     assert_equal({ :controller => 'files', :action => 'index', :files => 'images/photo.jpg' }, routing_args)
   end
 

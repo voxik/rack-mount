@@ -81,6 +81,13 @@ class RailsClassicApiTest < Test::Unit::TestCase
     assert_equal({ :controller => 'homepage', :action => 'index' }, routing_args)
   end
 
+  def test_path_with_globbing
+    get '/files/images/photo.jpg'
+    assert_success
+
+    assert_equal({ :controller => 'files', :action => 'index', :files => ['images', 'photo.jpg'] }, routing_args)
+  end
+
   def test_default_route_extracts_parameters
     get '/default/foo/bar/1.xml'
     assert_success

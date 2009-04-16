@@ -32,6 +32,7 @@ module Rack
         class Dispatcher
           def initialize(options = {})
             defaults = options[:defaults]
+            @glob_param = options.delete(:glob)
             @app = controller(defaults)
           end
 
@@ -39,6 +40,7 @@ module Rack
             params = env[Const::RACK_ROUTING_ARGS]
             app = @app || controller(params)
             merge_default_action!(params)
+            split_glob_param!(params) if @glob_param
 
             # TODO: Rails response is not finalized by the controller
             app.call(env).to_a
@@ -54,6 +56,10 @@ module Rack
 
             def merge_default_action!(params)
               params[:action] ||= 'index'
+            end
+
+            def split_glob_param!(params)
+              params[@glob_param] = params[@glob_param].split('/')
             end
         end
 
@@ -93,7 +99,11 @@ module Rack
             end
           end
 
-          app = Dispatcher.new(:defaults => defaults)
+          if path.is_a?(String) && path =~ /\/\*(\w+)$/
+            glob = $1.to_sym
+          end
+
+          app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
           @set.add_route(app, {
             :name => name,
