@@ -6,11 +6,7 @@ require 'fixtures'
 
 Response = [200, {Rack::Mount::Const::CONTENT_TYPE => 'text/plain'}, []]
 EchoApp = lambda { |env| Response }
-
-Env = {
-  Rack::Mount::Const::REQUEST_METHOD => 'GET',
-  Rack::Mount::Const::PATH_INFO => '/foo'
-}
+Env = Rack::MockRequest.env_for('/foo')
 
 require 'benchmark'
 

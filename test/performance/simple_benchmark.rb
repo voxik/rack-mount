@@ -23,11 +23,7 @@ Map = lambda do |map|
   map.connect ':controller/:action/:id'
 end
 
-Env = {
-  Rack::Mount::Const::REQUEST_METHOD => 'GET',
-  Rack::Mount::Const::PATH_INFO => '/zz/1'
-}
-
+Env = Rack::MockRequest.env_for('/zz/1')
 Routes = Rack::Mount::RouteSet.new.draw(&Map)
 
 require 'benchmark'

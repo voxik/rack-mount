@@ -5,11 +5,7 @@ require 'rack/mount'
 require 'lib/performance_helper'
 require 'fixtures'
 
-Env = {
-  Rack::Mount::Const::REQUEST_METHOD => 'GET',
-  Rack::Mount::Const::PATH_INFO => '/foo'
-}.freeze
-
+Env = Rack::MockRequest.env_for('/foo')
 Response = [200, {Rack::Mount::Const::CONTENT_TYPE => 'text/plain'}, []]
 EchoApp = lambda { |env| Response }
 

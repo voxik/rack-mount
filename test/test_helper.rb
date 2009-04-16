@@ -36,29 +36,26 @@ module TestHelper
     end
 
     def get(path, options = {})
-      process(:get, path, options)
+      process(path, options.merge(:method => 'GET'))
     end
 
     def post(path, options = {})
-      process(:post, path, options)
+      process(path, options.merge(:method => 'POST'))
     end
 
     def put(path, options = {})
-      process(:put, path, options)
+      process(path, options.merge(:method => 'PUT'))
     end
 
     def delete(path, options = {})
-      process(:delete, path, options)
+      process(path, options.merge(:method => 'DELETE'))
     end
 
-    def process(method, path, options = {})
-      @method = method
-      @path   = path
+    def process(path, options = {})
+      @path = path
 
-      @response = @app.call({
-        Rack::Mount::Const::REQUEST_METHOD => method.to_s.upcase,
-        Rack::Mount::Const::PATH_INFO => path
-      }.merge(options))
+      env = Rack::MockRequest.env_for(path, options)
+      @response = @app.call(env)
 
       if @response && @response[0] == 200
         @env = YAML.load(@response[2][0])
