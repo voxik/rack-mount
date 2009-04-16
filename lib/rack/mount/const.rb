@@ -28,7 +28,9 @@ module Rack
 
       DEFAULT_CONTENT_TYPE_HEADERS = {CONTENT_TYPE => TEXT_SLASH_HTML}.freeze
       HTTP_METHODS = [GET, HEAD, POST, PUT, DELETE].freeze
-      NOT_FOUND_RESPONSE = [404, {CONTENT_TYPE => TEXT_SLASH_HTML}, 'Not Found'.freeze].freeze
+
+      OK_RESPONSE = [200, {CONTENT_TYPE => TEXT_SLASH_HTML}, ['OK'.freeze]].freeze
+      NOT_FOUND_RESPONSE = [404, {CONTENT_TYPE => TEXT_SLASH_HTML}, ['Not Found'.freeze]].freeze
     end
   end
 end

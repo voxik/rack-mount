@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'rack/mount'
 require 'rack/mount/mappers/rails_classic'
+require 'fixtures'
 
-Response = [200, {Rack::Mount::Const::CONTENT_TYPE => 'text/plain'}, []]
-EchoApp = lambda { |env| Response }
+EchoApp = lambda { |env| Rack::Mount::Const::OK_RESPONSE }
 
 def Object.const_missing(name)
   if name.to_s =~ /Controller$/
@@ -23,13 +23,12 @@ Map = lambda do |map|
   map.connect ':controller/:action/:id'
 end
 
-Env = Rack::MockRequest.env_for('/zz/1')
+TIMES = 10_000.to_i
 Routes = Rack::Mount::RouteSet.new.draw(&Map)
+Env = EnvGenerator.env_for(TIMES, '/zz/1')
 
 require 'benchmark'
 
-TIMES = 10_000.to_i
-
 Benchmark.bmbm do |x|
-  x.report('hash bucket') { TIMES.times { Routes.call(Env.dup) } }
+  x.report('hash bucket') { TIMES.times { |n| Routes.call(Env[n]) } }
 end
