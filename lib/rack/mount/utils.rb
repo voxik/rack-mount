@@ -47,7 +47,7 @@ module Rack
 
         begin
           extract_regexp_parts(regexp).each do |part|
-            break if part.is_a?(Capture)
+            raise ArgumentError if part.is_a?(Capture)
 
             part = part.dup
             part.gsub!(/\\\//, '/')
@@ -65,6 +65,8 @@ module Rack
               segments << (s =~ /^\w+$/ ? s : nil)
             end
           end
+
+          segments << '$'
         rescue ArgumentError
           # generation failed somewhere, but lets take what we can get
         end

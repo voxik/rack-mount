@@ -21,6 +21,7 @@ module Rack
         @path_keys ||= begin
           keys = path.split(%r{/|\.|\?})
           keys.shift
+          keys << '$'
           keys
         end
       end

@@ -21,9 +21,21 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     assert_equal [], re.names
     assert_equal({}, re.named_captures)
 
-    assert_equal ['foo'], extract_static_segments(re, @separators)
+    assert_equal ['foo', '$'], extract_static_segments(re, @separators)
     assert_equal ['/foo'], build_generation_segments(re)
     assert_equal ['/foo'], extract_regexp_parts(re)
+  end
+
+  def test_root_path
+    re = convert_segment_string_to_regexp('/')
+
+    assert_equal %r{^/$}, re
+    assert_equal [], re.names
+    assert_equal({}, re.named_captures)
+
+    assert_equal ['$'], extract_static_segments(re, @separators)
+    assert_equal ['/'], build_generation_segments(re)
+    assert_equal ['/'], extract_regexp_parts(re)
   end
 
   def test_multisegment_static_string
@@ -33,7 +45,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     assert_equal [], re.names
     assert_equal({}, re.named_captures)
 
-    assert_equal ['people', 'show', '1'], extract_static_segments(re, @separators)
+    assert_equal ['people', 'show', '1', '$'], extract_static_segments(re, @separators)
     assert_equal ['/people/show/1'], build_generation_segments(re)
     assert_equal ['/people/show/1'], extract_regexp_parts(re)
   end
