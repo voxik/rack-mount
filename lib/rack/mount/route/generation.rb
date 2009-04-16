@@ -5,13 +5,16 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = Utils.build_generation_segments(@recognizer)
+          @segments = Utils.build_generation_segments(@recognizer).freeze
+          @required_params = @segments.find_all { |s| s.is_a?(Symbol) }.freeze
         end
 
         def url_for(params = {})
-          return nil if @segments.empty?
-
           params = (params || {}).dup
+
+          return nil if @segments.empty?
+          return nil unless @required_params.all? { |p| params.include?(p) }
+
           path = generate_from_segments(@segments, params, @defaults)
 
           @defaults.each do |key, value|
@@ -28,8 +31,18 @@ module Rack
         private
           def generate_from_segments(segments, params, defaults, optional = false)
             if optional
-              # We don't want to generate all string optional segments
               return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
+              return Const::EMPTY_STRING if segments.flatten.all? { |s|
+                if s.is_a?(Symbol) && params[s]
+                  if @requirements[s]
+                    params[s].to_s !~ @requirements[s]
+                  else
+                    false
+                  end
+                else
+                  true
+                end
+              }
             end
 
             generated = segments.map do |segment|

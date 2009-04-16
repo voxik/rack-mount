@@ -2,7 +2,7 @@ module Rack
   module Mount
     class RouteSet
       module Generation
-        DEFAULT_KEYS = [:controller, :action].freeze
+        DEFAULT_KEYS = [] # [:controller, :action].freeze
 
         def initialize(options = {})
           @named_routes = {}
@@ -23,8 +23,9 @@ module Rack
         end
 
         def url_for(*args)
-          params = args.pop if args.last.is_a?(Hash)
+          params = args.last.is_a?(Hash) ? args.pop : {}
           named_route = args.shift
+          route = nil
 
           if named_route
             unless route = @named_routes[named_route.to_sym]
@@ -32,7 +33,14 @@ module Rack
             end
           else
             keys = @generation_keys.map { |key| params[key] }
-            unless route = @generation_graph[*keys].first
+            @generation_graph[*keys].each do |r|
+              if r.defaults.all? { |k, v| params[k] == v }
+                route = r
+                break
+              end
+            end
+
+            unless route
               raise RoutingError, "No route matches #{params.inspect}"
             end
           end

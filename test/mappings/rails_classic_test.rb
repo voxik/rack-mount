@@ -136,4 +136,9 @@ class RailsClassicApiTest < Test::Unit::TestCase
     get '/regexp/bars/foo/baz'
     assert_not_found
   end
+
+  def test_url_for_with_resource_named_route
+    assert_equal '/people', @app.url_for(:people)
+    assert_equal '/people/1', @app.url_for(:person, :id => '1')
+  end
 end
