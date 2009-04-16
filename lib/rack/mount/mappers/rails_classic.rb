@@ -3,6 +3,7 @@ module Rack
     class RouteSet
       def draw(&block)
         Mappers::RailsClassic.new(self).draw(&block)
+        install_helpers
         freeze
       end
 
@@ -18,6 +19,11 @@ module Rack
       alias reload! load!
 
       def reload
+      end
+
+      def install_helpers(destinations = [ActionController::Base, ActionView::Base], regenerate_code = false)
+        Array(destinations).each { |d| d.module_eval { include ActionController::Routing::Helpers } }
+        # named_routes.install(destinations, regenerate_code)
       end
     end
 
