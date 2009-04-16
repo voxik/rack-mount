@@ -15,12 +15,12 @@ module Rack
       class Merb
         class ::Merb::Router::Behavior
           def to_route
-            raise Error, "The route has already been committed." if @route
+            raise Error, 'The route has already been committed.' if @route
 
             controller = @params[:controller]
 
             if prefixes = @options[:controller_prefix]
-              controller ||= ":controller"
+              controller ||= ':controller'
 
               prefixes.reverse_each do |prefix|
                 break if controller =~ %r{^/(.*)} && controller = $1
@@ -91,7 +91,7 @@ module Rack
 
         def initialize(set)
           @set = set
-          @root_behavior = ::Merb::Router::Behavior.new.defaults(:action => "index")
+          @root_behavior = ::Merb::Router::Behavior.new.defaults(:action => 'index')
         end
 
         def prepare(first = [], last = [], &block)

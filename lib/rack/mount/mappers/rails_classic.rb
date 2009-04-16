@@ -26,7 +26,7 @@ module Rack
         class RoutingError < StandardError; end
 
         NotFound = lambda { |env|
-          raise RoutingError, "No route matches #{env["PATH_INFO"].inspect} with #{env.inspect}"
+          raise RoutingError, "No route matches #{env['PATH_INFO'].inspect} with #{env.inspect}"
         }
 
         class Dispatcher
@@ -73,7 +73,7 @@ module Rack
 
         def add_route(path, options = {})
           if path.is_a?(String)
-            path = path.gsub(".:format", "(.:format)")
+            path = path.gsub('.:format', '(.:format)')
             path = optionalize_trailing_dynamic_segments(path)
           end
 

@@ -26,7 +26,7 @@ module Rack
                 method = env[Const::REQUEST_METHOD]
                 path = env[Const::PATH_INFO]
 
-                if #{@method ? "method == @method && " : ""}path =~ @recognizer
+                if #{@method ? 'method == @method && ' : ''}path =~ @recognizer
                   routing_args, param_matches = @defaults.dup, $~.captures
                   #{assign_index_params}
                   env[Const::RACK_ROUTING_ARGS] = routing_args

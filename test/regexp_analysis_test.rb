@@ -98,7 +98,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_optional_capture_within_segment
-    re = convert_segment_string_to_regexp("/people(.:format)")
+    re = convert_segment_string_to_regexp('/people(.:format)')
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re
@@ -118,7 +118,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_and_optional_segment
-    re = convert_segment_string_to_regexp("/people/:id(.:format)")
+    re = convert_segment_string_to_regexp('/people/:id(.:format)')
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re
@@ -136,7 +136,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_nested_optional_captures
-    re = convert_segment_string_to_regexp("/:controller(/:action(/:id(.:format)))")
+    re = convert_segment_string_to_regexp('/:controller(/:action(/:id(.:format)))')
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re
@@ -150,7 +150,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
     assert_equal [], extract_static_segments(re, @separators)
     assert_equal ['/', :controller, ['/', :action, ['/', :id, ['.', :format]]]], build_generation_segments(re)
-    assert_equal ['/', Capture.new("[^/.?]+", :name => 'controller'),
+    assert_equal ['/', Capture.new('[^/.?]+', :name => 'controller'),
       Capture.new('/', Capture.new('[^/.?]+', :name => 'action'),
         Capture.new('/', Capture.new('[^/.?]+', :name => 'id'),
           Capture.new('\\.', Capture.new('[^/.?]+', :name => 'format'), :optional => true),
@@ -178,7 +178,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_period_separator
-    re = convert_segment_string_to_regexp("/foo/:id.:format")
+    re = convert_segment_string_to_regexp('/foo/:id.:format')
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<id>[^/.?]+)\\.(?<format>[^/.?]+)$}"), re
@@ -196,7 +196,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_glob
-    re = convert_segment_string_to_regexp("/files/*files")
+    re = convert_segment_string_to_regexp('/files/*files')
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/files/(?<files>.*)$}"), re

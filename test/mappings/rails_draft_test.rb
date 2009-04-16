@@ -49,7 +49,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match 'people/:id/update', :to => 'people#update', :as => :update_person
     match '/projects/:project_id/people/:id/update', :to => 'people#update', :as => :update_project_person
 
-    match 'articles/:year/:month/:day/:title', :to => "articles#show", :as => :article
+    match 'articles/:year/:month/:day/:title', :to => 'articles#show', :as => :article
 
     namespace :account do
       resources :subscription, :credit, :credit_card
@@ -74,49 +74,49 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match '/optional/index(.:format)', :to => 'optional#index'
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}"), :to => "foo"
-      match eval("%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}"), :to => "foo"
+      match eval("%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}"), :to => 'foo'
+      match eval("%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}"), :to => 'foo'
     else
-      match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)$}, :to => "foo"
-      match %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :to => "foo"
+      match %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)$}, :to => 'foo'
+      match %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :to => 'foo'
     end
-    match %r{^/regexp/baz/[a-z]+/[0-9]+$}, :to => "foo"
+    match %r{^/regexp/baz/[a-z]+/[0-9]+$}, :to => 'foo'
 
     match 'files/*files', :to => 'files#index'
 
-    match 'params_with_defaults(/:controller)', :to => "foo"
+    match 'params_with_defaults(/:controller)', :to => 'foo'
     match 'default/:controller/:action/:id'
     match 'default/:controller/:action/:id.:format'
   end
 
   def test_misc_routes
-    get "/people/1/update"
+    get '/people/1/update'
     assert_success
-    assert_equal({ :controller => "people", :action => "update", :id => "1"}, routing_args)
+    assert_equal({ :controller => 'people', :action => 'update', :id => '1'}, routing_args)
 
-    get "/projects/1/people/2/update"
+    get '/projects/1/people/2/update'
     assert_success
-    assert_equal({ :project_id => "1", :controller => "people", :id => "2", :action => "update" }, routing_args)
+    assert_equal({ :project_id => '1', :controller => 'people', :id => '2', :action => 'update' }, routing_args)
 
-    get "/articles/2009/1/19/birthday"
+    get '/articles/2009/1/19/birthday'
     assert_success
-    assert_equal({ :controller => "articles", :action => "show", :year => "2009", :month => "1", :day => "19", :title => "birthday" }, routing_args)
+    assert_equal({ :controller => 'articles', :action => 'show', :year => '2009', :month => '1', :day => '19', :title => 'birthday' }, routing_args)
   end
 
   def test_nested_route
-    get "/articles2/hello/1"
+    get '/articles2/hello/1'
     assert_success
-    assert_equal({ :controller => "articles", :action => "with_id", :title => "hello", :id => "1" }, routing_args)
+    assert_equal({ :controller => 'articles', :action => 'with_id', :title => 'hello', :id => '1' }, routing_args)
   end
 
   def test_nested_resource
-    get "/12345/rooms"
+    get '/12345/rooms'
     assert_success
-    assert_equal({ :controller => "rooms", :action => "index", :access_token => "12345" }, routing_args)
+    assert_equal({ :controller => 'rooms', :action => 'index', :access_token => '12345' }, routing_args)
 
-    get "/12345/rooms/1"
+    get '/12345/rooms/1'
     assert_success
-    assert_equal({ :controller => "rooms", :action => "show", :access_token => "12345", :id => "1" }, routing_args)
+    assert_equal({ :controller => 'rooms', :action => 'show', :access_token => '12345', :id => '1' }, routing_args)
   end
 
   def setup

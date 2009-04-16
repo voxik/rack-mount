@@ -10,36 +10,36 @@ class RouteSetTest < Test::Unit::TestCase
   end
 
   def test_path_prefix
-    get "/prefix/foo/bar/1"
+    get '/prefix/foo/bar/1'
     assert_success
-    assert_equal({ :controller => "foo", :action => "bar", :id => "1" }, routing_args)
+    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
   end
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_named_regexp_groups
-      get "/ruby19/foo/1"
+      get '/ruby19/foo/1'
       assert_success
-      assert_equal({ :controller => "ruby19", :action => "foo", :id => "1" }, routing_args)
+      assert_equal({ :controller => 'ruby19', :action => 'foo', :id => '1' }, routing_args)
     end
 
     def test_optional_segments_with_period
-      get "/ruby19/index"
+      get '/ruby19/index'
       assert_success
-      assert_equal({ :controller => "ruby19", :action => "index" }, routing_args)
+      assert_equal({ :controller => 'ruby19', :action => 'index' }, routing_args)
 
-      get "/ruby19/index.xml"
+      get '/ruby19/index.xml'
       assert_success
-      assert_equal({ :controller => "ruby19", :action => "index", :format => "xml" }, routing_args)
+      assert_equal({ :controller => 'ruby19', :action => 'index', :format => 'xml' }, routing_args)
     end
 
     def test_optional_segments_with_slash
-      get "/ruby19/foo"
+      get '/ruby19/foo'
       assert_success
-      assert_equal({ :controller => "ruby19", :action => "foo" }, routing_args)
+      assert_equal({ :controller => 'ruby19', :action => 'foo' }, routing_args)
 
-      get "/ruby19/foo/123"
+      get '/ruby19/foo/123'
       assert_success
-      assert_equal({ :controller => "ruby19", :action => "foo", :id => "123" }, routing_args)
+      assert_equal({ :controller => 'ruby19', :action => 'foo', :id => '123' }, routing_args)
     end
   end
 
@@ -54,7 +54,7 @@ class RouteSetTest < Test::Unit::TestCase
   def test_ensure_each_route_requires_a_valid_rack_app
     set = Rack::Mount::RouteSet.new
     assert_raise(ArgumentError) { set.add_route({}) }
-    assert_raise(ArgumentError) { set.add_route(:app => "invalid app") }
+    assert_raise(ArgumentError) { set.add_route(:app => 'invalid app') }
   end
 
   def test_worst_case

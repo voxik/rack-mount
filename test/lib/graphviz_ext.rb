@@ -3,7 +3,7 @@ require 'graphviz'
 class GraphViz
   def self.escape(str)
     str.to_str.gsub(/\|/, '\\|')
-    str.to_str.gsub(/\|/, '\\|').gsub(/\</, "\\<").gsub(/\>/, "\\>")
+    str.to_str.gsub(/\|/, '\\|').gsub(/\</, '\\<').gsub(/\>/, '\\>')
   end
 
   def self.to_node(obj)
@@ -13,17 +13,17 @@ class GraphViz
   def self.to_label(obj)
     case obj
     when true
-      "true"
+      'true'
     when false
-      "false"
+      'false'
     when nil
-      "nil"
+      'nil'
     when Array
-      "{#{obj.map { |e| to_label(e) }.join("|")}}"
+      "{#{obj.map { |e| to_label(e) }.join('|')}}"
     when Hash
       "#{obj.keys.map { |e|
         "<#{to_node(e)}> #{e.to_s}"
-      }.join("|")}|<default>"
+      }.join('|')}|<default>"
     when Regexp
       obj.source
     when String

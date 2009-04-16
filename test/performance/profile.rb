@@ -6,11 +6,11 @@ require 'lib/performance_helper'
 require 'fixtures'
 
 Env = {
-  "REQUEST_METHOD" => "GET",
-  "PATH_INFO" => "/foo"
+  'REQUEST_METHOD' => 'GET',
+  'PATH_INFO' => '/foo'
 }.freeze
 
-Response = [200, {"Content-Type" => "text/plain"}, []]
+Response = [200, {'Content-Type' => 'text/plain'}, []]
 EchoApp = lambda { |env| Response }
 
 routes = BasicSet

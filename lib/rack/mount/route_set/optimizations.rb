@@ -47,7 +47,7 @@ module Rack
               else
                 "req.#{key}"
               end
-            }.join(", ")
+            }.join(', ')
           end
       end
     end

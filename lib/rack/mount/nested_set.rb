@@ -25,7 +25,7 @@ module Rack
         key   = WILD_REGEXP if key.nil?
         keys  = args.freeze
 
-        raise ArgumentError, "missing value" unless value
+        raise ArgumentError, 'missing value' unless value
 
         case key
         when Regexp
@@ -50,7 +50,7 @@ module Rack
 
           super(key, v)
         else
-          raise ArgumentError, "unsupported key"
+          raise ArgumentError, 'unsupported key'
         end
       end
 

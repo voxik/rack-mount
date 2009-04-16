@@ -16,7 +16,7 @@ module Rack
         class RoutingError < StandardError; end
 
         NotFound = lambda { |env|
-          raise RoutingError, "No route matches #{env["PATH_INFO"].inspect} with #{env.inspect}"
+          raise RoutingError, "No route matches #{env['PATH_INFO'].inspect} with #{env.inspect}"
         }
 
         DynamicController = lambda { |env|
@@ -84,7 +84,7 @@ module Rack
           end
 
           if to = options.delete(:to)
-            controller, action = to.to_s.split("#")
+            controller, action = to.to_s.split('#')
 
             if controller && action && defaults[:controller]
               defaults[:controller] = "#{defaults[:controller]}#{controller}"

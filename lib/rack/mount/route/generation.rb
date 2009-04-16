@@ -29,7 +29,7 @@ module Rack
           def generate_from_segments(segments, params, defaults, optional = false)
             if optional
               # We don't want to generate all string optional segments
-              return "" if segments.all? { |s| s.is_a?(String) }
+              return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
             end
 
             generated = segments.map do |segment|
@@ -39,7 +39,7 @@ module Rack
               when Symbol
                 params[segment] || defaults[segment]
               when Array
-                generate_from_segments(segment, params, defaults, true) || ""
+                generate_from_segments(segment, params, defaults, true) || Const::EMPTY_STRING
               end
             end
 

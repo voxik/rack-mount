@@ -26,7 +26,7 @@ module Rack
         end
 
         def call(env)
-          raise "route set not finalized" unless frozen?
+          raise 'route set not finalized' unless frozen?
 
           req = Request.new(env)
           keys = @recognition_keys.map { |key| req.send(*key) }

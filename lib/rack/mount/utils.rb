@@ -15,7 +15,7 @@ module Rack
         requirements = requirements || {}
         str.replace("/#{str}") unless str =~ /^\//
 
-        re = ""
+        re = ''
 
         while m = (str.match(SEGMENT_REGEXP))
           re << m.pre_match unless m.pre_match.empty?
@@ -30,7 +30,7 @@ module Rack
         re << str unless str.empty?
 
         if m = re.match(GLOB_REGEXP)
-          re.sub!(GLOB_REGEXP, "/#{Const::REGEXP_NAMED_CAPTURE % [$1, ".*"]}")
+          re.sub!(GLOB_REGEXP, "/#{Const::REGEXP_NAMED_CAPTURE % [$1, '.*']}")
         end
 
         while re =~ OPTIONAL_SEGMENT_REGEXP
