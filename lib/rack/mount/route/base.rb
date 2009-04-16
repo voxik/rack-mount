@@ -23,23 +23,22 @@ module Rack
           method = options.delete(:method)
           @method = method.to_s.upcase if method
 
-          @path = options.delete(:path)
-          if @path.is_a?(String)
-            @path = "/#{path}" unless path =~ /^\//
+          path = options.delete(:path)
+          if path.is_a?(String)
+            path = "/#{path}" unless path =~ /^\//
           end
-          @path.freeze
 
           @requirements = (options.delete(:requirements) || {}).freeze
           @capture_names = (options.delete(:capture_names) || {}).freeze
           @defaults = (options.delete(:defaults) || {}).freeze
 
-          if @path.is_a?(Regexp)
-            @recognizer = RegexpWithNamedGroups.new(@path, @capture_names)
+          if path.is_a?(Regexp)
+            @path = RegexpWithNamedGroups.new(path, @capture_names)
           else
             # TODO: Remove this and push conversion into the mapper
-            @recognizer = Utils.convert_segment_string_to_regexp(@path, @requirements)
+            @path = Utils.convert_segment_string_to_regexp(path, @requirements)
           end
-          @recognizer.freeze
+          @path.freeze
         end
       end
     end

@@ -5,7 +5,7 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = Utils.build_generation_segments(@recognizer).freeze
+          @segments = Utils.build_generation_segments(@path).freeze
           @required_params = @segments.find_all { |s| s.is_a?(Symbol) }.freeze
         end
 

@@ -2,8 +2,7 @@ require 'graphviz'
 
 class GraphViz
   def self.escape(str)
-    str.to_str.gsub(/\|/, '\\|')
-    str.to_str.gsub(/\|/, '\\|').gsub(/\</, '\\<').gsub(/\>/, '\\>')
+    str.to_str.gsub(/(\||\<|\>|\{|\})/, '\\\1')
   end
 
   def self.to_node(obj)

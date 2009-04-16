@@ -5,15 +5,15 @@ module Rack
         def initialize(*args)
           super
 
-          @path_keys      = path_keys(@recognizer, %w( / ))
-          @named_captures = named_captures(@recognizer)
+          @path_keys      = path_keys(@path, %w( / ))
+          @named_captures = named_captures(@path)
         end
 
         def call(env)
           method = env[Const::REQUEST_METHOD]
           path = env[Const::PATH_INFO]
 
-          if (@method.nil? || method == @method) && path =~ @recognizer
+          if (@method.nil? || method == @method) && path =~ @path
             routing_args, param_matches = @defaults.dup, $~.captures
             @named_captures.each { |k, i|
               if v = param_matches[i]
