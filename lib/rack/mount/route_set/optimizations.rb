@@ -6,8 +6,8 @@ module Rack
           @recognition_graph.lists.each do |list|
             body = (0...list.length).zip(list).map { |i, route|
               <<-EOS
-                route = self[#{i}]
-                if #{route.method ? 'method == route.method && ' : ''}path =~ route.path
+                if #{route.method ? "method == #{route.method.inspect} && " : ''}path =~ #{route.path.inspect}
+                  route = self[#{i}]
                   routing_args, param_matches = route.defaults.dup, $~.captures
                   #{route.instance_variable_get("@named_captures").map { |k, i|
                     "routing_args[#{k.inspect}] = param_matches[#{i}] if param_matches[#{i}]"
