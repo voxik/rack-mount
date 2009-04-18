@@ -8,6 +8,7 @@ module Rack
       end
 
       def generate(options, recall = {}, method = :generate)
+        url_for(options)
       end
 
       def add_configuration_file(path)
