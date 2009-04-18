@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rack/mount'
-require 'fixtures'
-require 'benchmark'
+require 'lib/performance_helper'
 
 TIMES = 100_000.to_i
 Set = DeeplyNestedSet

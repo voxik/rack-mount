@@ -1,3 +1,17 @@
+require 'benchmark'
+require 'ruby-prof'
+require 'fixtures'
+
+EchoApp = lambda { |env| Rack::Mount::Const::OK_RESPONSE }
+
+def Object.const_missing(name)
+  if name.to_s =~ /Controller$/
+    EchoApp
+  else
+    super
+  end
+end
+
 OUTPUT = File.join(File.dirname(__FILE__), '..', '..', 'tmp', 'performance')
 
 PRINTERS = {
