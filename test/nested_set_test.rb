@@ -15,6 +15,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/companies'], root['/companies']
     assert_equal [], root['/notfound']
 
+    assert_equal 3, root.lists.length
     assert_equal 3, root.height
   end
 
@@ -32,6 +33,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/:controller/edit', '/companies', '/:controller/:action'], root['/companies']
     assert_equal ['/:controller/edit', '/:controller/:action'], root['/notfound']
 
+    assert_equal 3, root.lists.length
     assert_equal 5, root.height
   end
 
@@ -51,6 +53,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/:id', '/:action'], root['/789']
     assert_equal ['/:id', '/:action'], root['/notfound']
 
+    assert_equal 4, root.lists.length
     assert_equal 3, root.height
   end
 
@@ -68,6 +71,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal [], root['/admin', '/notfound']
     assert_equal [], root['/notfound']
 
+    assert_equal 4, root.lists.length
     assert_equal 3, root.height
   end
 
@@ -88,6 +92,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/:controller/:action'], root['/admin', '/notfound']
     assert_equal ['/:controller/:action'], root['/notfound']
 
+    assert_equal 5, root.lists.length
     assert_equal 6, root.height
   end
 
@@ -106,6 +111,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['ANY /messages/export'], root['GET', '/messages']
     assert_equal ['POST /messages', 'ANY /messages/export'], root['POST', '/messages']
 
+    assert_equal 9, root.lists.length
     assert_equal 3, root.height
   end
 
@@ -126,6 +132,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['GET /people', 'GET /people/:id'], root['GET', 'people', '1']
     assert_equal ['GET /people', 'GET /people/:id', 'GET /people/:id/edit'], root['GET', 'people', '1', 'edit']
 
+    assert_equal 11, root.lists.length
     assert_equal 3, root.height
   end
 
@@ -137,6 +144,7 @@ class NestedSetTest < Test::Unit::TestCase
     root[nil, '/messages'] = 'POST /messages'
     root[nil] = 'ANY /:controller/:action'
 
+    assert_equal 3, root.lists.length
     assert_equal 3, root.height
   end
 
