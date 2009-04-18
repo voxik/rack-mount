@@ -9,6 +9,25 @@ module Rack
         end
 
         def freeze
+          @recognition_graph.lists.each do |list|
+            body = (0...list.length).zip(list).map { |i, e|
+              %Q{
+                result = self[#{i}].call(env)
+                return result unless result[0] == #{@catch}
+              }
+            }.join
+
+            method = <<-EOS, __FILE__, __LINE__
+              def optimized_each(env)
+                #{body}
+                nil
+              end
+            EOS
+
+            puts method if ENV[Const::RACK_MOUNT_DEBUG]
+            list.instance_eval(*method)
+          end
+
           optimize_call! unless frozen?
           super
         end
@@ -30,11 +49,7 @@ module Rack
               def call(env)
                 req = Request.new(env)
                 keys = [#{convert_keys_to_method_calls}]
-                @recognition_graph[*keys].each do |route|
-                  result = route.call(env)
-                  return result unless result[0] == @catch
-                end
-                @throw
+                @recognition_graph[*keys].optimized_each(env) || @throw
               end
             EOS
           end

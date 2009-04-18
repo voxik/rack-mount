@@ -10,7 +10,7 @@ end
 
 require 'rack/mount'
 require 'rack/mount/mappers/simple'
-Mount = Rack::Mount::RouteSet.new.prepare(&Map)
+Mount = Rack::Mount::RouteSet.new(:optimize => true).prepare(&Map)
 
 require 'rack/router'
 Router = Rack::Router.new(&Map)

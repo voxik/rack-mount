@@ -2,8 +2,6 @@ module Rack
   module Mount
     class NestedSet < Hash
       class List < Array
-        undef :[], :[]=
-
         def freeze
           each { |e| e.freeze }
           super
