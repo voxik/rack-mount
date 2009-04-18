@@ -15,7 +15,7 @@ Mount = Rack::Mount::RouteSet.new(:optimize => true).prepare(&Map)
 require 'rack/router'
 Router = Rack::Router.new(&Map)
 
-TIMES = 100.to_i
+TIMES = 1_000.to_i
 FirstEnv = EnvGenerator.env_for(TIMES, '/a/a')
 MidEnv = EnvGenerator.env_for(TIMES, '/a/mn')
 LastEnv = EnvGenerator.env_for(TIMES, '/a/zz')
