@@ -3,7 +3,7 @@ module Rack
     class Route
       module Base
         attr_reader :name, :params, :defaults
-        attr_reader :path, :method
+        attr_reader :app, :path, :method
         attr_writer :throw
 
         def initialize(app, options)

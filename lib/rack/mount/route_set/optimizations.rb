@@ -2,24 +2,28 @@ module Rack
   module Mount
     class RouteSet
       module Optimizations
-        def add_route(*args)
-          route = super
-          route.extend Route::Optimizations
-          route
-        end
-
         def freeze
           @recognition_graph.lists.each do |list|
-            body = (0...list.length).zip(list).map { |i, e|
-              %Q{
-                result = self[#{i}].call(env)
-                return result unless result[0] == #{@catch}
-              }
+            body = (0...list.length).zip(list).map { |i, route|
+              <<-EOS
+                route = self[#{i}]
+                if #{route.method ? 'method == route.method && ' : ''}path =~ route.path
+                  routing_args, param_matches = route.defaults.dup, $~.captures
+                  #{route.instance_variable_get("@named_captures").map { |k, i|
+                    "routing_args[#{k.inspect}] = param_matches[#{i}] if param_matches[#{i}]"
+                  }.join("\n                  ")}
+                  env[Const::RACK_ROUTING_ARGS] = routing_args
+                  result = route.app.call(env)
+                  return result unless result[0] == #{@catch}
+                end
+              EOS
             }.join
 
             method = <<-EOS, __FILE__, __LINE__
               def optimized_each(env)
-                #{body}
+                method = env[Const::REQUEST_METHOD]
+                path = env[Const::PATH_INFO]
+#{body}
                 nil
               end
             EOS
