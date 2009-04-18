@@ -8,7 +8,8 @@ module Rack
       end
 
       def generate(options, recall = {}, method = :generate)
-        url_for(options)
+        named_route = options.delete(:use_route)
+        url_for(named_route, options)
       end
 
       def add_configuration_file(path)
