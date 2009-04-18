@@ -12,6 +12,8 @@ module Rack
           @throw.freeze
 
           @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
+          @recognition_keys.freeze
+
           @recognition_graph = NestedSet.new
           super
         end
@@ -39,7 +41,6 @@ module Rack
         end
 
         def freeze
-          @recognition_keys.freeze
           @recognition_graph.freeze
           super
         end
