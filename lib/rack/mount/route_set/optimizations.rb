@@ -5,13 +5,18 @@ module Rack
         def freeze
           @recognition_graph.lists.each do |list|
             body = (0...list.length).zip(list).map { |i, route|
+              assign_index_params = route.instance_variable_get("@named_captures").map { |k, index|
+                "routing_args[#{k.inspect}] = param_matches[#{index}] if param_matches[#{index}]"
+              }
               <<-EOS
                 if #{route.method ? "method == #{route.method.inspect} && " : ''}path =~ #{route.path.inspect}
                   route = self[#{i}]
-                  routing_args, param_matches = route.defaults.dup, $~.captures
-                  #{route.instance_variable_get("@named_captures").map { |k, i|
-                    "routing_args[#{k.inspect}] = param_matches[#{i}] if param_matches[#{i}]"
-                  }.join("\n                  ")}
+                  #{if assign_index_params.any?
+                    'routing_args, param_matches = route.defaults.dup, $~.captures'
+                  else
+                    'routing_args = route.defaults.dup'
+                  end}
+                  #{assign_index_params.join("\n                  ")}
                   env[Const::RACK_ROUTING_ARGS] = routing_args
                   result = route.app.call(env)
                   return result unless result[0] == #{@catch}
