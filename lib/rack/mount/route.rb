@@ -5,7 +5,7 @@ module Rack
         # TODO: Support any method on Request object
         VALID_CONDITIONS = [:method, :path].freeze
 
-        attr_reader :app, :conditions, :requirements, :defaults, :name
+        attr_reader :app, :conditions, :defaults, :name
         attr_reader :path, :method
         attr_writer :throw
 
@@ -16,7 +16,7 @@ module Rack
           @throw = Const::NOT_FOUND_RESPONSE
 
           @name = name.to_sym if name
-          @requirements = (requirements || {}).freeze
+          requirements = (requirements || {}).freeze
           @defaults = (defaults || {}).freeze
 
           @conditions = conditions
@@ -31,7 +31,7 @@ module Rack
           elsif path.is_a?(String)
             path = "/#{path}" unless path =~ /^\//
             # TODO: Remove this and push conversion into the mapper
-            @path = Utils.convert_segment_string_to_regexp(path, @requirements, %w( / . ? ))
+            @path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
           end
           @path.freeze
 
