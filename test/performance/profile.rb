@@ -4,7 +4,7 @@ require 'rack'
 require 'rack/mount'
 require 'lib/performance_helper'
 
-Env = EnvGenerator.env_for(2, '/foo')
+Env = EnvGenerator.env_for(2, '/account/credit_card/1')
 
 Routes = OptimizedBasicSet
 Routes.call(Env[0])
