@@ -1,6 +1,6 @@
 module Rack
   module Mount
-    class RouteSet
+    module Generation
       module Optimizations
         def freeze
           optimize_call! unless frozen?

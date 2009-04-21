@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class Route
-      module Generation
+    module Generation
+      module Route
         def initialize(*args)
           super
 

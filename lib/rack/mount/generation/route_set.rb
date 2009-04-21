@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class RouteSet
-      module Generation
+    module Generation
+      module RouteSet
         DEFAULT_KEYS = [] # [:controller, :action].freeze
 
         def initialize(options = {})

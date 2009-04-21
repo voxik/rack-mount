@@ -1,13 +1,25 @@
 module Rack
   module Mount
     class RouteSet
-      autoload :Base, 'rack/mount/route_set/base'
-      autoload :Generation, 'rack/mount/route_set/generation'
-      autoload :Optimizations, 'rack/mount/route_set/optimizations'
-      autoload :Recognition, 'rack/mount/route_set/recognition'
+      module Base
+        def initialize(options = {})
+          if options.delete(:optimize) == true
+            extend Generation::Optimizations
+          end
 
+          if block_given?
+            yield self
+            freeze
+          end
+        end
+
+        def add_route(app, conditions = {}, requirements = {}, defaults = {}, name = nil)
+          Route.new(app, conditions, requirements, defaults, name)
+        end
+      end
       include Base
-      include Generation, Recognition
+
+      include Generation::RouteSet, Recognition::RouteSet
     end
   end
 end

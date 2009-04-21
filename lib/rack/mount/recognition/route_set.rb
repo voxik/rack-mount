@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class RouteSet
-      module Recognition
+    module Recognition
+      module RouteSet
         DEFAULT_KEYS = [:method, [:path_keys_at, 0].freeze].freeze
         DEFAULT_CATCH_STATUS = 404
 

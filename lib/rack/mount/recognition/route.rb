@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class Route
-      module Recognition
+    module Recognition
+      module Route
         def initialize(*args)
           super
 
