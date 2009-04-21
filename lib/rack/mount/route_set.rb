@@ -13,8 +13,8 @@ module Rack
           end
         end
 
-        def add_route(app, conditions = {}, requirements = {}, defaults = {}, name = nil)
-          Route.new(app, conditions, requirements, defaults, name)
+        def add_route(app, conditions = {}, defaults = {}, name = nil)
+          Route.new(app, conditions, defaults, name)
         end
       end
       include Base

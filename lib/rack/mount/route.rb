@@ -9,14 +9,13 @@ module Rack
         attr_reader :path, :method
         attr_writer :throw
 
-        def initialize(app, conditions, requirements, defaults, name)
+        def initialize(app, conditions, defaults, name)
           @app = app
           validate_app!
 
           @throw = Const::NOT_FOUND_RESPONSE
 
           @name = name.to_sym if name
-          requirements = (requirements || {}).freeze
           @defaults = (defaults || {}).freeze
 
           @conditions = conditions
@@ -30,8 +29,7 @@ module Rack
             @path = RegexpWithNamedGroups.new(path)
           elsif path.is_a?(String)
             path = "/#{path}" unless path =~ /^\//
-            # TODO: Remove this and push conversion into the mapper
-            @path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
+            @path = RegexpWithNamedGroups.compile("^#{path}$")
           end
           @path.freeze
 

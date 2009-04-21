@@ -118,6 +118,11 @@ module Rack
             end
           end
 
+          if new_conditions[:path].is_a?(String)
+            new_conditions[:path] = Utils.convert_segment_string_to_regexp(
+              new_conditions[:path], requirements, %w( / . ? ))
+          end
+
           app = params.has_key?(:controller) ?
             ActiveSupport::Inflector.constantize(ActiveSupport::Inflector.camelize("#{params[:controller]}Controller")) :
             DynamicController
@@ -130,7 +135,7 @@ module Rack
             app = RequestConditions.new(app, conditions)
           end
 
-          @set.add_route(app, new_conditions, requirements, params)
+          @set.add_route(app, new_conditions, params)
         end
       end
     end

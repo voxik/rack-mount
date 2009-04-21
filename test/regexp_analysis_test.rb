@@ -218,12 +218,12 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
   private
     def extract_static_segments(re)
-      route = Rack::Mount::Route.new(EchoApp, { :path => re }, {}, {}, nil)
+      route = Rack::Mount::Route.new(EchoApp, { :path => re }, {}, nil)
       route.instance_variable_get('@path_keys')
     end
 
     def build_generation_segments(re)
-      route = Rack::Mount::Route.new(EchoApp, { :path => re }, {}, {}, nil)
+      route = Rack::Mount::Route.new(EchoApp, { :path => re }, {}, nil)
       route.instance_variable_get('@segments')
     end
 end

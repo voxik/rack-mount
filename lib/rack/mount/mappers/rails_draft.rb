@@ -101,8 +101,11 @@ module Rack
             ActiveSupport::Inflector.constantize("#{defaults[:controller].camelize}Controller") :
             DynamicController
 
+          if path.is_a?(String)
+            path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
+          end
           conditions = { :method => method, :path => path }
-          @set.add_route(app, conditions, requirements, defaults)
+          @set.add_route(app, conditions, defaults)
         end
 
         def controller(controller, &block)

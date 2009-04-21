@@ -107,14 +107,15 @@ module Rack
             end
           end
 
-          if path.is_a?(String) && path =~ /\/\*(\w+)$/
-            glob = $1.to_sym
+          if path.is_a?(String)
+            glob = $1.to_sym if path =~ /\/\*(\w+)$/
+            path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
           end
 
           app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
           conditions = { :method => method, :path => path }
-          @set.add_route(app, conditions, requirements, defaults, name)
+          @set.add_route(app, conditions, defaults, name)
         end
 
         def add_named_route(name, path, options = {})
