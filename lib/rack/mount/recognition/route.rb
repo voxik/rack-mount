@@ -1,3 +1,5 @@
+require 'strscan'
+
 module Rack
   module Mount
     module Recognition
@@ -35,7 +37,41 @@ module Rack
           # Keys for inserting into NestedSet
           # #=> ['people', /[0-9]+/, 'edit']
           def path_keys(regexp, separators)
-            Utils.extract_static_segments(regexp, separators).freeze
+            separators = Regexp.compile(separators.map { |s| Regexp.escape(s) }.join('|'))
+            segments = []
+
+            begin
+              Utils.extract_regexp_parts(regexp).each do |part|
+                raise ArgumentError if part.is_a?(Utils::Capture)
+
+                part = part.dup
+                part.gsub!(/\\\//, '/')
+                part.gsub!(/^\//, '')
+
+                scanner = StringScanner.new(part)
+
+                until scanner.eos?
+                  unless s = scanner.scan_until(separators)
+                    s = scanner.rest
+                    scanner.terminate
+                  end
+
+                  s.gsub!(/\/$/, '')
+                  segments << (s =~ /^\w+$/ ? s : nil)
+                end
+              end
+
+              segments << '$'
+            rescue ArgumentError
+              # generation failed somewhere, but lets take what we can get
+            end
+
+            # Pop off trailing nils
+            while segments.length > 0 && segments.last.nil?
+              segments.pop
+            end
+
+            segments.freeze
           end
 
           # Maps named captures to their capture index

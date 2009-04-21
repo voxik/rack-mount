@@ -41,45 +41,6 @@ module Rack
       end
       module_function :convert_segment_string_to_regexp
 
-      def extract_static_segments(regexp, separators)
-        separators = Regexp.compile(separators.map { |s| Regexp.escape(s) }.join('|'))
-        segments = []
-
-        begin
-          extract_regexp_parts(regexp).each do |part|
-            raise ArgumentError if part.is_a?(Capture)
-
-            part = part.dup
-            part.gsub!(/\\\//, '/')
-            part.gsub!(/^\//, '')
-
-            scanner = StringScanner.new(part)
-
-            until scanner.eos?
-              unless s = scanner.scan_until(separators)
-                s = scanner.rest
-                scanner.terminate
-              end
-
-              s.gsub!(/\/$/, '')
-              segments << (s =~ /^\w+$/ ? s : nil)
-            end
-          end
-
-          segments << '$'
-        rescue ArgumentError
-          # generation failed somewhere, but lets take what we can get
-        end
-
-        # Pop off trailing nils
-        while segments.length > 0 && segments.last.nil?
-          segments.pop
-        end
-
-        segments
-      end
-      module_function :extract_static_segments
-
       class Capture < Array
         attr_reader :name, :optional
         alias_method :optional?, :optional
