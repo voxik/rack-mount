@@ -55,7 +55,7 @@ class RouteSetTest < Test::Unit::TestCase
   def test_ensure_each_route_requires_a_valid_rack_app
     set = Rack::Mount::RouteSet.new
     assert_raise(ArgumentError) { set.add_route({}) }
-    assert_raise(ArgumentError) { set.add_route(:app => 'invalid app') }
+    assert_raise(ArgumentError) { set.add_route('invalid app') }
   end
 
   def test_worst_case

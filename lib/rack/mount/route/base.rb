@@ -2,11 +2,13 @@ module Rack
   module Mount
     class Route
       module Base
+        attr_reader :app, :conditions, :requirements, :defaults
+
         attr_reader :name, :params, :defaults
-        attr_reader :app, :path, :method
+        attr_reader :path, :method
         attr_writer :throw
 
-        def initialize(app, options)
+        def initialize(app, conditions, requirements, defaults, name)
           @app = app
 
           unless @app.respond_to?(:call)
@@ -16,24 +18,23 @@ module Rack
 
           @throw = Const::NOT_FOUND_RESPONSE
 
-          if name = options.delete(:name)
+          if name
             @name = name.to_sym
           end
 
-          method = options.delete(:method)
+          method = conditions.delete(:method)
           @method = method.to_s.upcase if method
 
-          path = options.delete(:path)
+          path = conditions.delete(:path)
           if path.is_a?(String)
             path = "/#{path}" unless path =~ /^\//
           end
 
-          @requirements = (options.delete(:requirements) || {}).freeze
-          @capture_names = (options.delete(:capture_names) || {}).freeze
-          @defaults = (options.delete(:defaults) || {}).freeze
+          @requirements = (requirements || {}).freeze
+          @defaults = (defaults || {}).freeze
 
           if path.is_a?(Regexp)
-            @path = RegexpWithNamedGroups.new(path, @capture_names)
+            @path = RegexpWithNamedGroups.new(path, @requirements)
           else
             # TODO: Remove this and push conversion into the mapper
             @path = Utils.convert_segment_string_to_regexp(path, @requirements)

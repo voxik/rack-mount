@@ -113,13 +113,8 @@ module Rack
 
           app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
-          @set.add_route(app, {
-            :name => name,
-            :path => path,
-            :method => method,
-            :requirements => requirements,
-            :defaults => defaults
-          })
+          conditions = { :method => method, :path => path }
+          @set.add_route(app, conditions, requirements, defaults, name)
         end
 
         def add_named_route(name, path, options = {})

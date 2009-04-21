@@ -107,24 +107,19 @@ module Rack
         end
 
         def add_route(conditions, params, deferred_procs, options = {})
-          new_options = {}
-          new_options[:path] = conditions.delete(:path)[0]
-          new_options[:method] = conditions.delete(:method)
+          new_conditions = {}
+          new_conditions[:path] = conditions.delete(:path)[0]
+          new_conditions[:method] = conditions.delete(:method)
 
-          capture_names = {}
           requirements = {}
           conditions.each do |k, v|
             if v.is_a?(Regexp)
               requirements[k.to_sym] = conditions.delete(k)
-            elsif new_options[:path].is_a?(Regexp)
+            elsif new_conditions[:path].is_a?(Regexp)
               index = conditions.delete(k)
-              capture_names[k.to_sym] = Integer(index.scan(/\d+/)[0])
+              requirements[k.to_sym] = Integer(index.scan(/\d+/)[0])
             end
           end
-
-          new_options[:capture_names] = capture_names
-          new_options[:requirements] = requirements
-          new_options[:defaults] = params
 
           app = params.has_key?(:controller) ?
             ActiveSupport::Inflector.constantize(ActiveSupport::Inflector.camelize("#{params[:controller]}Controller")) :
@@ -138,7 +133,7 @@ module Rack
             app = RequestConditions.new(app, conditions)
           end
 
-          @set.add_route(app, new_options)
+          @set.add_route(app, new_conditions, requirements, params)
         end
       end
     end

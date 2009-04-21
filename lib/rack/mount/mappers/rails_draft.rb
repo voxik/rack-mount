@@ -101,12 +101,8 @@ module Rack
             ActiveSupport::Inflector.constantize("#{defaults[:controller].camelize}Controller") :
             DynamicController
 
-          @set.add_route(app, {
-            :path => path,
-            :method => method,
-            :requirements => requirements,
-            :defaults => defaults
-          })
+          conditions = { :method => method, :path => path }
+          @set.add_route(app, conditions, requirements, defaults)
         end
 
         def controller(controller, &block)
