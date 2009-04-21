@@ -4,6 +4,14 @@ module Rack
   module Mount
     unless Const::SUPPORTS_NAMED_CAPTURES
       class RegexpWithNamedGroups < Regexp
+        def self.new(regexp)
+          if regexp.is_a?(RegexpWithNamedGroups)
+            regexp
+          else
+            super
+          end
+        end
+
         attr_reader :named_captures, :names
 
         def initialize(regexp)

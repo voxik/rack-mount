@@ -5,7 +5,7 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = Utils.build_generation_segments(@path).freeze
+          @segments = segments(@path).freeze
           @required_params = @segments.find_all { |s| s.is_a?(Symbol) }.freeze
         end
 
@@ -29,6 +29,38 @@ module Rack
         end
 
         private
+          # Segment data structure used for generations
+          # * Strings represent static parts of the path
+          # * Symbols represent dynamic parameters
+          # * Arrays represent optional segments
+          # => ['/people', ['.', :format]]
+          def segments(regexp)
+            parse_segments(Utils.extract_regexp_parts(regexp))
+          rescue ArgumentError
+            []
+          end
+
+          def parse_segments(segments)
+            s = []
+            segments.each do |part|
+              if part.is_a?(Utils::Capture)
+                if part.named?
+                  s << part.name.to_sym
+                else
+                  s << parse_segments(part)
+                end
+              else
+                source = part.gsub('\\.', '.').gsub('\\/', '/')
+                if Regexp.compile("^(#{part})$") =~ source
+                  s << source
+                else
+                  raise ArgumentError, "failed to parse #{part.inspect}"
+                end
+              end
+            end
+            s
+          end
+
           def generate_from_segments(segments, params, defaults, optional = false)
             if optional
               return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
