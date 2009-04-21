@@ -11,7 +11,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_simple_static_string
-    re = convert_segment_string_to_regexp('/foo')
+    re = convert_segment_string_to_regexp('/foo', {}, %w( / . ? ))
 
     assert_equal %r{^/foo$}, re
     assert_equal ['foo', '$'], extract_static_segments(re)
@@ -20,7 +20,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_root_path
-    re = convert_segment_string_to_regexp('/')
+    re = convert_segment_string_to_regexp('/', {}, %w( / . ? ))
 
     assert_equal %r{^/$}, re
     assert_equal ['$'], extract_static_segments(re)
@@ -29,7 +29,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_multisegment_static_string
-    re = convert_segment_string_to_regexp('/people/show/1')
+    re = convert_segment_string_to_regexp('/people/show/1', {}, %w( / . ? ))
 
     assert_equal %r{^/people/show/1$}, re
     assert_equal ['people', 'show', '1', '$'], extract_static_segments(re)
@@ -38,7 +38,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_segments
-    re = convert_segment_string_to_regexp('/foo/:action/:id')
+    re = convert_segment_string_to_regexp('/foo/:action/:id', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}'), re
@@ -56,7 +56,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
   def test_dynamic_segments_with_requirements
     re = convert_segment_string_to_regexp('/foo/:action/:id',
-      :action => /bar|baz/, :id => /[a-z0-9]+/)
+      { :action => /bar|baz/, :id => /[a-z0-9]+/ }, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/foo/(?<action>bar|baz)/(?<id>[a-z0-9]+)$}'), re
@@ -73,7 +73,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_optional_capture
-    re = convert_segment_string_to_regexp('/people/(:id)')
+    re = convert_segment_string_to_regexp('/people/(:id)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/people/((?<id>[^/.?]+))?$}'), re
@@ -89,7 +89,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_optional_capture_within_segment
-    re = convert_segment_string_to_regexp('/people(.:format)')
+    re = convert_segment_string_to_regexp('/people(.:format)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re
@@ -105,7 +105,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_and_optional_segment
-    re = convert_segment_string_to_regexp('/people/:id(.:format)')
+    re = convert_segment_string_to_regexp('/people/:id(.:format)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re
@@ -119,7 +119,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_nested_optional_captures
-    re = convert_segment_string_to_regexp('/:controller(/:action(/:id(.:format)))')
+    re = convert_segment_string_to_regexp('/:controller(/:action(/:id(.:format)))', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re
@@ -162,7 +162,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_period_separator
-    re = convert_segment_string_to_regexp('/foo/:id.:format')
+    re = convert_segment_string_to_regexp('/foo/:id.:format', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<id>[^/.?]+)\\.(?<format>[^/.?]+)$}"), re
@@ -178,7 +178,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_glob
-    re = convert_segment_string_to_regexp('/files/*files')
+    re = convert_segment_string_to_regexp('/files/*files', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/files/(?<files>.*)$}"), re

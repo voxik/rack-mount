@@ -31,7 +31,7 @@ module Rack
           elsif path.is_a?(String)
             path = "/#{path}" unless path =~ /^\//
             # TODO: Remove this and push conversion into the mapper
-            @path = Utils.convert_segment_string_to_regexp(path, @requirements)
+            @path = Utils.convert_segment_string_to_regexp(path, @requirements, %w( / . ? ))
           end
           @path.freeze
 

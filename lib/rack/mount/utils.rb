@@ -3,12 +3,11 @@ require 'strscan'
 module Rack
   module Mount
     module Utils
-      SEPARATORS = %w( / . ? )
       GLOB_REGEXP = /\/\\\*(\w+)$/
       OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
-      def convert_segment_string_to_regexp(str, requirements = {})
+      def convert_segment_string_to_regexp(str, requirements = {}, separators = [])
         raise ArgumentError unless str.is_a?(String)
 
         str = Regexp.escape(str.dup)
@@ -22,7 +21,7 @@ module Rack
           if requirement = requirements[$2.to_sym]
             re << Const::REGEXP_NAMED_CAPTURE % [$2, requirement.source]
           else
-            re << Const::REGEXP_NAMED_CAPTURE % [$2, "[^#{SEPARATORS.join}]+"]
+            re << Const::REGEXP_NAMED_CAPTURE % [$2, "[^#{separators.join}]+"]
           end
           str = m.post_match
         end
