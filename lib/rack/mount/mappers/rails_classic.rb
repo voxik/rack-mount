@@ -9,6 +9,7 @@ module Rack
 
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
+        options = recall.merge(options)
         url_for(named_route, options)
       end
 
@@ -24,8 +25,44 @@ module Rack
       end
 
       def install_helpers(destinations = [ActionController::Base, ActionView::Base], regenerate_code = false)
-        Array(destinations).each { |d| d.module_eval { include ActionController::Routing::Helpers } }
-        # named_routes.install(destinations, regenerate_code)
+        mod ||= Module.new
+        mod.instance_methods.each do |selector|
+          mod.class_eval { remove_method selector }
+        end
+
+        @named_routes.each do |name, route|
+          url_options  = route.defaults.merge(:use_route => name, :only_path => false)
+          path_options = route.defaults.merge(:use_route => name, :only_path => true)
+
+          mod.module_eval <<-end_eval
+            def hash_for_#{name}_path(options = nil)
+              options ? #{path_options.inspect}.merge(options) : #{path_options.inspect}
+            end
+            protected :hash_for_#{name}_path
+
+            def hash_for_#{name}_url(options = nil)
+              options ? #{url_options.inspect}.merge(options) : #{url_options.inspect}
+            end
+            protected :hash_for_#{name}_url
+
+            def #{name}_path(*args)
+              opts = args.extract_options!
+              url_for(hash_for_#{name}_path(opts))
+            end
+            protected :#{name}_path
+
+            def #{name}_url(*args)
+              opts = args.extract_options!
+              url_for(hash_for_#{name}_url(opts))
+            end
+            protected :#{name}_url
+          end_eval
+        end
+
+        Array(destinations).each do |d|
+          d.module_eval { include ActionController::Routing::Helpers }
+          d.__send__(:include, mod)
+        end
       end
     end
 
