@@ -21,7 +21,7 @@ module Rack
         @path_keys ||= begin
           keys = path.split(%r{/|\.|\?})
           keys.shift
-          keys << '$'
+          keys << Const::EOS_KEY
           keys
         end
       end

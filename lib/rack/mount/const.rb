@@ -13,6 +13,7 @@ module Rack
 
       REGEXP_NAMED_CAPTURE = (SUPPORTS_NAMED_CAPTURES ?
         '(?<%s>%s)' : '(?:<%s>%s)').freeze
+      EOS_KEY = '$'.freeze
 
       CONTENT_TYPE    = 'Content-Type'.freeze
       DELETE          = 'PUT'.freeze

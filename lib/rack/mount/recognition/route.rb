@@ -37,7 +37,8 @@ module Rack
           # Keys for inserting into NestedSet
           # #=> ['people', /[0-9]+/, 'edit']
           def path_keys(regexp, separators)
-            separators = Regexp.compile(separators.map { |s| Regexp.escape(s) }.join('|'))
+            escaped_separators = separators.map { |s| Regexp.escape(s) }
+            separators = Regexp.compile(escaped_separators.join('|'))
             segments = []
 
             begin
@@ -57,11 +58,11 @@ module Rack
                   end
 
                   s.gsub!(/\/$/, '')
-                  segments << (s =~ /^\w+$/ ? s : nil)
+                  segments << (clean_regexp?(s) ? s : nil)
                 end
               end
 
-              segments << '$'
+              segments << Const::EOS_KEY
             rescue ArgumentError
               # generation failed somewhere, but lets take what we can get
             end
@@ -82,6 +83,10 @@ module Rack
               named_captures[k.to_sym] = v.last - 1
             }
             named_captures.freeze
+          end
+
+          def clean_regexp?(source)
+            source =~ /^\w+$/
           end
       end
     end
