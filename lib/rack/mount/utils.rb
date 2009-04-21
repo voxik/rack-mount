@@ -149,10 +149,10 @@ module Rack
         end
 
         if regexp.source =~ /\?<([^>]+)>/
-          regexp = regexp.source.gsub(/\?<([^>]+)>/, '?:<\1>')
-          regexp = RegexpWithNamedGroups.new(regexp)
+          regexp, names = extract_named_captures(regexp)
+        else
+          names = regexp.names
         end
-
         source = regexp.source
 
         source =~ /^\^/ ? source.gsub!(/^\^/, '') :
@@ -168,7 +168,7 @@ module Rack
           cur  = stack.last
 
           if char == '('
-            name = regexp.names[capture_index]
+            name = names[capture_index]
             capture = Capture.new(:name => name)
             capture_index += 1
             cur.push(capture)
@@ -190,6 +190,26 @@ module Rack
         result
       end
       module_function :extract_regexp_parts
+
+      NAMED_CAPTURE_REGEXP = (Const::SUPPORTS_NAMED_CAPTURES ?
+        /\?<([^>]+)>/ : /\?:<([^>]+)>/).freeze
+
+      def extract_named_captures(regexp)
+        source = Regexp.compile(regexp).source
+        names, scanner = [], StringScanner.new(source)
+
+        while scanner.skip_until(/\(/)
+          if scanner.scan(NAMED_CAPTURE_REGEXP)
+            names << scanner[1]
+          else
+            names << nil
+          end
+        end
+
+        source.gsub!(NAMED_CAPTURE_REGEXP, '')
+        return Regexp.compile(source), names
+      end
+      module_function :extract_named_captures
     end
   end
 end

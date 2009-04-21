@@ -59,24 +59,21 @@ class SimpleApiTest < Test::Unit::TestCase
 
     r.map '/optional/index(.:format)', :to => EchoApp, :with => { :controller => 'optional', :action => 'index' }
 
-    r.map %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :to => EchoApp, :with => { :controller => 'foo' }
-    r.map %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :to => EchoApp, :name => :complex_regexp, :with => { :controller => 'foo' }
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      regexp = eval('%r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)}')
+      r.map regexp, :to => EchoApp, :with => { :controller => 'foo' }
+
+      regexp = eval('%r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$}')
+      r.map regexp, :to => EchoApp, :name => :complex_regexp, :with => { :controller => 'foo' }
+    else
+      r.map %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)}, :to => EchoApp, :with => { :controller => 'foo' }
+      r.map %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$}, :to => EchoApp, :name => :complex_regexp, :with => { :controller => 'foo' }
+    end
     r.map %r{^/regexp/baz/[a-z]+/[0-9]+$}, :to => EchoApp, :name => :complex_regexp_fail, :with => { :controller => 'foo' }
 
     r.map 'files/*files', :to => EchoApp, :with => { :controller => 'files', :action => 'index' }
 
     r.map %r{^/prefix/.*$}, :to => Rack::Mount::PathPrefix.new(DefaultSet, '/prefix')
-
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      regexp = eval('/^\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)$/')
-      r.map regexp, :to => EchoApp, :with => { :controller => 'ruby19' }
-
-      regexp = eval('/^\/ruby19\/index(\.(?<format>[a-z]+))?$/')
-      r.map regexp, :to => EchoApp, :with => { :controller => 'ruby19', :action => 'index' }
-
-      regexp = eval('/^\/ruby19\/(?<action>[a-z]+)(\/(?<id>[0-9]+))?$/')
-      r.map regexp, :to => EchoApp, :with => { :controller => 'ruby19' }
-    end
 
     r.map 'params_with_defaults(/:controller)', :to => EchoApp, :with => { :controller => 'foo' }
     r.map 'default/:controller(/:action(/:id(.:format)))', :to => EchoApp

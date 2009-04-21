@@ -2,65 +2,29 @@ require 'strscan'
 
 module Rack
   module Mount
-    class RegexpWithNamedGroups < Regexp
-      def initialize(regexp)
-        names = nil if names && !names.any?
-        regexp, @names = extract_shim_named_captures(regexp)
+    unless Const::SUPPORTS_NAMED_CAPTURES
+      class RegexpWithNamedGroups < Regexp
+        attr_reader :named_captures, :names
 
-        @names = nil unless @names.any?
+        def initialize(regexp)
+          names = nil if names && !names.any?
+          regexp, @names = Utils.extract_named_captures(regexp)
 
-        if @names
-          @named_captures = {}
-          @names.each_with_index { |n, i| @named_captures[n] = [i+1] if n }
-        end
+          @names = nil unless @names.any?
 
-        super(regexp)
-      end
-
-      if instance_methods.include?(:named_captures)
-        def named_captures
-          @named_captures ||= super
-        end
-      else
-        def named_captures
-          @named_captures ||= {}
-        end
-      end
-
-      if instance_methods.include?(:names)
-        def names
-          @names ||= super
-        end
-      else
-        def names
-          @names ||= []
-        end
-      end
-
-      def freeze
-        named_captures
-        names
-        super
-      end
-
-      private
-        SHIM_NAMED_CAPTURE = /\?:<([^>]+)>/.freeze
-
-        def extract_shim_named_captures(regexp)
-          source = Regexp.compile(regexp).source
-          names, scanner = [], StringScanner.new(source)
-
-          while scanner.skip_until(/\(/)
-            if scanner.scan(SHIM_NAMED_CAPTURE)
-              names << scanner[1]
-            else
-              names << nil
-            end
+          if @names
+            @named_captures = {}
+            @names.each_with_index { |n, i| @named_captures[n] = [i+1] if n }
           end
 
-          source.gsub!(SHIM_NAMED_CAPTURE, '')
-          return Regexp.compile(source), names
+          (@named_captures ||= {}).freeze
+          (@names ||= []).freeze
+
+          super(regexp)
         end
+      end
+    else
+      RegexpWithNamedGroups = Regexp
     end
   end
 end

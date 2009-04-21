@@ -54,6 +54,7 @@ module TestHelper
     def process(path, options = {})
       @path = path
 
+      require 'rack/mock'
       env = Rack::MockRequest.env_for(path, options)
       @response = @app.call(env)
 
