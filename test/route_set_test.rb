@@ -15,34 +15,6 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
   end
 
-  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-    def test_named_regexp_groups
-      get '/ruby19/foo/1'
-      assert_success
-      assert_equal({ :controller => 'ruby19', :action => 'foo', :id => '1' }, routing_args)
-    end
-
-    def test_optional_segments_with_period
-      get '/ruby19/index'
-      assert_success
-      assert_equal({ :controller => 'ruby19', :action => 'index' }, routing_args)
-
-      get '/ruby19/index.xml'
-      assert_success
-      assert_equal({ :controller => 'ruby19', :action => 'index', :format => 'xml' }, routing_args)
-    end
-
-    def test_optional_segments_with_slash
-      get '/ruby19/foo'
-      assert_success
-      assert_equal({ :controller => 'ruby19', :action => 'foo' }, routing_args)
-
-      get '/ruby19/foo/123'
-      assert_success
-      assert_equal({ :controller => 'ruby19', :action => 'foo', :id => '123' }, routing_args)
-    end
-  end
-
   def test_ensure_routeset_needs_to_be_frozen
     set = Rack::Mount::RouteSet.new
     assert_raise(RuntimeError) { set.call({}) }
