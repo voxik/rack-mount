@@ -18,9 +18,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp('/foo')
 
     assert_equal %r{^/foo$}, re
-    assert_equal [], re.names
-    assert_equal({}, re.named_captures)
-
     assert_equal ['foo', '$'], extract_static_segments(re, @separators)
     assert_equal ['/foo'], build_generation_segments(re)
     assert_equal ['/foo'], extract_regexp_parts(re)
@@ -30,9 +27,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp('/')
 
     assert_equal %r{^/$}, re
-    assert_equal [], re.names
-    assert_equal({}, re.named_captures)
-
     assert_equal ['$'], extract_static_segments(re, @separators)
     assert_equal ['/'], build_generation_segments(re)
     assert_equal ['/'], extract_regexp_parts(re)
@@ -42,9 +36,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp('/people/show/1')
 
     assert_equal %r{^/people/show/1$}, re
-    assert_equal [], re.names
-    assert_equal({}, re.named_captures)
-
     assert_equal ['people', 'show', '1', '$'], extract_static_segments(re, @separators)
     assert_equal ['/people/show/1'], build_generation_segments(re)
     assert_equal ['/people/show/1'], extract_regexp_parts(re)
@@ -58,8 +49,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     else
       assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re
     end
-    assert_equal ['action', 'id'], re.names
-    assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
 
     assert_equal ['foo'], extract_static_segments(re, @separators)
     assert_equal ['/foo/', :action, '/', :id], build_generation_segments(re)
@@ -78,8 +67,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     else
       assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re
     end
-    assert_equal ['action', 'id'], re.names
-    assert_equal({ 'action' => [1], 'id' => [2] }, re.named_captures)
 
     assert_equal ['foo'], extract_static_segments(re, @separators)
     assert_equal ['/foo/', :action, '/', :id], build_generation_segments(re)
@@ -94,12 +81,8 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/people/((?<id>[^/.?]+))?$}'), re
-      assert_equal ['id'], re.names
-      assert_equal({ 'id' => [1] }, re.named_captures)
     else
       assert_equal %r{^/people/(([^/.?]+))?$}, re
-      assert_equal [nil, 'id'], re.names
-      assert_equal({ 'id' => [2] }, re.named_captures)
     end
 
     assert_equal ['people'], extract_static_segments(re, @separators)
@@ -114,12 +97,8 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re
-      assert_equal ['format'], re.names
-      assert_equal({ 'format' => [1] }, re.named_captures)
     else
       assert_equal %r{^/people(\.([^/.?]+))?$}, re
-      assert_equal [nil, 'format'], re.names
-      assert_equal({ 'format' => [2] }, re.named_captures)
     end
 
     assert_equal ['people'], extract_static_segments(re, @separators)
@@ -134,12 +113,8 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re
-      assert_equal ['id', 'format'], re.names
-      assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
     else
       assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, re
-      assert_equal ['id', nil, 'format'], re.names
-      assert_equal({ 'id' => [1], 'format' => [3] }, re.named_captures)
     end
 
     assert_equal ['people'], extract_static_segments(re, @separators)
@@ -152,12 +127,8 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re
-      assert_equal ['controller', 'action', 'id', 'format'], re.names
-      assert_equal({ 'controller' => [1], 'action' => [2], 'id' => [3], 'format' => [4] }, re.named_captures)
     else
       assert_equal %r{^/([^/.?]+)(/([^/.?]+)(/([^/.?]+)(\.([^/.?]+))?)?)?$}, re
-      assert_equal ['controller', nil, 'action', nil, 'id', nil, 'format'], re.names
-      assert_equal({ 'controller' => [1], 'action' => [3], 'id' => [5], 'format' => [7] }, re.named_captures)
     end
 
     assert_equal [], extract_static_segments(re, @separators)
@@ -202,8 +173,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     else
       assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re
     end
-    assert_equal ['id', 'format'], re.names
-    assert_equal({ 'id' => [1], 'format' => [2] }, re.named_captures)
 
     assert_equal ['foo'], extract_static_segments(re, @separators)
     assert_equal ['/foo/', :id, '.', :format], build_generation_segments(re)
@@ -220,9 +189,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     else
       assert_equal %r{^/files/(.*)$}, re
     end
-
-    assert_equal ['files'], re.names
-    assert_equal({ 'files' => [1] }, re.named_captures)
 
     assert_equal ['files'], extract_static_segments(re, @separators)
     assert_equal ['/files/', :files], build_generation_segments(re)
