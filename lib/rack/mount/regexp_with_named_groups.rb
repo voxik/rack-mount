@@ -3,18 +3,9 @@ require 'strscan'
 module Rack
   module Mount
     class RegexpWithNamedGroups < Regexp
-      def initialize(regexp, names = nil)
+      def initialize(regexp)
         names = nil if names && !names.any?
-
-        case names
-        when Hash
-          @names = []
-          names.each { |k, v| @names[v.to_int-1] = k.to_s }
-        when Array
-          @names = names.map { |n| n && n.to_s }
-        else
-          regexp, @names = extract_shim_named_captures(regexp)
-        end
+        regexp, @names = extract_shim_named_captures(regexp)
 
         @names = nil unless @names.any?
 

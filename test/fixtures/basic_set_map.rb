@@ -51,8 +51,8 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path => '/optional/index(.:format)' }, {}, { :controller => 'optional', :action => 'index' })
 
-  set.add_route(EchoApp, { :path => %r{^/regexp/foos?/(bar|baz)/([a-z0-9]+)$} }, { :action => 1, :id => 2 }, { :controller => 'foo' })
-  set.add_route(EchoApp, { :path => %r{^/regexp/bar/([a-z]+)/([0-9]+)$} }, { :action => 1, :id => 2 }, { :controller => 'foo' }, :complex_regexp)
+  set.add_route(EchoApp, { :path => %r{^/regexp/foos?/(?:<action>bar|baz)/(?:<id>[a-z0-9]+)$} }, {}, { :controller => 'foo' })
+  set.add_route(EchoApp, { :path => %r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$} }, {}, { :controller => 'foo' }, :complex_regexp)
   set.add_route(EchoApp, { :path => %r{^/regexp/baz/[a-z]+/[0-9]+$} }, {}, { :controller => 'foo' }, :complex_regexp_fail)
 
   set.add_route(EchoApp, { :path => 'files/*files' }, {}, { :controller => 'files', :action => 'index' })

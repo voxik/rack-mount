@@ -27,7 +27,7 @@ module Rack
 
           path = @conditions.delete(:path)
           if path.is_a?(Regexp)
-            @path = RegexpWithNamedGroups.new(path, @requirements)
+            @path = RegexpWithNamedGroups.new(path)
           elsif path.is_a?(String)
             path = "/#{path}" unless path =~ /^\//
             # TODO: Remove this and push conversion into the mapper

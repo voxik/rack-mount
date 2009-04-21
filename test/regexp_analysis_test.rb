@@ -181,7 +181,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_another_regexp_with_requirements
-    re = Rack::Mount::RegexpWithNamedGroups.new(%r{^/regexp/bar/([a-z]+)/([0-9]+)$}, [:action, :id])
+    re = Rack::Mount::RegexpWithNamedGroups.new(%r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$})
 
     assert_equal ['regexp', 'bar'], extract_static_segments(re, @separators)
     assert_equal ['/regexp/bar/', :action, '/', :id], build_generation_segments(re)
