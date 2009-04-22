@@ -33,30 +33,31 @@ module Rack
         @named_routes.each do |name, route|
           url_options  = route.defaults.merge(:use_route => name, :only_path => false)
           path_options = route.defaults.merge(:use_route => name, :only_path => true)
+          segment_keys = route.instance_variable_get("@required_params").map(&:to_sym)
 
-          mod.module_eval <<-end_eval
-            def hash_for_#{name}_path(options = nil)
-              options ? #{path_options.inspect}.merge(options) : #{path_options.inspect}
-            end
-            protected :hash_for_#{name}_path
+          { :path => path_options, :url => url_options }.each do |kind, options|
+            mod.module_eval <<-end_eval
+              def hash_for_#{name}_#{kind}(options = nil)
+                options ? #{options.inspect}.merge(options) : #{options.inspect}
+              end
+              protected :hash_for_#{name}_#{kind}
 
-            def hash_for_#{name}_url(options = nil)
-              options ? #{url_options.inspect}.merge(options) : #{url_options.inspect}
-            end
-            protected :hash_for_#{name}_url
-
-            def #{name}_path(*args)
-              opts = args.extract_options!
-              url_for(hash_for_#{name}_path(opts))
-            end
-            protected :#{name}_path
-
-            def #{name}_url(*args)
-              opts = args.extract_options!
-              url_for(hash_for_#{name}_url(opts))
-            end
-            protected :#{name}_url
-          end_eval
+              def #{name}_#{kind}(*args)
+                opts = if args.empty? || Hash === args.first
+                  args.first || {}
+                else
+                  options = args.extract_options!
+                  args = args.zip(#{segment_keys.inspect}).inject({}) do |h, (v, k)|
+                    h[k] = v
+                    h
+                  end
+                  options.merge(args)
+                end
+                url_for(hash_for_#{name}_#{kind}(opts))
+              end
+              protected :#{name}_#{kind}
+            end_eval
+          end
         end
 
         Array(destinations).each do |d|
@@ -108,11 +109,12 @@ module Rack
             end
         end
 
-        attr_reader :named_routes
-
         def initialize(set)
           @set = set
-          @named_routes = {}
+        end
+
+        def named_routes
+          @set.instance_variable_get('@named_routes')
         end
 
         def draw(&block)
