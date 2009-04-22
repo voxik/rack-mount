@@ -10,6 +10,7 @@ module Rack
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
         options = recall.merge(options)
+        options.each { |k, v| options[k] = v.to_param }
         url_for(named_route, options)
       end
 
@@ -33,7 +34,7 @@ module Rack
         @named_routes.each do |name, route|
           url_options  = route.defaults.merge(:use_route => name, :only_path => false)
           path_options = route.defaults.merge(:use_route => name, :only_path => true)
-          segment_keys = route.instance_variable_get("@required_params").map(&:to_sym)
+          segment_keys = route.path.names.compact.map(&:to_sym)
 
           { :path => path_options, :url => url_options }.each do |kind, options|
             mod.module_eval <<-end_eval
