@@ -201,6 +201,8 @@ module Rack
 
           def generate(options, recall = {}, method = :generate)
             named_route = options.delete(:use_route)
+            expire_on = build_expiry(options, recall)
+            expire_on.each { |k, v| recall.delete(k) unless v }
             options = recall.merge(options)
             options.each { |k, v| options[k] = v.to_param }
             @set.url_for(named_route, options)
@@ -215,6 +217,13 @@ module Rack
           end
 
           private
+            def build_expiry(options, recall)
+              recall.inject({}) do |expiry, (key, recalled_value)|
+                expiry[key] = (options.key?(key) && options[key].to_param != recalled_value.to_param)
+                expiry
+              end
+            end
+
             def optionalize_trailing_dynamic_segments(path)
               path = (path =~ /^\//) ? path.dup : "/#{path}"
               optional, segments = true, []
