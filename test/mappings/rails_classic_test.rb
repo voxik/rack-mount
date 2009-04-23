@@ -22,7 +22,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
     end
   end
 
-  Routes = Rack::Mount::RouteSet.new
+  Routes = Rack::Mount::Mappers::RailsClassic::RouteSet.new
   Routes.draw do |map|
     map.resources :people
 
