@@ -1,151 +1,133 @@
 require 'test_helper'
 
 class NestedSetTest < Test::Unit::TestCase
-  NestedSet = Rack::Mount::NestedSet
-
   def test_one_level
-    root = NestedSet.new
+    set['/people'] = '/people'
+    set['/people'] = '/people/1'
+    set['/people'] = '/people/new'
+    set['/companies'] = '/companies'
 
-    root['/people'] = '/people'
-    root['/people'] = '/people/1'
-    root['/people'] = '/people/new'
-    root['/companies'] = '/companies'
+    assert_equal ['/people', '/people/1', '/people/new'], set['/people']
+    assert_equal ['/companies'], set['/companies']
+    assert_equal [], set['/notfound']
 
-    assert_equal ['/people', '/people/1', '/people/new'], root['/people']
-    assert_equal ['/companies'], root['/companies']
-    assert_equal [], root['/notfound']
-
-    assert_equal 3, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 3, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_one_level_with_defaults
-    root = NestedSet.new
+    set['/people'] = '/people'
+    set['/people'] = '/people/1'
+    set[nil] = '/:controller/edit'
+    set['/people'] = '/people/new'
+    set['/companies'] = '/companies'
+    set[nil] = '/:controller/:action'
 
-    root['/people'] = '/people'
-    root['/people'] = '/people/1'
-    root[nil] = '/:controller/edit'
-    root['/people'] = '/people/new'
-    root['/companies'] = '/companies'
-    root[nil] = '/:controller/:action'
+    assert_equal ['/people', '/people/1', '/:controller/edit', '/people/new', '/:controller/:action'], set['/people']
+    assert_equal ['/:controller/edit', '/companies', '/:controller/:action'], set['/companies']
+    assert_equal ['/:controller/edit', '/:controller/:action'], set['/notfound']
 
-    assert_equal ['/people', '/people/1', '/:controller/edit', '/people/new', '/:controller/:action'], root['/people']
-    assert_equal ['/:controller/edit', '/companies', '/:controller/:action'], root['/companies']
-    assert_equal ['/:controller/edit', '/:controller/:action'], root['/notfound']
-
-    assert_equal 3, root.lists.length
-    assert_equal 5, root.height
+    assert_equal 3, set.lists.length
+    assert_equal 5, set.height
   end
 
   def test_regexp
-    root = NestedSet.new
+    set['/abc'] = '/abc'
+    set['/abc'] = '/abc/show'
+    set['/123'] = '/123'
+    set['/456'] = '/456'
+    set[/\d{3}/] = '/:id'
+    set[nil] = '/:action'
 
-    root['/abc'] = '/abc'
-    root['/abc'] = '/abc/show'
-    root['/123'] = '/123'
-    root['/456'] = '/456'
-    root[/\d{3}/] = '/:id'
-    root[nil] = '/:action'
+    assert_equal ['/abc', '/abc/show', '/:action'], set['/abc']
+    assert_equal ['/123', '/:id', '/:action'], set['/123']
+    assert_equal ['/456', '/:id', '/:action'], set['/456']
+    assert_equal ['/:id', '/:action'], set['/789']
+    assert_equal ['/:id', '/:action'], set['/notfound']
 
-    assert_equal ['/abc', '/abc/show', '/:action'], root['/abc']
-    assert_equal ['/123', '/:id', '/:action'], root['/123']
-    assert_equal ['/456', '/:id', '/:action'], root['/456']
-    assert_equal ['/:id', '/:action'], root['/789']
-    assert_equal ['/:id', '/:action'], root['/notfound']
-
-    assert_equal 4, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 4, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_nested_buckets
-    root = NestedSet.new
+    set['/admin', '/people'] = '/admin/people'
+    set['/admin', '/people'] = '/admin/people/1'
+    set['/admin', '/people'] = '/admin/people/new'
+    set['/admin', '/companies'] = '/admin/companies'
 
-    root['/admin', '/people'] = '/admin/people'
-    root['/admin', '/people'] = '/admin/people/1'
-    root['/admin', '/people'] = '/admin/people/new'
-    root['/admin', '/companies'] = '/admin/companies'
+    assert_equal ['/admin/people', '/admin/people/1', '/admin/people/new'], set['/admin', '/people', '/notfound']
+    assert_equal ['/admin/people', '/admin/people/1', '/admin/people/new'], set['/admin', '/people']
+    assert_equal ['/admin/companies'], set['/admin', '/companies']
+    assert_equal [], set['/admin', '/notfound']
+    assert_equal [], set['/notfound']
 
-    assert_equal ['/admin/people', '/admin/people/1', '/admin/people/new'], root['/admin', '/people', '/notfound']
-    assert_equal ['/admin/people', '/admin/people/1', '/admin/people/new'], root['/admin', '/people']
-    assert_equal ['/admin/companies'], root['/admin', '/companies']
-    assert_equal [], root['/admin', '/notfound']
-    assert_equal [], root['/notfound']
-
-    assert_equal 4, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 4, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_nested_buckets_with_defaults
-    root = NestedSet.new
+    set['/admin'] = '/admin/accounts/new'
+    set['/admin', '/people'] = '/admin/people'
+    set['/admin', '/people'] = '/admin/people/1'
+    set['/admin'] = '/admin/:controller/edit'
+    set['/admin', '/people'] = '/admin/people/new'
+    set['/admin', '/companies'] = '/admin/companies'
+    set[nil, '/companies'] = '/:namespace/companies'
+    set[nil] = '/:controller/:action'
 
-    root['/admin'] = '/admin/accounts/new'
-    root['/admin', '/people'] = '/admin/people'
-    root['/admin', '/people'] = '/admin/people/1'
-    root['/admin'] = '/admin/:controller/edit'
-    root['/admin', '/people'] = '/admin/people/new'
-    root['/admin', '/companies'] = '/admin/companies'
-    root[nil, '/companies'] = '/:namespace/companies'
-    root[nil] = '/:controller/:action'
+    assert_equal ['/admin/accounts/new', '/admin/people', '/admin/people/1', '/admin/:controller/edit', '/admin/people/new', '/:controller/:action'], set['/admin', '/people']
+    assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/admin/companies', '/:namespace/companies', '/:controller/:action'], set['/admin', '/companies']
+    assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/:controller/:action'], set['/admin', '/notfound']
+    assert_equal ['/:controller/:action'], set['/notfound']
 
-    assert_equal ['/admin/accounts/new', '/admin/people', '/admin/people/1', '/admin/:controller/edit', '/admin/people/new', '/:controller/:action'], root['/admin', '/people']
-    assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/admin/companies', '/:namespace/companies', '/:controller/:action'], root['/admin', '/companies']
-    assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/:controller/:action'], root['/admin', '/notfound']
-    assert_equal ['/:controller/:action'], root['/notfound']
-
-    assert_equal 5, root.lists.length
-    assert_equal 6, root.height
+    assert_equal 5, set.lists.length
+    assert_equal 6, set.height
   end
 
   def test_another_nested_buckets_with_defaults
-    root = NestedSet.new
+    set['GET', '/people'] = 'GET /people'
+    set[nil, '/people'] = 'ANY /people/export'
+    set['GET', '/people'] = 'GET /people/1'
+    set['POST', '/messages'] = 'POST /messages'
+    set[nil, '/messages'] = 'ANY /messages/export'
 
-    root['GET', '/people'] = 'GET /people'
-    root[nil, '/people'] = 'ANY /people/export'
-    root['GET', '/people'] = 'GET /people/1'
-    root['POST', '/messages'] = 'POST /messages'
-    root[nil, '/messages'] = 'ANY /messages/export'
+    assert_equal ['GET /people', 'ANY /people/export', 'GET /people/1'], set['GET', '/people']
+    assert_equal ['ANY /people/export'], set['POST', '/people']
+    assert_equal ['ANY /people/export'], set['PUT', '/people']
+    assert_equal ['ANY /messages/export'], set['GET', '/messages']
+    assert_equal ['POST /messages', 'ANY /messages/export'], set['POST', '/messages']
 
-    assert_equal ['GET /people', 'ANY /people/export', 'GET /people/1'], root['GET', '/people']
-    assert_equal ['ANY /people/export'], root['POST', '/people']
-    assert_equal ['ANY /people/export'], root['PUT', '/people']
-    assert_equal ['ANY /messages/export'], root['GET', '/messages']
-    assert_equal ['POST /messages', 'ANY /messages/export'], root['POST', '/messages']
-
-    assert_equal 9, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 9, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_nested_with_regexp
-    root = NestedSet.new
+    set['GET', 'people'] = 'GET /people'
+    set['POST', 'people'] = 'POST /people'
+    set['GET', 'people', 'new'] = 'GET /people/new'
+    set['GET', 'people', /\d+/] = 'GET /people/:id'
+    set['GET', 'people', /\d+/, 'edit'] = 'GET /people/:id/edit'
+    set['POST', 'people', /\d+/] = 'POST /people/:id'
+    set['PUT', 'people', /\d+/] = 'PUT /people/:id'
+    set['DELETE', 'people', /\d+/] = 'DELETE /people/:id'
 
-    root['GET', 'people'] = 'GET /people'
-    root['POST', 'people'] = 'POST /people'
-    root['GET', 'people', 'new'] = 'GET /people/new'
-    root['GET', 'people', /\d+/] = 'GET /people/:id'
-    root['GET', 'people', /\d+/, 'edit'] = 'GET /people/:id/edit'
-    root['POST', 'people', /\d+/] = 'POST /people/:id'
-    root['PUT', 'people', /\d+/] = 'PUT /people/:id'
-    root['DELETE', 'people', /\d+/] = 'DELETE /people/:id'
+    assert_equal ['GET /people', 'GET /people/:id'], set['GET', 'people']
+    assert_equal ['GET /people', 'GET /people/new'], set['GET', 'people', 'new']
+    assert_equal ['GET /people', 'GET /people/:id'], set['GET', 'people', '1']
+    assert_equal ['GET /people', 'GET /people/:id', 'GET /people/:id/edit'], set['GET', 'people', '1', 'edit']
 
-    assert_equal ['GET /people', 'GET /people/:id'], root['GET', 'people']
-    assert_equal ['GET /people', 'GET /people/new'], root['GET', 'people', 'new']
-    assert_equal ['GET /people', 'GET /people/:id'], root['GET', 'people', '1']
-    assert_equal ['GET /people', 'GET /people/:id', 'GET /people/:id/edit'], root['GET', 'people', '1', 'edit']
-
-    assert_equal 11, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 11, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_nested_default_bucket
-    root = NestedSet.new
+    set[nil, '/people'] = 'GET /people'
+    set[nil, '/people'] = 'GET /people/1'
+    set[nil, '/messages'] = 'POST /messages'
+    set[nil] = 'ANY /:controller/:action'
 
-    root[nil, '/people'] = 'GET /people'
-    root[nil, '/people'] = 'GET /people/1'
-    root[nil, '/messages'] = 'POST /messages'
-    root[nil] = 'ANY /:controller/:action'
-
-    assert_equal 3, root.lists.length
-    assert_equal 3, root.height
+    assert_equal 3, set.lists.length
+    assert_equal 3, set.height
   end
 
   def test_deeply_nested_set
@@ -160,17 +142,36 @@ class NestedSetTest < Test::Unit::TestCase
   end
 
   def test_freeze
-    root = NestedSet.new
+    set['/admin', '/people'] = '/admin/people'
+    set['/admin', '/people'] = '/admin/people/1'
+    set['/admin'] = '/admin/:controller/edit'
+    set['/admin', '/people'] = '/admin/people/new'
+    set['/admin', '/companies'] = '/admin/companies'
+    set[nil] = '/:controller/:action'
 
-    root['/admin', '/people'] = '/admin/people'
-    root['/admin', '/people'] = '/admin/people/1'
-    root['/admin'] = '/admin/:controller/edit'
-    root['/admin', '/people'] = '/admin/people/new'
-    root['/admin', '/companies'] = '/admin/companies'
-    root[nil] = '/:controller/:action'
+    set.freeze
 
-    root.freeze
-
-    assert_frozen(root)
+    assert_frozen(set)
   end
+
+  private
+    def set
+      @set ||= Rack::Mount::NestedSet.new
+    end
+end
+
+begin
+  class NativeNestedSetTest < NestedSetTest
+    class NativeNestedSet < Rack::Mount::NestedSet
+      include Rack::Mount::NestedSetExt
+      alias_method :[], :cfetch
+    end
+
+    private
+      def set
+        @set ||= NativeNestedSet.new
+      end
+  end
+rescue MissingSourceFile
+  puts "Skipping native nested set tests"
 end
