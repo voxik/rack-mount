@@ -172,6 +172,6 @@ begin
         @set ||= NativeNestedSet.new
       end
   end
-rescue MissingSourceFile
+rescue Exception
   puts "Skipping native nested set tests"
 end
