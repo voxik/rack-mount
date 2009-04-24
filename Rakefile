@@ -1,5 +1,4 @@
 require 'rake/testtask'
-require 'rake/extensiontask'
 
 task :default => :test
 
@@ -8,6 +7,10 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/**/*_test.rb']
   t.verbose = true
 end
+
+
+gem 'rake-compiler'
+require 'rake/extensiontask'
 
 Rake::ExtensionTask.new do |ext|
   ext.name = 'nested_set_ext'
