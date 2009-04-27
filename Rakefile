@@ -9,11 +9,14 @@ Rake::TestTask.new do |t|
 end
 
 
-gem 'rake-compiler'
-require 'rake/extensiontask'
+begin
+  gem 'rake-compiler'
+  require 'rake/extensiontask'
 
-Rake::ExtensionTask.new do |ext|
-  ext.name = 'nested_set_ext'
-  ext.ext_dir = 'ext/rack/mount'
-  ext.lib_dir = 'lib/rack/mount'
+  Rake::ExtensionTask.new do |ext|
+    ext.name = 'nested_set_ext'
+    ext.ext_dir = 'ext/rack/mount'
+    ext.lib_dir = 'lib/rack/mount'
+  end
+rescue Gem::LoadError
 end
