@@ -13,7 +13,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
     def call(env)
       @app.call(env)
-    rescue Rack::Mount::Mappers::RailsClassic::RoutingError
+    rescue ActionController::RoutingError
       Rack::Mount::Const::NOT_FOUND_RESPONSE
     end
 
@@ -22,8 +22,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
     end
   end
 
-  Routes = Rack::Mount::Mappers::RailsClassic::RouteSet.new
-  Routes.draw do |map|
+  ActionController::Routing::Routes.draw do |map|
     map.resources :people
 
     map.connect '', :controller => 'homepage'
@@ -72,7 +71,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
   end
 
   def setup
-    @app = CatchRoutingErrors.new(Routes)
+    @app = CatchRoutingErrors.new(ActionController::Routing::Routes)
   end
 
   def test_root_path
