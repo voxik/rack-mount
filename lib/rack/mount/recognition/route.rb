@@ -3,7 +3,7 @@ require 'strscan'
 module Rack
   module Mount
     module Recognition
-      module Route
+      module Route #:nodoc:
         def initialize(*args)
           super
 

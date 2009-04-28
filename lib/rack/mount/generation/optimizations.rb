@@ -1,7 +1,7 @@
 module Rack
   module Mount
     module Generation
-      module Optimizations
+      module Optimizations #:nodoc:
         def freeze
           optimize_call! unless frozen?
           super

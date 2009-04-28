@@ -1,6 +1,6 @@
 module Rack
   module Mount
-    class Request
+    class Request #:nodoc:
       def initialize(env)
         @env = env
       end

@@ -2,7 +2,7 @@ require 'strscan'
 
 module Rack
   module Mount
-    module Utils
+    module Utils #:nodoc:
       GLOB_REGEXP = /\/\\\*(\w+)$/
       OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
@@ -40,7 +40,7 @@ module Rack
       end
       module_function :convert_segment_string_to_regexp
 
-      class Capture < Array
+      class Capture < Array #:nodoc:
         attr_reader :name, :optional
         alias_method :optional?, :optional
 

@@ -3,7 +3,7 @@ require 'strscan'
 module Rack
   module Mount
     unless Const::SUPPORTS_NAMED_CAPTURES
-      class RegexpWithNamedGroups < Regexp
+      class RegexpWithNamedGroups < Regexp #:nodoc:
         def self.new(regexp)
           if regexp.is_a?(RegexpWithNamedGroups)
             regexp

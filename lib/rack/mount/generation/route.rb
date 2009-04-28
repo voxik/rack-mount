@@ -1,8 +1,8 @@
 module Rack
   module Mount
     module Generation
-      module Route
-        class DynamicSegment
+      module Route #:nodoc:
+        class DynamicSegment #:nodoc:
           attr_reader :name, :requirement
 
           def initialize(name, requirement)

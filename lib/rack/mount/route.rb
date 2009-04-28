@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class Route
-      module Base
+    class Route #:nodoc:
+      module Base #:nodoc:
         # TODO: Support any method on Request object
         VALID_CONDITIONS = [:method, :path].freeze
 

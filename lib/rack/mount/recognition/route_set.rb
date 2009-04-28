@@ -45,7 +45,7 @@ module Rack
           super
         end
 
-        def height
+        def height #:nodoc:
           @recognition_graph.height
         end
       end

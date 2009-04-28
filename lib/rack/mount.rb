@@ -1,8 +1,8 @@
 require 'rack/utils'
 require 'rack/mount/exceptions'
 
-module Rack
-  module Mount
+module Rack #:nodoc:
+  module Mount #:nodoc:
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'
     autoload :NestedSet, 'rack/mount/nested_set'

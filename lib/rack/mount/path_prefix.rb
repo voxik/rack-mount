@@ -1,6 +1,6 @@
 module Rack
   module Mount
-    class PathPrefix
+    class PathPrefix #:nodoc:
       def initialize(app, path_prefix = nil)
         @app, @path_prefix = app, /^#{Regexp.escape(path_prefix)}/.freeze
       end

@@ -1,7 +1,7 @@
 module Rack
   module Mount
-    class NestedSet < Hash
-      class List < Array
+    class NestedSet < Hash #:nodoc:
+      class List < Array #:nodoc:
         def freeze
           each { |e| e.freeze }
           super
