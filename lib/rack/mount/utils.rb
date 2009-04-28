@@ -122,8 +122,11 @@ module Rack
       end
       module_function :extract_regexp_parts
 
-      NAMED_CAPTURE_REGEXP = (Const::SUPPORTS_NAMED_CAPTURES ?
-        /\?<([^>]+)>/ : /\?:<([^>]+)>/).freeze
+      if Const::SUPPORTS_NAMED_CAPTURES
+        NAMED_CAPTURE_REGEXP = /\?<([^>]+)>/.freeze
+      else
+        NAMED_CAPTURE_REGEXP = /\?:<([^>]+)>/.freeze
+      end
 
       def extract_named_captures(regexp)
         source = Regexp.compile(regexp).source
