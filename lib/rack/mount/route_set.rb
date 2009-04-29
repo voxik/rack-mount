@@ -4,7 +4,7 @@ module Rack
       module Base
         def initialize(options = {})
           if options.delete(:optimize) == true
-            extend Generation::Optimizations
+            extend Recognition::Optimizations
           end
 
           if block_given?

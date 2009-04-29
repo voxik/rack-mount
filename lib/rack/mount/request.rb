@@ -25,6 +25,14 @@ module Rack
           keys
         end
       end
+
+      10.times do |n|
+        class_eval(<<-EOS, __FILE__, __LINE__)
+          def path_keys_at_#{n}
+            path_keys[#{n}]
+          end
+        EOS
+      end
     end
   end
 end

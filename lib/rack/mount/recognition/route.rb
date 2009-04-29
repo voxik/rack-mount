@@ -33,6 +33,14 @@ module Rack
           @path_keys[index]
         end
 
+        10.times do |n|
+          module_eval(<<-EOS, __FILE__, __LINE__)
+            def path_keys_at_#{n}
+              @path_keys[#{n}]
+            end
+          EOS
+        end
+
         private
           # Keys for inserting into NestedSet
           # #=> ['people', /[0-9]+/, 'edit']

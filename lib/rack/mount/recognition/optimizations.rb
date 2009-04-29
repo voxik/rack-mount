@@ -1,6 +1,6 @@
 module Rack
   module Mount
-    module Generation
+    module Recognition
       module Optimizations #:nodoc:
         def freeze
           optimize_call! unless frozen?
@@ -63,12 +63,7 @@ module Rack
 
           def convert_keys_to_method_calls
             @recognition_keys.map { |key|
-              if key.is_a?(Array)
-                key = key.dup
-                "req.#{key.shift}(#{key.join(',')})"
-              else
-                "req.#{key}"
-              end
+              "req.#{key}"
             }.join(', ')
           end
 
