@@ -193,6 +193,14 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       extract_regexp_parts(re)
   end
 
+  def test_prefix_regexp
+    re = %r{^/prefix/.*$}
+    assert_equal ['prefix'], extract_static_segments(re)
+    assert_equal ['/prefix/.*'], build_generation_segments(re)
+    assert_equal ['/prefix/.*'],
+      extract_regexp_parts(re)
+  end
+
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
     def test_named_regexp_groups
       re = eval('%r{^/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)$}')

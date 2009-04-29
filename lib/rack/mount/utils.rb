@@ -74,6 +74,8 @@ module Rack
         end
       end
 
+      METACHARACTERS = %w( . [ ] ^ $ * + )
+
       def extract_regexp_parts(regexp)
         unless regexp.is_a?(RegexpWithNamedGroups)
           regexp = RegexpWithNamedGroups.new(regexp)
@@ -98,6 +100,8 @@ module Rack
           char = scanner.getch
           cur  = stack.last
 
+          escaped = cur.last.is_a?(String) && cur.last == '\\'
+
           if char == '('
             name = names[capture_index]
             capture = Capture.new(:name => name)
@@ -110,6 +114,7 @@ module Rack
               scanner.pos += 1
               capture.optionalize!
             end
+          # elsif !escaped && METACHARACTERS.include?(char)
           else
             cur.push('') unless cur.last.is_a?(String)
             cur.last << char

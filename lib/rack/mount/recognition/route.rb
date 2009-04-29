@@ -46,7 +46,7 @@ module Rack
           # #=> ['people', /[0-9]+/, 'edit']
           def path_keys(regexp, separators)
             escaped_separators = separators.map { |s| Regexp.escape(s) }
-            separators = Regexp.compile(escaped_separators.join('|'))
+            separators_regexp = Regexp.compile(escaped_separators.join('|'))
             segments = []
 
             begin
@@ -60,12 +60,13 @@ module Rack
                 scanner = StringScanner.new(part)
 
                 until scanner.eos?
-                  unless s = scanner.scan_until(separators)
+                  unless s = scanner.scan_until(separators_regexp)
                     s = scanner.rest
                     scanner.terminate
                   end
 
                   s.gsub!(/\/$/, '')
+                  raise ArgumentError if matches_separator?(s, separators)
                   segments << (clean_regexp?(s) ? s : nil)
                 end
               end
@@ -95,6 +96,15 @@ module Rack
 
           def clean_regexp?(source)
             source =~ /^\w+$/
+          end
+
+          def matches_separator?(source, separators)
+            separators.each do |separator|
+              if Regexp.compile("^#{source}$") =~ separator
+                return true
+              end
+            end
+            false
           end
       end
     end
