@@ -31,7 +31,16 @@ module Rack
             each { |k, v| v << value if key =~ k }
             default << value
           else
-            each { |k, v| v[keys.dup] = value if key =~ k }
+            self.keys.each { |k|
+              if key =~ k
+                v = at(k)
+                v = v.dup if v.equal?(default)
+                v = NestedSet.new(v) if v.is_a?(List)
+                v[keys.dup] = value
+                super(k, v)
+              end
+            }
+
             self.default = NestedSet.new(default) if default.is_a?(List)
             default[keys.dup] = value
           end
@@ -50,6 +59,13 @@ module Rack
         else
           raise ArgumentError, 'unsupported key'
         end
+      end
+
+      def dup
+        set = self.class.new
+        each { |k, v| set.store(k, v.dup) }
+        set.default = default.dup
+        set
       end
 
       def [](*keys)

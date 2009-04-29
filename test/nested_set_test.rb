@@ -85,20 +85,22 @@ class NestedSetTest < Test::Unit::TestCase
   end
 
   def test_another_nested_buckets_with_defaults
+    set['DELETE'] = 'DELETE .*'
+    set[nil, '/people'] = 'ANY /people/new'
     set['GET', '/people'] = 'GET /people'
     set[nil, '/people'] = 'ANY /people/export'
     set['GET', '/people'] = 'GET /people/1'
     set['POST', '/messages'] = 'POST /messages'
     set[nil, '/messages'] = 'ANY /messages/export'
 
-    assert_equal ['GET /people', 'ANY /people/export', 'GET /people/1'], set['GET', '/people']
-    assert_equal ['ANY /people/export'], set['POST', '/people']
-    assert_equal ['ANY /people/export'], set['PUT', '/people']
+    assert_equal ['ANY /people/new', 'GET /people', 'ANY /people/export', 'GET /people/1'], set['GET', '/people']
+    assert_equal ['ANY /people/new', 'ANY /people/export'], set['POST', '/people']
+    assert_equal ['ANY /people/new', 'ANY /people/export'], set['PUT', '/people']
     assert_equal ['ANY /messages/export'], set['GET', '/messages']
     assert_equal ['POST /messages', 'ANY /messages/export'], set['POST', '/messages']
 
-    assert_equal 9, set.lists.length
-    assert_equal 3, set.height
+    assert_equal 12, set.lists.length
+    assert_equal 4, set.height
   end
 
   def test_nested_with_regexp
