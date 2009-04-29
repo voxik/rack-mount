@@ -42,22 +42,12 @@ class RouteSetTest < Test::Unit::TestCase
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
-    assert_equal 12, @app.height
+    assert_equal 3, @app.height
   end
 end
 
 class OptimizedRouteSetTest < RouteSetTest
   def setup
     @app = OptimizedBasicSet
-  end
-end
-
-class LinearBasicSetTest < RouteSetTest
-  def setup
-    @app = LinearBasicSet
-  end
-
-  def test_worst_case
-    # Skip assertions
   end
 end

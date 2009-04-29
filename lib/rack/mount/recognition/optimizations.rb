@@ -20,7 +20,7 @@ module Rack
 
         private
           def optimize_call!
-            @recognition_graph.lists.each do |list|
+            recognition_graph.lists.each do |list|
               body = (0...list.length).zip(list).map { |i, route|
                 assign_index_params = assign_index_params(route)
                 <<-EOS
@@ -62,7 +62,7 @@ module Rack
           end
 
           def convert_keys_to_method_calls
-            @recognition_keys.map { |key|
+            recognition_keys.map { |key|
               "req.#{key}"
             }.join(', ')
           end

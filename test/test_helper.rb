@@ -85,7 +85,7 @@ class Test::Unit::TestCase
 
     obj = objs.pop
     case obj
-    when Symbol, Integer
+    when NilClass, Symbol, Integer
       return nil
     else
       assert obj.frozen?, "#{obj.inspect} was not frozen"

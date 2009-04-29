@@ -4,10 +4,15 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
+        KEYS = [:method]
+
+        attr_reader :keys
+
         def initialize(*args)
           super
 
           @path_keys      = path_keys(@path, %w( / ))
+          @keys           = generate_keys
           @named_captures = named_captures(@path)
         end
 
@@ -38,8 +43,11 @@ module Rack
             def path_keys_at_#{n}
               @path_keys[#{n}]
             end
+            KEYS << :"path_keys_at_#{n}"
           EOS
         end
+
+        KEYS.freeze
 
         private
           # Keys for inserting into NestedSet
@@ -82,6 +90,15 @@ module Rack
             end
 
             segments.freeze
+          end
+
+          def generate_keys
+            KEYS.inject({}) { |keys, k|
+              if v = send(k)
+                keys[k] = v
+              end
+              keys
+            }
           end
 
           # Maps named captures to their capture index

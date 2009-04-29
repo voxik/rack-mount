@@ -2,7 +2,6 @@ module Rack
   module Mount
     module Recognition
       module RouteSet
-        DEFAULT_KEYS = [:method, :path_keys_at_0].freeze
         DEFAULT_CATCH_STATUS = 404
 
         def initialize(options = {})
@@ -11,20 +10,14 @@ module Rack
           @throw[0] = @catch
           @throw.freeze
 
-          @recognition_keys = options.delete(:keys) || DEFAULT_KEYS
-          @recognition_keys.freeze
-
-          @recognition_graph = NestedSet.new
+          @routes = []
           super
         end
 
         def add_route(*args)
           route = super
           route.throw = @throw
-
-          keys = @recognition_keys.map { |key| route.send(*key) }
-          @recognition_graph[*keys] = route
-
+          @routes << route
           route
         end
 
@@ -41,13 +34,51 @@ module Rack
         end
 
         def freeze
-          @recognition_graph.freeze
+          recognition_keys.freeze
+          recognition_graph.freeze
+          @routes = nil
+
           super
         end
 
         def height #:nodoc:
           @recognition_graph.height
         end
+
+        private
+          def recognition_keys
+            @recognition_keys ||= generate_keys(@routes)
+          end
+
+          def recognition_graph
+            @recognition_graph ||= build_graph(@routes, recognition_keys)
+          end
+
+          def build_graph(routes, keys)
+            graph = NestedSet.new
+            routes.each do |route|
+              k = keys.map { |key| route.send(*key) }
+              while k.length > 0 && k.last.nil?
+                k.pop
+              end
+              graph[*k] = route
+            end
+            graph
+          end
+
+          def generate_keys(routes)
+            key_statistics = {}
+            routes.each do |route|
+              route.keys.each do |key, value|
+                key_statistics[key] ||= 0
+                key_statistics[key] += 1
+              end
+            end
+            key_statistics = key_statistics.sort { |e1, e2| e1[1] <=> e2[1] }
+            key_statistics.reverse!
+            key_statistics.map! { |e| e[0] }
+            key_statistics
+          end
       end
     end
   end
