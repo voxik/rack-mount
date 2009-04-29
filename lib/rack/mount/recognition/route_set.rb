@@ -51,9 +51,7 @@ module Rack
               graph = NestedSet.new
               @recognition_graph.each do |route|
                 k = keys.map { |key| route.send(*key) }
-                while k.length > 0 && k.last.nil?
-                  k.pop
-                end
+                Utils.pop_trailing_nils!(k)
                 graph[*k] = route
               end
               @recognition_graph = graph

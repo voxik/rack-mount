@@ -3,6 +3,14 @@ require 'strscan'
 module Rack
   module Mount
     module Utils #:nodoc:
+      def pop_trailing_nils!(ary)
+        while ary.length > 0 && ary.last.nil?
+          ary.pop
+        end
+        nil
+      end
+      module_function :pop_trailing_nils!
+
       GLOB_REGEXP = /\/\\\*(\w+)$/
       OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/

@@ -84,10 +84,7 @@ module Rack
               # generation failed somewhere, but lets take what we can get
             end
 
-            # Pop off trailing nils
-            while segments.length > 0 && segments.last.nil?
-              segments.pop
-            end
+            Utils.pop_trailing_nils!(segments)
 
             segments.freeze
           end

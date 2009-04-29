@@ -56,9 +56,7 @@ module Rack
               graph = NestedSet.new
               @generation_graph.each do |route|
                 k = keys.map { |key| route.defaults[key] }
-                while k.length > 0 && k.last.nil?
-                  k.pop
-                end
+                Utils.pop_trailing_nils!(k)
                 graph[*k] = route
               end
               @generation_graph = graph
