@@ -10,14 +10,14 @@ module Rack
           @throw[0] = @catch
           @throw.freeze
 
-          @routes = []
+          @recognition_graph = []
           super
         end
 
         def add_route(*args)
           route = super
           route.throw = @throw
-          @routes << route
+          @recognition_graph << route
           route
         end
 
@@ -36,7 +36,6 @@ module Rack
         def freeze
           recognition_keys.freeze
           recognition_graph.freeze
-          @routes = nil
 
           super
         end
@@ -46,38 +45,28 @@ module Rack
         end
 
         private
-          def recognition_keys
-            @recognition_keys ||= generate_keys(@routes)
-          end
-
           def recognition_graph
-            @recognition_graph ||= build_graph(@routes, recognition_keys)
+            if @recognition_graph.is_a?(Array)              
+              keys = recognition_keys
+              graph = NestedSet.new
+              @recognition_graph.each do |route|
+                k = keys.map { |key| route.send(*key) }
+                while k.length > 0 && k.last.nil?
+                  k.pop
+                end
+                graph[*k] = route
+              end
+              @recognition_graph = graph
+            else
+              @recognition_graph
+            end
           end
 
-          def build_graph(routes, keys)
-            graph = NestedSet.new
-            routes.each do |route|
-              k = keys.map { |key| route.send(*key) }
-              while k.length > 0 && k.last.nil?
-                k.pop
-              end
-              graph[*k] = route
+          def recognition_keys
+            @recognition_keys ||= begin
+              keys = @recognition_graph.map { |route| route.keys }
+              Utils.analysis_keys(keys)
             end
-            graph
-          end
-
-          def generate_keys(routes)
-            key_statistics = {}
-            routes.each do |route|
-              route.keys.each do |key, value|
-                key_statistics[key] ||= 0
-                key_statistics[key] += 1
-              end
-            end
-            key_statistics = key_statistics.sort { |e1, e2| e1[1] <=> e2[1] }
-            key_statistics.reverse!
-            key_statistics.map! { |e| e[0] }
-            key_statistics
           end
       end
     end

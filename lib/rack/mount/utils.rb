@@ -149,6 +149,21 @@ module Rack
         return Regexp.compile(source), names
       end
       module_function :extract_named_captures
+
+      def analysis_keys(possible_key_set)
+        keys = {}
+        possible_key_set.each do |possible_keys|
+          possible_keys.each do |key, value|
+            keys[key] ||= 0
+            keys[key] += 1
+          end
+        end
+        keys = keys.sort { |e1, e2| e1[1] <=> e2[1] }
+        keys.reverse!
+        keys.map! { |e| e[0] }
+        keys
+      end
+      module_function :analysis_keys
     end
   end
 end

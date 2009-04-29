@@ -2,23 +2,16 @@ module Rack
   module Mount
     module Generation
       module RouteSet
-        DEFAULT_KEYS = [] # [:controller, :action].freeze
-
         def initialize(options = {})
           @named_routes = {}
-          @generation_keys = DEFAULT_KEYS
-          @generation_graph = NestedSet.new
+          @generation_graph = []
           super
         end
 
         def add_route(*args)
           route = super
-
           @named_routes[route.name] = route if route.name
-
-          keys = @generation_keys.map { |key| route.defaults[key] }
-          @generation_graph[*keys] = route
-
+          @generation_graph << route
           route
         end
 
@@ -50,10 +43,36 @@ module Rack
 
         def freeze
           @named_routes.freeze
-          @generation_keys.freeze
-          @generation_graph.freeze
+          generation_keys.freeze
+          generation_graph.freeze
+
           super
         end
+
+        private
+          def generation_graph
+            if @generation_graph.is_a?(Array)              
+              keys = generation_keys
+              graph = NestedSet.new
+              @generation_graph.each do |route|
+                k = keys.map { |key| route.defaults[key] }
+                while k.length > 0 && k.last.nil?
+                  k.pop
+                end
+                graph[*k] = route
+              end
+              @generation_graph = graph
+            else
+              @generation_graph
+            end
+          end
+
+          def generation_keys
+            @generation_keys ||= begin
+              keys = @generation_graph.map { |route| route.defaults }
+              Utils.analysis_keys(keys)
+            end
+          end
       end
     end
   end
