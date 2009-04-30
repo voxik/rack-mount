@@ -4,14 +4,12 @@ module Rack
       module RouteSet
         def initialize(options = {})
           @named_routes = {}
-          @generation_graph = []
           super
         end
 
         def add_route(*args)
           route = super
           @named_routes[route.name] = route if route.name
-          @generation_graph << route
           route
         end
 
@@ -51,23 +49,21 @@ module Rack
 
         private
           def generation_graph
-            if @generation_graph.is_a?(Array)              
+            @generation_graph ||= begin
               keys = generation_keys
               graph = NestedSet.new
-              @generation_graph.each do |route|
+              @routes.each do |route|
                 k = keys.map { |key| route.defaults[key] }
                 Utils.pop_trailing_nils!(k)
                 graph[*k] = route
               end
-              @generation_graph = graph
-            else
-              @generation_graph
+              graph
             end
           end
 
           def generation_keys
             @generation_keys ||= begin
-              keys = @generation_graph.map { |route| route.defaults }
+              keys = @routes.map { |route| route.defaults }
               Utils.analysis_keys(keys)
             end
           end

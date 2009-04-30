@@ -7,6 +7,8 @@ module Rack
             extend Recognition::Optimizations
           end
 
+          @routes = []
+
           if block_given?
             yield self
             freeze
@@ -23,7 +25,14 @@ module Rack
         # <tt>name</tt>:: Symbol identifier for the route used with named 
         #                 route generations
         def add_route(app, conditions = {}, defaults = {}, name = nil)
-          Route.new(app, conditions, defaults, name)
+          route = Route.new(app, conditions, defaults, name)
+          @routes << route
+          route
+        end
+
+        def freeze
+          @routes.freeze
+          super
         end
       end
       include Base

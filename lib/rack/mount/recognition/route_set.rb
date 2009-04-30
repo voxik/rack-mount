@@ -10,14 +10,12 @@ module Rack
           @throw[0] = @catch
           @throw.freeze
 
-          @recognition_graph = []
           super
         end
 
         def add_route(*args)
           route = super
           route.throw = @throw
-          @recognition_graph << route
           route
         end
 
@@ -46,23 +44,21 @@ module Rack
 
         private
           def recognition_graph
-            if @recognition_graph.is_a?(Array)              
+            @recognition_graph ||= begin
               keys = recognition_keys
               graph = NestedSet.new
-              @recognition_graph.each do |route|
+              @routes.each do |route|
                 k = keys.map { |key| route.send(*key) }
                 Utils.pop_trailing_nils!(k)
                 graph[*k] = route
               end
-              @recognition_graph = graph
-            else
-              @recognition_graph
+              graph
             end
           end
 
           def recognition_keys
             @recognition_keys ||= begin
-              keys = @recognition_graph.map { |route| route.keys }
+              keys = @routes.map { |route| route.keys }
               Utils.analysis_keys(keys)
             end
           end
