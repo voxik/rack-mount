@@ -14,4 +14,9 @@ module NestedSetGraphing
 
     g
   end
+
+  def debug_graph!
+    to_graph.output(:path => '/opt/local/bin/', :file => '/tmp/graph.dot')
+    system('open /tmp/graph.dot')
+  end
 end
