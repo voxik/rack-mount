@@ -50,21 +50,13 @@ module Rack
         private
           def generation_graph
             @generation_graph ||= begin
-              keys = generation_keys
-              graph = NestedSet.new
-              @routes.each do |route|
-                k = keys.map { |key| route.defaults[key] }
-                Utils.pop_trailing_nils!(k)
-                graph[*k] = route
-              end
-              graph
+              build_nested_route_set(generation_keys) { |r, k| r.defaults[k] }
             end
           end
 
           def generation_keys
             @generation_keys ||= begin
-              keys = @routes.map { |route| route.defaults }
-              Utils.analysis_keys(keys)
+              Utils.analysis_keys(@routes.map { |r| r.defaults })
             end
           end
       end

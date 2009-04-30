@@ -45,21 +45,13 @@ module Rack
         private
           def recognition_graph
             @recognition_graph ||= begin
-              keys = recognition_keys
-              graph = NestedSet.new
-              @routes.each do |route|
-                k = keys.map { |key| route.send(*key) }
-                Utils.pop_trailing_nils!(k)
-                graph[*k] = route
-              end
-              graph
+              build_nested_route_set(recognition_keys) { |r, k| r.send(*k) }
             end
           end
 
           def recognition_keys
             @recognition_keys ||= begin
-              keys = @routes.map { |route| route.keys }
-              Utils.analysis_keys(keys)
+              Utils.analysis_keys(@routes.map { |r| r.keys })
             end
           end
       end

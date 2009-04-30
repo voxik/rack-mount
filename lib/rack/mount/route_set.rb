@@ -34,6 +34,17 @@ module Rack
           @routes.freeze
           super
         end
+
+        private
+          def build_nested_route_set(keys, &block)
+            graph = NestedSet.new
+            @routes.each do |route|
+              k = keys.map { |key| block.call(route, key) }
+              Utils.pop_trailing_nils!(k)
+              graph[*k] = route
+            end
+            graph
+          end
       end
       include Base
 
