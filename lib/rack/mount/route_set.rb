@@ -3,6 +3,13 @@ module Rack
     class RouteSet < BaseClass
       include Generation::RouteSet, Recognition::RouteSet
 
+      # Basic RouteSet initializer.
+      #
+      # If a block is given, the set is yielded and finalized.
+      #
+      # See other aspects for other valid options:
+      # - <tt>Generation::RouteSet.new</tt>
+      # - <tt>Recognition::RouteSet.new</tt>
       def initialize(options = {}, &block)
         if options.delete(:optimize) == true
           extend Recognition::Optimizations
@@ -42,14 +49,20 @@ module Rack
       end
 
       # Finalizes the set and builds optimized data structures. You *must*
-      # freeze the set before you can use <tt>call</tt> and <tt>url_for</tt>. So remember
-      # to call freeze after you are done adding routes.
+      # freeze the set before you can use <tt>call</tt> and <tt>url_for</tt>.
+      # So remember to call freeze after you are done adding routes.
       def freeze
         @routes.freeze
         super
       end
 
       private
+        # An internal helper method for constructing a nested set from
+        # the linear route set.
+        #
+        # build_nested_route_set([:request_method, :path]) { |route, method|
+        #   route.send(method)
+        # }
         def build_nested_route_set(keys, &block)
           graph = NestedSet.new
           @routes.each do |route|
