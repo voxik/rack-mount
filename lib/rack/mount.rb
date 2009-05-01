@@ -3,6 +3,7 @@ require 'rack/mount/exceptions'
 
 module Rack #:nodoc:
   module Mount #:nodoc:
+    autoload :BaseClass, 'rack/mount/base_class'
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'
     autoload :NestedSet, 'rack/mount/nested_set'
