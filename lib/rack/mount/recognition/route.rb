@@ -4,13 +4,19 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
-        KEYS = [:method]
+        def self.included(base)
+          base.class_eval do
+            alias_method :initialize_without_recognition, :initialize
+            alias_method :initialize, :initialize_with_recognition
+          end
+        end
 
-        attr_reader :keys
+        attr_writer :throw
 
-        def initialize(*args)
-          super
+        def initialize_with_recognition(*args)
+          initialize_without_recognition(*args)
 
+          @throw          = Const::NOT_FOUND_RESPONSE
           @path_keys      = path_keys(@path, %w( / ))
           @keys           = generate_keys
           @named_captures = named_captures(@path)
@@ -37,6 +43,10 @@ module Rack
         def path_keys_at(index)
           @path_keys[index]
         end
+
+        KEYS = [:method]
+
+        attr_reader :keys
 
         10.times do |n|
           module_eval(<<-EOS, __FILE__, __LINE__)

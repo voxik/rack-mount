@@ -14,8 +14,15 @@ module Rack
           end
         end
 
-        def initialize(*args)
-          super
+        def self.included(base)
+          base.class_eval do
+            alias_method :initialize_without_generation, :initialize
+            alias_method :initialize, :initialize_with_generation
+          end
+        end
+
+        def initialize_with_generation(*args)
+          initialize_without_generation(*args)
 
           @segments = segments(@path).freeze
           @required_params = @segments.find_all { |s|
