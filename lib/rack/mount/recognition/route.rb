@@ -4,7 +4,7 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
-        def self.included(base)
+        def self.included(base) #:nodoc:
           base.class_eval do
             alias_method :initialize_without_recognition, :initialize
             alias_method :initialize, :initialize_with_recognition

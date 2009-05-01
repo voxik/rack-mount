@@ -2,19 +2,32 @@ module Rack
   module Mount
     module Recognition
       module RouteSet
+        def self.included(base) #:nodoc:
+          base.class_eval do
+            alias_method :initialize_without_recognition, :initialize
+            alias_method :initialize, :initialize_with_recognition
+
+            alias_method :add_route_without_recognition, :add_route
+            alias_method :add_route, :add_route_with_recognition
+
+            alias_method :freeze_without_recognition, :freeze
+            alias_method :freeze, :freeze_with_recognition
+          end
+        end
+
         DEFAULT_CATCH_STATUS = 404
 
-        def initialize(options = {})
+        def initialize_with_recognition(options = {}, &block)
           @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
           @throw = Const::NOT_FOUND_RESPONSE.dup
           @throw[0] = @catch
           @throw.freeze
 
-          super
+          initialize_without_recognition(options, &block)
         end
 
-        def add_route(*args)
-          route = super
+        def add_route_with_recognition(*args)
+          route = add_route_without_recognition(*args)
           route.throw = @throw
           route
         end
@@ -31,11 +44,10 @@ module Rack
           @throw
         end
 
-        def freeze
+        def freeze_with_recognition
           recognition_keys.freeze
           recognition_graph.freeze
-
-          super
+          freeze_without_recognition
         end
 
         def height #:nodoc:

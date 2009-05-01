@@ -14,7 +14,7 @@ module Rack
           end
         end
 
-        def self.included(base)
+        def self.included(base) #:nodoc:
           base.class_eval do
             alias_method :initialize_without_generation, :initialize
             alias_method :initialize, :initialize_with_generation
