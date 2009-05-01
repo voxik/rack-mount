@@ -2,26 +2,13 @@ module Rack
   module Mount
     module Generation
       module RouteSet
-        def self.included(base) #:nodoc:
-          base.class_eval do
-            alias_method :initialize_without_generation, :initialize
-            alias_method :initialize, :initialize_with_generation
-
-            alias_method :add_route_without_generation, :add_route
-            alias_method :add_route, :add_route_with_generation
-
-            alias_method :freeze_without_generation, :freeze
-            alias_method :freeze, :freeze_with_generation
-          end
-        end
-
-        def initialize_with_generation(*args, &block)
+        def initialize(*args)
           @named_routes = {}
-          initialize_without_generation(*args, &block)
+          super
         end
 
-        def add_route_with_generation(*args)
-          route = add_route_without_generation(*args)
+        def add_route(*args)
+          route = super
           @named_routes[route.name] = route if route.name
           route
         end
@@ -54,11 +41,12 @@ module Rack
 
         # Adds the generation aspect to RouteSet#freeze. Generation keys
         # are determined and an optimized generation graph is constructed.
-        def freeze_with_generation
+        def freeze
           @named_routes.freeze
           generation_keys.freeze
           generation_graph.freeze
-          freeze_without_generation
+
+          super
         end
 
         private

@@ -4,17 +4,10 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
-        def self.included(base) #:nodoc:
-          base.class_eval do
-            alias_method :initialize_without_recognition, :initialize
-            alias_method :initialize, :initialize_with_recognition
-          end
-        end
-
         attr_writer :throw
 
-        def initialize_with_recognition(*args)
-          initialize_without_recognition(*args)
+        def initialize(*args)
+          super
 
           @throw          = Const::NOT_FOUND_RESPONSE
           @path_keys      = path_keys(@path, %w( / ))

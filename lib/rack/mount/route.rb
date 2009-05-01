@@ -5,7 +5,10 @@ module Rack
     # Plugins should not depend on any method on this class or instantiate
     # new Route objects. Instead use the factory method, RouteSet#add_route
     # to create new routes and add them to the set.
-    class Route
+    class Route < BaseClass
+      # Include generation and recognition concerns
+      include Generation::Route, Recognition::Route
+
       #--
       # TODO: Support any method on Request object
       #++
@@ -55,9 +58,6 @@ module Rack
 
         @conditions.freeze
       end
-
-      # Include generation and recognition concerns
-      include Generation::Route, Recognition::Route
 
       private
         def validate_app!

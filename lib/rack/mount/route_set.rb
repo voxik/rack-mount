@@ -1,6 +1,8 @@
 module Rack
   module Mount
-    class RouteSet
+    class RouteSet < BaseClass
+      include Generation::RouteSet, Recognition::RouteSet
+
       def initialize(options = {}, &block)
         if options.delete(:optimize) == true
           extend Recognition::Optimizations
@@ -46,8 +48,6 @@ module Rack
         @routes.freeze
         super
       end
-
-      include Generation::RouteSet, Recognition::RouteSet
 
       private
         def build_nested_route_set(keys, &block)
