@@ -44,6 +44,8 @@ module Rack
           @throw
         end
 
+        # Adds the recognition aspect to RouteSet#freeze. Recognition keys
+        # are determined and an optimized recognition graph is constructed.
         def freeze_with_recognition
           recognition_keys.freeze
           recognition_graph.freeze

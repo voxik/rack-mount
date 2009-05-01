@@ -52,6 +52,8 @@ module Rack
           route.url_for(params)
         end
 
+        # Adds the generation aspect to RouteSet#freeze. Generation keys
+        # are determined and an optimized generation graph is constructed.
         def freeze_with_generation
           @named_routes.freeze
           generation_keys.freeze

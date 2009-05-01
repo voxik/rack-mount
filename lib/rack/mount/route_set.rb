@@ -39,6 +39,9 @@ module Rack
         super
       end
 
+      # Finalizes the set and builds optimized data structures. You *must*
+      # freeze the set before you can use <tt>call</tt> and <tt>url_for</tt>. So remember
+      # to call freeze after you are done adding routes.
       def freeze
         @routes.freeze
         super
