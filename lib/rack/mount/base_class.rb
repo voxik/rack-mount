@@ -1,8 +1,8 @@
 module Rack
   module Mount
     class BaseClass
-      def self.include(mod)
-        (@included_modules ||= []) << mod
+      def self.include(*mod)
+        (@included_modules ||= []).push(*mod)
       end
 
       def self.new(*args, &block)
