@@ -1,6 +1,9 @@
 module Rack
   module Mount
-    class RouteSet < BaseClass
+    class RouteSet
+      extend Mixover
+
+      # Include generation and recognition concerns
       include Generation::RouteSet, Recognition::RouteSet
 
       # Basic RouteSet initializer.

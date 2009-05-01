@@ -5,7 +5,9 @@ module Rack
     # Plugins should not depend on any method on this class or instantiate
     # new Route objects. Instead use the factory method, RouteSet#add_route
     # to create new routes and add them to the set.
-    class Route < BaseClass
+    class Route
+      extend Mixover
+
       # Include generation and recognition concerns
       include Generation::Route, Recognition::Route
 
