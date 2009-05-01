@@ -1,11 +1,35 @@
 module Rack
   module Mount
-    class Route #:nodoc:
+    # Route is an internal class used to wrap a single route attributes.
+    #
+    # Plugins should not depend on any method on this class or instantiate
+    # new Route objects. Instead use the factory method, RouteSet#add_route
+    # to create new routes and add them to the set.
+    class Route
+      #--
       # TODO: Support any method on Request object
+      #++
       VALID_CONDITIONS = [:method, :path].freeze
 
-      attr_reader :app, :conditions, :defaults, :name
-      attr_reader :path, :method
+      # Valid rack application to call if conditions are met
+      attr_reader :app
+
+      # A hash of conditions to match against. Conditions may be expressed
+      # as strings or regexps to match against. Currently, <tt>:method</tt>
+      # and <tt>:path</tt> are the only valid conditions.
+      attr_reader :conditions
+
+      # A hash of values that always gets merged into the parameters hash
+      attr_reader :defaults
+
+      # Symbol identifier for the route used with named route generations
+      attr_reader :name
+
+      # Path condition
+      attr_reader :path
+
+      # Method condition
+      attr_reader :method
 
       def initialize(app, conditions, defaults, name)
         @app = app
