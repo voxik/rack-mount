@@ -33,12 +33,12 @@ module Rack
 
       # See Rack::Mount::Recognition::RouteSet#call
       def call(env)
-        super
+        raise NotImplementedError
       end
 
       # See Rack::Mount::Generation::RouteSet#url_for
       def url_for(*args)
-        super
+        raise NotImplementedError
       end
 
       # Finalizes the set and builds optimized data structures. You *must*
