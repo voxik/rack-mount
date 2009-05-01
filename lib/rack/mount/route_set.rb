@@ -38,12 +38,12 @@ module Rack
         route
       end
 
-      # See Rack::Mount::Recognition::RouteSet#call
+      # See <tt>Recognition::RouteSet#call</tt>
       def call(env)
         raise NotImplementedError
       end
 
-      # See Rack::Mount::Generation::RouteSet#url_for
+      # See <tt>Generation::RouteSet#url_for</tt>
       def url_for(*args)
         raise NotImplementedError
       end
