@@ -1,8 +1,4 @@
-require 'rubygems'
-require 'rack'
-
-require 'rack/mount'
-require 'lib/performance_helper'
+require 'performance_helper'
 
 Env = EnvGenerator.env_for(2, '/account/credit_card/1')
 

@@ -1,6 +1,4 @@
-require 'rubygems'
-require 'rack/mount'
-require 'lib/performance_helper'
+require 'performance_helper'
 
 class Rack::Mount::NestedSet
   include Rack::Mount::NestedSetExt
