@@ -131,6 +131,10 @@ module ActionController
         @set.url_for(*args)
       end
 
+      def recognize(request)
+        raise NotImplementedError, "Only RouteSet#call is supported"
+      end
+
       def call(env)
         @set.call(env)
       end
