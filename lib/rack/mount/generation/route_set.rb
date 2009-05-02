@@ -37,7 +37,13 @@ module Rack
               raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
             end
           else
-            keys = @generation_keys.map { |key| params[key] }
+            keys = @generation_keys.map { |key|
+              if k = params[key]
+                k.to_s
+              else
+                nil
+              end
+            }
             @generation_graph[*keys].each do |r|
               if r.defaults.all? { |k, v| params[k] == v }
                 route = r
@@ -66,7 +72,13 @@ module Rack
         private
           def generation_graph
             @generation_graph ||= begin
-              build_nested_route_set(generation_keys) { |r, k| r.defaults[k] }
+              build_nested_route_set(generation_keys) { |r, k|
+                if k = r.defaults[k]
+                  k.to_s
+                else
+                  nil
+                end
+                }
             end
           end
 
