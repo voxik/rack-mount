@@ -4,6 +4,12 @@ module Rack
       module RouteSet
         DEFAULT_CATCH_STATUS = 404
 
+        # Adds recognition related concerns to RouteSet.new.
+        #
+        # Addition options include:
+        #
+        # <tt>:catch</tt>:: A "magic" status code that signals a non-match.
+        #                   Defaults to 404.
         def initialize(options = {})
           @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
           @throw = Const::NOT_FOUND_RESPONSE.dup
@@ -13,12 +19,19 @@ module Rack
           super
         end
 
+        # Adds recognition aspects to RouteSet#add_route.
         def add_route(*args)
           route = super
           route.throw = @throw
           route
         end
 
+        # Rack compatible recognition and dispatching method. Routes are
+        # tried until one returns a non-catch status code. If no routes
+        # match, the catch status code is returned.
+        #
+        # This method can only be invoked after the RouteSet has been
+        # finalized.
         def call(env)
           raise 'route set not finalized' unless frozen?
 
