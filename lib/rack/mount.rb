@@ -5,6 +5,7 @@ module Rack #:nodoc:
   module Mount #:nodoc:
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'
+    autoload :Mixover, 'rack/mount/mixover'
     autoload :NestedSet, 'rack/mount/nested_set'
     autoload :NestedSetExt, 'rack/mount/nested_set_ext'
     autoload :PathPrefix, 'rack/mount/path_prefix'

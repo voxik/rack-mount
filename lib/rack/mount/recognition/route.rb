@@ -4,13 +4,12 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
-        KEYS = [:method]
-
-        attr_reader :keys
+        attr_writer :throw
 
         def initialize(*args)
           super
 
+          @throw          = Const::NOT_FOUND_RESPONSE
           @path_keys      = path_keys(@path, %w( / ))
           @keys           = generate_keys
           @named_captures = named_captures(@path)
@@ -37,6 +36,10 @@ module Rack
         def path_keys_at(index)
           @path_keys[index]
         end
+
+        KEYS = [:method]
+
+        attr_reader :keys
 
         10.times do |n|
           module_eval(<<-EOS, __FILE__, __LINE__)

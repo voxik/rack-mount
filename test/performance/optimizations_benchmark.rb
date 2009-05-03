@@ -1,7 +1,4 @@
-require 'rubygems'
-require 'rack'
-require 'rack/mount'
-require 'lib/performance_helper'
+require 'performance_helper'
 
 TIMES = 10_000.to_i
 Env = EnvGenerator.env_for(TIMES, '/account/credit_card/1')

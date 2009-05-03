@@ -1,6 +1,4 @@
-require 'rubygems'
-require 'rack'
-require 'lib/performance_helper'
+require 'performance_helper'
 
 Map = lambda do |r|
   ('a'..'zz').each do |path|
