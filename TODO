@@ -1,0 +1,10 @@
+TODO
+====
+
+* Fully compatible Rails 2.3 API
+* Allow any request method to be a condition
+* Improve key analysis
+* Reduce memory footprint by collecting and merging identical objects
+* Use metaprogramming to write out optimized methods
+* Improve documentation
+* Move mappers into their own plugins
