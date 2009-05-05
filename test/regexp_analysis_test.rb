@@ -23,10 +23,10 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   def test_root_path
     re = convert_segment_string_to_regexp('/', {}, %w( / . ? ))
 
-    assert_equal %r{^/$}, re
+    assert_equal %r{^$}, re
     assert_equal ['$'], extract_static_segments(re)
-    assert_equal ['/'], build_generation_segments(re)
-    assert_equal ['/'], extract_regexp_parts(re)
+    assert_equal [], build_generation_segments(re)
+    assert_equal [], extract_regexp_parts(re)
   end
 
   def test_multisegment_static_string

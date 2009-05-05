@@ -10,7 +10,9 @@ module Rack
       end
 
       def path
-        @path ||= @env[Const::PATH_INFO] || Const::SLASH
+        @path ||= @env[Const::PATH_INFO] ?
+          Utils.normalize(@env[Const::PATH_INFO]) :
+          Const::SLASH
       end
 
       def path_keys_at(index)

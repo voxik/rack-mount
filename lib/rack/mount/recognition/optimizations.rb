@@ -42,7 +42,7 @@ module Rack
               method = <<-EOS, __FILE__, __LINE__
                 def optimized_each(env)
                   method = env[Const::REQUEST_METHOD]
-                  path = env[Const::PATH_INFO]
+                  path = Utils.normalize(env[Const::PATH_INFO])
 #{body}
                   nil
                 end

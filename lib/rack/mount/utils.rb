@@ -3,6 +3,11 @@ require 'strscan'
 module Rack
   module Mount
     module Utils #:nodoc:
+      def normalize(path)
+        "/#{path}".squeeze("/").sub(%r'/+$', '')
+      end
+      module_function :normalize
+
       def pop_trailing_nils!(ary)
         while ary.length > 0 && ary.last.nil?
           ary.pop
@@ -20,7 +25,7 @@ module Rack
 
         str = Regexp.escape(str.dup)
         requirements = requirements || {}
-        str.replace("/#{str}") unless str =~ /^\//
+        str = normalize(str)
 
         re = ''
 

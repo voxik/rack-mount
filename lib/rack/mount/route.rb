@@ -53,7 +53,7 @@ module Rack
         if path.is_a?(Regexp)
           @path = RegexpWithNamedGroups.new(path)
         elsif path.is_a?(String)
-          path = "/#{path}" unless path =~ /^\//
+          path = Utils.normalize(path)
           @path = RegexpWithNamedGroups.compile("^#{path}$")
         end
         @path.freeze if @path

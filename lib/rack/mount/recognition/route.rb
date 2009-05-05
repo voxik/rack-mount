@@ -18,7 +18,7 @@ module Rack
 
         def call(env)
           method = env[Const::REQUEST_METHOD]
-          path = env[Const::PATH_INFO]
+          path = Utils.normalize(env[Const::PATH_INFO])
 
           if (@method.nil? || method == @method) && (@path.nil? || path =~ @path)
             routing_args = @defaults.dup

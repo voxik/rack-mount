@@ -9,6 +9,20 @@ class RouteSetTest < Test::Unit::TestCase
     @app = BasicSet
   end
 
+  def test_slashes
+    get '/slashes/trailing/'
+    assert_success
+    assert_equal({ :controller => 'slash', :action => 'trailing' }, routing_args)
+
+    get '/slashes/trailing'
+    assert_success
+    assert_equal({ :controller => 'slash', :action => 'trailing' }, routing_args)
+
+    get '/slashes/repeated'
+    assert_success
+    assert_equal({ :controller => 'slash', :action => 'repeated' }, routing_args)
+  end
+
   def test_path_prefix
     get '/prefix/foo/bar/1'
     assert_success
