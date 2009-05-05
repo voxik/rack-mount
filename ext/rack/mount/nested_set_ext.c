@@ -5,7 +5,7 @@ static VALUE rb_nested_set_aref(int argc, VALUE *argv, VALUE self)
 	int i;
 	VALUE r;
 
-	for (i = 0, r = self; rb_obj_is_kind_of(r, rb_cArray) == Qfalse; i++)
+	for (i = 0, r = self; TYPE(r) != T_ARRAY; i++)
 		r = rb_hash_aref(r, (i < argc) ? argv[i] : Qnil);
 
 	return r;

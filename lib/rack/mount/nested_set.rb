@@ -1,14 +1,7 @@
 module Rack
   module Mount
     class NestedSet < Hash #:nodoc:
-      class List < Array #:nodoc:
-        def freeze
-          each { |e| e.freeze }
-          super
-        end
-      end
-
-      def initialize(default = List.new)
+      def initialize(default = [])
         super(default)
       end
 
@@ -35,13 +28,13 @@ module Rack
               if key =~ k
                 v = at(k)
                 v = v.dup if v.equal?(default)
-                v = NestedSet.new(v) if v.is_a?(List)
+                v = NestedSet.new(v) if v.is_a?(Array)
                 v[keys.dup] = value
                 super(k, v)
               end
             }
 
-            self.default = NestedSet.new(default) if default.is_a?(List)
+            self.default = NestedSet.new(default) if default.is_a?(Array)
             default[keys.dup] = value
           end
         when String
@@ -51,7 +44,7 @@ module Rack
           if keys.empty?
             v << value
           else
-            v = NestedSet.new(v) if v.is_a?(List)
+            v = NestedSet.new(v) if v.is_a?(Array)
             v[keys.dup] = value
           end
 
@@ -91,7 +84,10 @@ module Rack
       end
 
       def freeze
-        values_with_default.each { |v| v.freeze }
+        values_with_default.each { |v|
+          v.each { |e| e.freeze } if v.is_a?(Array)
+          v.freeze
+        }
         super
       end
 
