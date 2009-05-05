@@ -24,7 +24,7 @@ module Rack
               body = (0...list.length).zip(list).map { |i, route|
                 assign_index_params = assign_index_params(route)
                 <<-EOS
-                  if #{route.method ? "method == #{route.method.inspect} && " : ''}#{route.path ? "path =~ #{route.path.inspect}" : ''}
+                  if #{route.conditions[:method] ? "method =~ #{route.conditions[:method].inspect} && " : ''}#{route.conditions[:path] ? "path =~ #{route.conditions[:path].inspect}" : ''}
                     route = self[#{i}]
                     #{if assign_index_params.any?
                       'routing_args, param_matches = route.defaults.dup, $~.captures'

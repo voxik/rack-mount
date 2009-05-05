@@ -17,7 +17,7 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = segments(@path).freeze if @path
+          @segments = segments(@conditions[:path].to_regexp).freeze if @conditions.has_key?(:path)
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment)
           }.map { |s| s.name }.freeze if @segments

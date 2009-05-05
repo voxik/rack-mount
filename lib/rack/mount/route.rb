@@ -30,12 +30,6 @@ module Rack
       # Symbol identifier for the route used with named route generations
       attr_reader :name
 
-      # Path condition
-      attr_reader :path
-
-      # Method condition
-      attr_reader :method
-
       def initialize(app, conditions, defaults, name)
         @app = app
         validate_app!
@@ -46,17 +40,14 @@ module Rack
         @conditions = conditions
         validate_conditions!
 
-        method = @conditions.delete(:method)
-        @method = method.to_s.upcase if method
-
-        path = @conditions.delete(:path)
-        if path.is_a?(Regexp)
-          @path = RegexpWithNamedGroups.new(path)
-        elsif path.is_a?(String)
-          path = Utils.normalize(path)
-          @path = RegexpWithNamedGroups.compile("^#{path}$")
+        if method = @conditions.delete(:method)
+          method = method.to_s.upcase unless method.is_a?(Regexp)
+          @conditions[:method] = Condition.new(:method, method)
         end
-        @path.freeze if @path
+
+        if path = @conditions.delete(:path)
+          @conditions[:path] = PathCondition.new(:path, path).freeze
+        end
 
         @conditions.freeze
       end
