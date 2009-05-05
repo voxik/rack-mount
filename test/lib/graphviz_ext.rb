@@ -27,9 +27,17 @@ class GraphViz
       obj.source
     when String
       obj.to_str
+    when Rack::Mount::Condition
+      obj.inspect
     when Rack::Mount::Route
-      label = escape(to_label(obj.path))
-      obj.method ? "#{obj.method} #{label}" : label
+      label = []
+      if method = obj.conditions[:method]
+        label << escape(to_label(method))
+      end
+      if path = obj.conditions[:path]
+        label << escape(to_label(path))
+      end
+      label.join(' ')
     else
       raise "unsupported class: #{obj.class}"
     end

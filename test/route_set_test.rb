@@ -23,6 +23,22 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal({ :controller => 'slash', :action => 'repeated' }, routing_args)
   end
 
+  def test_method_regexp
+    get '/method'
+    assert_success
+    assert_equal({ :controller => 'method', :action => 'index' }, routing_args)
+
+    post '/method'
+    assert_success
+    assert_equal({ :controller => 'method', :action => 'index' }, routing_args)
+
+    # put '/method'
+    # assert_not_found
+
+    # delete '/method'
+    # assert_not_found
+  end
+
   def test_path_prefix
     get '/prefix/foo/bar/1'
     assert_success

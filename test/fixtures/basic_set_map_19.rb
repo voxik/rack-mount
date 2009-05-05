@@ -52,6 +52,8 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path => '/slashes/trailing/' }, { :controller => 'slash', :action => 'trailing' })
   set.add_route(EchoApp, { :path => '//slashes/repeated' }, { :controller => 'slash', :action => 'repeated' })
 
+  set.add_route(EchoApp, { :path => '/method', :method => /get|post/i }, { :controller => 'method', :action => 'index' })
+
   set.add_route(EchoApp, { :path => %r{^/optional/index(\.(?<format>[a-z]+))?$} }, { :controller => 'optional', :action => 'index' })
 
   set.add_route(EchoApp, { :path => %r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$} }, { :controller => 'foo' })
