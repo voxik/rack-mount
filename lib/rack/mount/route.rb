@@ -56,7 +56,7 @@ module Rack
           path = "/#{path}" unless path =~ /^\//
           @path = RegexpWithNamedGroups.compile("^#{path}$")
         end
-        @path.freeze
+        @path.freeze if @path
 
         @conditions.freeze
       end

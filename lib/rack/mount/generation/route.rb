@@ -17,10 +17,10 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = segments(@path).freeze
+          @segments = segments(@path).freeze if @path
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment)
-          }.map { |s| s.name }.freeze
+          }.map { |s| s.name }.freeze if @segments
         end
 
         def url_for(params = {})

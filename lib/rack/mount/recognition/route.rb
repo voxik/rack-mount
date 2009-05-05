@@ -10,17 +10,18 @@ module Rack
           super
 
           @throw          = Const::NOT_FOUND_RESPONSE
-          @path_keys      = path_keys(@path, %w( / ))
+          @path_keys      = path_keys(@path, %w( / )) if @path
           @keys           = generate_keys
-          @named_captures = named_captures(@path)
+          @named_captures = @path ? named_captures(@path) : []
         end
 
         def call(env)
           method = env[Const::REQUEST_METHOD]
           path = env[Const::PATH_INFO]
 
-          if (@method.nil? || method == @method) && path =~ @path
-            routing_args, param_matches = @defaults.dup, $~.captures
+          if (@method.nil? || method == @method) && (@path.nil? || path =~ @path)
+            routing_args = @defaults.dup
+            param_matches = $~.captures if $~
             @named_captures.each { |k, i|
               if v = param_matches[i]
                 routing_args[k] = v
@@ -44,7 +45,7 @@ module Rack
         10.times do |n|
           module_eval(<<-EOS, __FILE__, __LINE__)
             def path_keys_at_#{n}
-              @path_keys[#{n}]
+              @path_keys[#{n}] if @path_keys
             end
             KEYS << :"path_keys_at_#{n}"
           EOS

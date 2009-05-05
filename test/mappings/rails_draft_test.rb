@@ -87,6 +87,7 @@ class RailsDraftApiTest < Test::Unit::TestCase
     match 'params_with_defaults(/:controller)', :to => 'foo'
     match 'default/:controller/:action/:id'
     match 'default/:controller/:action/:id.:format'
+    match nil, :via => :delete, :to => 'global#destroy'
   end
 
   def test_misc_routes

@@ -188,6 +188,15 @@ module BasicRecognitionTests
     assert_not_found
   end
 
+  def test_only_method_condition
+    delete '/all'
+    assert_success
+    assert_equal({ :controller => 'global', :action => 'destroy' }, routing_args)
+
+    get '/all'
+    assert_not_found
+  end
+
   def test_not_found
     get '/admin/widgets/show/random'
     assert_not_found

@@ -77,6 +77,7 @@ class SimpleApiTest < Test::Unit::TestCase
 
     r.map 'params_with_defaults(/:controller)', :to => EchoApp, :with => { :controller => 'foo' }
     r.map 'default/:controller(/:action(/:id(.:format)))', :to => EchoApp
+    r.map nil, :delete, :to => EchoApp, :with => { :controller => 'global', :action => 'destroy' }
   end
 
   def setup

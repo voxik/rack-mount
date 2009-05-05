@@ -96,6 +96,7 @@ if RUBY_VERSION < '1.9'
       match('files/*files').to(:controller => 'files', :action => 'index')
       match('params_with_defaults(/:controller)').to(:controller => 'foo')
       match('default/:controller(/:action(/:id(.:format)))').to()
+      match(:method => :delete).to(:controller => 'global', :action => 'destroy')
     end
 
     def setup

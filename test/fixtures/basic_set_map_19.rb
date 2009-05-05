@@ -61,4 +61,5 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :controller => 'foo' })
   set.add_route(EchoApp, :path => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
+  set.add_route(EchoApp, { :method => 'delete' }, { :controller => 'global', :action => 'destroy' })
 end

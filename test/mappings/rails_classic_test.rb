@@ -68,6 +68,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
 
     map.connect 'params_with_defaults/:controller', :controller => 'foo'
     map.connect 'default/:controller/:action/:id.:format'
+    map.connect nil, :controller => 'global', :action => 'destroy', :conditions => { :method => :delete }
   end
 
   def setup
