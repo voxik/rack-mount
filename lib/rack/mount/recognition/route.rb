@@ -4,12 +4,13 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
-        attr_writer :throw
+        attr_writer :throw, :parameters_key
 
         def initialize(*args)
           super
 
           @throw          = Const::NOT_FOUND_RESPONSE
+          @parameters_key = Const::RACK_ROUTING_ARGS
           @path_keys      = path_keys(@path, %w( / )) if @path
           @keys           = generate_keys
           @named_captures = @path ? named_captures(@path) : []
@@ -27,7 +28,7 @@ module Rack
                 routing_args[k] = v
               end
             }
-            env[Const::RACK_ROUTING_ARGS] = routing_args
+            env[@parameters_key] = routing_args
             @app.call(env)
           else
             @throw

@@ -32,7 +32,7 @@ module Rack
                       'routing_args = route.defaults.dup'
                     end}
                     #{assign_index_params.join("\n                  ")}
-                    env[Const::RACK_ROUTING_ARGS] = routing_args
+                    env[#{@parameters_key.inspect}] = routing_args
                     result = route.app.call(env)
                     return result unless result[0] == #{@catch}
                   end

@@ -16,6 +16,9 @@ module Rack
           @throw[0] = @catch
           @throw.freeze
 
+          @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
+          @parameters_key.freeze
+
           super
         end
 
@@ -23,6 +26,7 @@ module Rack
         def add_route(*args)
           route = super
           route.throw = @throw
+          route.parameters_key = @parameters_key
           route
         end
 

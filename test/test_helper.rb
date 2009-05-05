@@ -33,8 +33,12 @@ module TestHelper
       @response
     end
 
+    def routing_args_key
+      Rack::Mount::Const::RACK_ROUTING_ARGS
+    end
+
     def routing_args
-      @env[Rack::Mount::Const::RACK_ROUTING_ARGS]
+      @env[routing_args_key]
     end
 
     def get(path, options = {})
