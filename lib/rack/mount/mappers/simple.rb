@@ -10,7 +10,7 @@ module Rack
 
     module Mappers
       class Simple
-        REQUEST_METHODS = %w( method path scheme )
+        REQUEST_METHODS = Mount::Route::VALID_CONDITIONS.map { |m| m.to_s }
 
         def initialize(set)
           @set = set
