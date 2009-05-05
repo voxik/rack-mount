@@ -14,7 +14,7 @@ module Rack
       #--
       # TODO: Support any method on Request object
       #++
-      VALID_CONDITIONS = [:method, :path].freeze
+      VALID_CONDITIONS = [:method, :path, :scheme].freeze
 
       # Valid rack application to call if conditions are met
       attr_reader :app
@@ -39,6 +39,10 @@ module Rack
 
         @conditions = conditions
         validate_conditions!
+
+        if scheme = @conditions.delete(:scheme)
+          @conditions[:scheme] = Condition.new(:scheme, scheme)
+        end
 
         if method = @conditions.delete(:method)
           method = method.to_s.upcase unless method.is_a?(Regexp)

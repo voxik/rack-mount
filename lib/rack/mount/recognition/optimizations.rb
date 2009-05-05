@@ -24,7 +24,7 @@ module Rack
               body = (0...list.length).zip(list).map { |i, route|
                 assign_index_params = assign_index_params(route)
                 <<-EOS
-                  if #{route.conditions[:method] ? "method =~ #{route.conditions[:method].inspect} && " : ''}#{route.conditions[:path] ? "path =~ #{route.conditions[:path].inspect}" : ''}
+                  if #{conditional_statement(route)}
                     route = self[#{i}]
                     #{if assign_index_params.any?
                       'routing_args, param_matches = route.defaults.dup, $~.captures'
@@ -41,6 +41,7 @@ module Rack
 
               method = <<-EOS, __FILE__, __LINE__
                 def optimized_each(env)
+                  scheme = env['rack.url_scheme']
                   method = env[Const::REQUEST_METHOD]
                   path = Utils.normalize(env[Const::PATH_INFO])
 #{body}
@@ -59,6 +60,14 @@ module Rack
                 @recognition_graph[*keys].optimized_each(env) || @throw
               end
             EOS
+          end
+
+          def conditional_statement(route)
+            Mount::Route::VALID_CONDITIONS.map { |condition|
+              if condition = route.conditions[condition]
+                "#{condition.method} =~ #{condition.inspect}"
+              end
+            }.compact.join(' && ')
           end
 
           def convert_keys_to_method_calls

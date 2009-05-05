@@ -17,10 +17,12 @@ module Rack
         end
 
         def call(env)
+          scheme = env['rack.url_scheme']
           method = env[Const::REQUEST_METHOD]
-          path = Utils.normalize(env[Const::PATH_INFO])
+          path   = Utils.normalize(env[Const::PATH_INFO])
 
-          if (!@conditions.has_key?(:method) || method =~ @conditions[:method].to_regexp) &&
+          if (!@conditions.has_key?(:scheme) || scheme =~ @conditions[:scheme].to_regexp) &&
+             (!@conditions.has_key?(:method) || method =~ @conditions[:method].to_regexp) &&
                (!@conditions.has_key?(:path) || path =~ @conditions[:path].to_regexp)
             routing_args = @defaults.dup
             param_matches = $~.captures if $~

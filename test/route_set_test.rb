@@ -39,6 +39,16 @@ class RouteSetTest < Test::Unit::TestCase
     # assert_not_found
   end
 
+  def test_schema_condition
+    get '/ssl', 'rack.url_scheme' => 'http'
+    assert_success
+    assert_equal({ :controller => 'ssl', :action => 'nonssl' }, routing_args)
+
+    get '/ssl', 'rack.url_scheme' => 'https'
+    assert_success
+    assert_equal({ :controller => 'ssl', :action => 'ssl' }, routing_args)
+  end
+
   def test_path_prefix
     get '/prefix/foo/bar/1'
     assert_success

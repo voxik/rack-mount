@@ -10,6 +10,8 @@ module Rack
 
     module Mappers
       class Simple
+        REQUEST_METHODS = %w( method path scheme )
+
         def initialize(set)
           @set = set
         end
@@ -22,13 +24,20 @@ module Rack
           method = args[1]
           defaults = options[:with]
 
-          requirements = options[:conditions] || {}
-          requirements.each { |k,v| requirements[k] = v.to_s unless v.is_a?(Regexp) }
+          conditions, requirements = {}, {}
+
+          (options[:conditions] || {}).each do |k,v|
+            v = v.to_s unless v.is_a?(Regexp)
+            REQUEST_METHODS.include?(k.to_s) ?
+              conditions[k] = v :
+              requirements[k] = v
+          end
 
           if path.is_a?(String)
             path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
           end
-          conditions = { :method => method, :path => path }
+
+          conditions.merge!(:method => method, :path => path)
           @set.add_route(app, conditions, defaults)
         end
       end
