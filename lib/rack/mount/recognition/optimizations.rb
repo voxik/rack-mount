@@ -41,9 +41,7 @@ module Rack
 
               method = <<-EOS, __FILE__, __LINE__
                 def optimized_each(env)
-                  scheme = env['rack.url_scheme']
-                  method = env[Const::REQUEST_METHOD]
-                  path = Utils.normalize(env[Const::PATH_INFO])
+                  req = Request.new(env)
 #{body}
                   nil
                 end
@@ -65,7 +63,7 @@ module Rack
           def conditional_statement(route)
             Mount::Route::VALID_CONDITIONS.map { |condition|
               if condition = route.conditions[condition]
-                "#{condition.method} =~ #{condition.inspect}"
+                "req.#{condition.method} =~ #{condition.inspect}"
               end
             }.compact.join(' && ')
           end

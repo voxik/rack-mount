@@ -40,16 +40,10 @@ module Rack
         @conditions = conditions
         validate_conditions!
 
-        if scheme = @conditions.delete(:scheme)
-          @conditions[:scheme] = Condition.new(:scheme, scheme)
-        end
-
-        if method = @conditions.delete(:method)
-          @conditions[:method] = Condition.new(:method, method)
-        end
-
-        if path = @conditions.delete(:path)
-          @conditions[:path] = PathCondition.new(:path, path).freeze
+        VALID_CONDITIONS.each do |method|
+          if pattern = @conditions.delete(method)
+            @conditions[method] = Condition.new(method, pattern)
+          end
         end
 
         @conditions.freeze

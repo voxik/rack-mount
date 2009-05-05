@@ -1,6 +1,17 @@
 module Rack
   module Mount
     class Condition #:nodoc:
+      class << self
+        alias_method :new2, :new
+        def new(*args)
+          if args.first == :path
+            PathCondition.new2(*args)
+          else
+            Condition.new2(*args)
+          end
+        end
+      end
+
       attr_reader :method, :pattern
       alias_method :to_regexp, :pattern
 

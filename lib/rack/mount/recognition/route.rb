@@ -17,20 +17,19 @@ module Rack
         end
 
         def call(env)
-          scheme = env['rack.url_scheme']
-          method = env[Const::REQUEST_METHOD]
-          path   = Utils.normalize(env[Const::PATH_INFO])
+          req = Request.new(env)
 
-          if (!@conditions.has_key?(:scheme) || scheme =~ @conditions[:scheme].to_regexp) &&
-             (!@conditions.has_key?(:method) || method =~ @conditions[:method].to_regexp) &&
-               (!@conditions.has_key?(:path) || path =~ @conditions[:path].to_regexp)
-            routing_args = @defaults.dup
-            param_matches = $~.captures if $~
-            @named_captures.each { |k, i|
-              if v = param_matches[i]
-                routing_args[k] = v
-              end
-            }
+          routing_args = @defaults.dup
+          if @conditions.all? { |method, condition|
+            if req.send(method) =~ condition.to_regexp
+              param_matches = $~.captures
+              @named_captures.each { |k, i|
+                if v = param_matches[i]
+                  routing_args[k] = v
+                end
+              }
+            end
+          }
             env[@parameters_key] = routing_args
             @app.call(env)
           else

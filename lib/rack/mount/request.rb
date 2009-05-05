@@ -5,6 +5,10 @@ module Rack
         @env = env
       end
 
+      def scheme
+        @scheme ||= @env['rack.url_scheme']
+      end
+
       def method
         @method ||= @env[Const::REQUEST_METHOD] || Const::GET
       end
