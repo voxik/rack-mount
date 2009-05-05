@@ -45,7 +45,6 @@ module Rack
         end
 
         if method = @conditions.delete(:method)
-          method = method.to_s.upcase unless method.is_a?(Regexp)
           @conditions[:method] = Condition.new(:method, method)
         end
 

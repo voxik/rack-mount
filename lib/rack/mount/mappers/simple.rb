@@ -21,7 +21,9 @@ module Rack
 
           app = options[:to]
           path = args[0]
-          method = args[1]
+          if method = args[1]
+            method = method.to_s.upcase unless method.is_a?(Regexp)
+          end
           defaults = options[:with]
 
           conditions, requirements = {}, {}

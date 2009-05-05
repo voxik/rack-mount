@@ -85,7 +85,7 @@ module ActionController
         end
 
         if conditions = options.delete(:conditions)
-          method = conditions.delete(:method)
+          method = conditions.delete(:method).to_s.upcase
         end
 
         name = options.delete(:name)

@@ -60,7 +60,9 @@ module Rack
           end
 
           new_options = {}
-          method = options.delete(:via)
+          if method = options.delete(:via)
+            method = method.to_s.upcase
+          end
           requirements = options.delete(:constraints) || {}
           defaults = {}
 

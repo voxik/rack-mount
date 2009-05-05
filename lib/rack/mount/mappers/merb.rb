@@ -109,7 +109,9 @@ module Rack
         def add_route(conditions, params, deferred_procs, options = {})
           new_conditions = {}
           new_conditions[:path] = conditions.delete(:path)[0]
-          new_conditions[:method] = conditions.delete(:method)
+          if method = conditions.delete(:method)
+            new_conditions[:method] = method.to_s.upcase
+          end
 
           requirements = {}
           conditions.each do |k, v|
