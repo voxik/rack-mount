@@ -14,7 +14,7 @@ module Rack
       #--
       # TODO: Support any method on Request object
       #++
-      VALID_CONDITIONS = [:method, :path, :scheme].freeze
+      VALID_CONDITIONS = [:host, :method, :path, :scheme].freeze
 
       # Valid rack application to call if conditions are met
       attr_reader :app

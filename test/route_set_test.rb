@@ -49,6 +49,19 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal({ :controller => 'ssl', :action => 'ssl' }, routing_args)
   end
 
+  def test_host_condition
+    get '/host', 'HTTP_HOST' => '37s.backpackit.com'
+    assert_success
+    assert_equal({ :controller => 'account', :account => '37s' }, routing_args)
+
+    get '/host', 'HTTP_HOST' => 'josh.backpackit.com'
+    assert_success
+    assert_equal({ :controller => 'account', :account => 'josh' }, routing_args)
+
+    get '/host', 'HTTP_HOST' => 'nil.backpackit.com'
+    assert_not_found
+  end
+
   def test_path_prefix
     get '/prefix/foo/bar/1'
     assert_success

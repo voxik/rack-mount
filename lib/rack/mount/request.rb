@@ -9,6 +9,10 @@ module Rack
         @scheme ||= @env['rack.url_scheme']
       end
 
+      def host
+        @host ||= @env['HTTP_HOST']
+      end
+
       def method
         @method ||= @env[Const::REQUEST_METHOD] || Const::GET
       end
