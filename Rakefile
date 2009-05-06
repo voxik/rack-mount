@@ -52,6 +52,13 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
+require 'spec/rake/spectask'
+
+Spec::Rake::SpecTask.new('rack_router_spec') do |t|
+  t.spec_files = FileList['vendor/rack-router/spec/**/*.rb']
+  t.spec_opts = ['-c', '-fs']
+end
+
 begin
   gem 'rake-compiler'
   require 'rake/extensiontask'
