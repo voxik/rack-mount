@@ -19,7 +19,7 @@ module Rack
 
           @segments = segments(@conditions[:path].to_regexp).freeze if @conditions.has_key?(:path)
           @required_params = @segments.find_all { |s|
-            s.is_a?(DynamicSegment)
+            s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
           }.map { |s| s.name }.freeze if @segments
         end
 

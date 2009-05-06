@@ -68,6 +68,11 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
   end
 
+  def test_uses_default_parameters_when_non_are_passed
+    assert_equal '/feed/atom', @app.url_for(:feed, :kind => 'atom')
+    assert_equal '/feed/rss', @app.url_for(:feed)
+  end
+
   def test_ensure_routeset_needs_to_be_frozen
     set = Rack::Mount::RouteSet.new
     assert_raise(RuntimeError) { set.call({}) }

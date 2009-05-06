@@ -45,6 +45,8 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path => %r{^/account/credit_card/(?<id>[a-z0-9]+)$}, :method => 'PUT' }, { :controller => 'account/credit_card', :action => 'update' })
   set.add_route(EchoApp, { :path => %r{^/account/credit_card/(?<id>[a-z0-9]+)$}, :method => 'DELETE' }, { :controller => 'account/credit_card', :action => 'destroy' })
 
+  set.add_route(EchoApp, { :path => %r{^/feed/(?<kind>[a-z]+)$} }, { :controller => 'feed', :kind => 'rss' }, :feed)
+
   set.add_route(EchoApp, { :path => 'foo' }, { :controller => 'foo', :action => 'index' })
   set.add_route(EchoApp, { :path => 'foo/bar' }, { :controller => 'foo_bar', :action => 'index' })
   set.add_route(EchoApp, { :path => '/baz' }, { :controller => 'baz', :action => 'index' })
