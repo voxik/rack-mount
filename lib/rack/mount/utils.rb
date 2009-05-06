@@ -16,7 +16,7 @@ module Rack
       end
       module_function :pop_trailing_nils!
 
-      GLOB_REGEXP = /\/\\\*(\w+)$/
+      GLOB_REGEXP = /\/\\\*(\w+)/
       OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
