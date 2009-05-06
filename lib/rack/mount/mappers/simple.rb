@@ -25,6 +25,7 @@ module Rack
             method = method.to_s.upcase unless method.is_a?(Regexp)
           end
           defaults = options[:with]
+          name = options[:name]
 
           conditions, requirements = {}, {}
 
@@ -40,7 +41,7 @@ module Rack
           end
 
           conditions.merge!(:method => method, :path => path)
-          @set.add_route(app, conditions, defaults)
+          @set.add_route(app, conditions, defaults, name)
         end
       end
     end
