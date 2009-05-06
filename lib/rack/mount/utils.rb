@@ -17,7 +17,7 @@ module Rack
       module_function :pop_trailing_nils!
 
       GLOB_REGEXP = /\/\\\*(\w+)/
-      OPTIONAL_SEGMENT_REGEXP = /\\\((.+)\\\)/
+      OPTIONAL_SEGMENT_REGEXP = /\\\((.+?)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
 
       def convert_segment_string_to_regexp(str, requirements = {}, separators = [])

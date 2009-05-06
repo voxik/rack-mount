@@ -119,6 +119,26 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     assert_equal ['/people/', Capture.new('[^/.?]+', :name => 'id'), ['\\.', Capture.new('[^/.?]+', :name => 'format')]], extract_regexp_parts(re)
   end
 
+  def test_multiple_optional_captures
+    re = convert_segment_string_to_regexp('/:foo(/:bar)(/:baz)', {}, %w( / . ? ))
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval("%r{^/(?<foo>[^/.?]+)(/(?<bar>[^/.?]+))?(/(?<baz>[^/.?]+))?$}"), re
+    else
+      assert_equal %r{^/([^/.?]+)(/([^/.?]+))?(/([^/.?]+))?$}, re
+    end
+
+    assert_equal [], extract_static_segments(re)
+    assert_equal ['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
+      ['/', DynamicSegment.new(:bar, %r{[^/.?]+})],
+      ['/', DynamicSegment.new(:baz, %r{[^/.?]+})]
+    ], build_generation_segments(re)
+    assert_equal ['/', Capture.new('[^/.?]+', :name => 'foo'),
+      Capture.new('/', Capture.new('[^/.?]+', :name => 'bar'), :optional => true),
+      Capture.new('/', Capture.new('[^/.?]+', :name => 'baz'), :optional => true)
+    ], extract_regexp_parts(re)
+  end
+
   def test_nested_optional_captures
     re = convert_segment_string_to_regexp('/:controller(/:action(/:id(.:format)))', {}, %w( / . ? ))
 
