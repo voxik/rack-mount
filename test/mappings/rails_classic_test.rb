@@ -141,4 +141,9 @@ class RailsClassicApiTest < Test::Unit::TestCase
     assert_equal '/people', @app.url_for(:people)
     assert_equal '/people/1', @app.url_for(:person, :id => '1')
   end
+
+  def test_recognize
+    assert_equal({ :controller => "foo", :action => "index"}, @app.recognize_path('/foo'))
+    assert_raise(ActionController::RoutingError) { @app.recognize_path('/notfound') }
+  end
 end

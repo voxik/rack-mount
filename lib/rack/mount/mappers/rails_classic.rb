@@ -20,8 +20,11 @@ module ActionController
           merge_default_action!(params)
           split_glob_param!(params) if @glob_param
 
-          # TODO: Rails response is not finalized by the controller
-          app.call(env).to_a
+          if env['action_controller.recognize']
+            [200, {}, params]
+          else
+            app.call(env).to_a
+          end
         end
 
         private
@@ -131,8 +134,15 @@ module ActionController
         @set.url_for(*args)
       end
 
-      def recognize(request)
-        raise NotImplementedError, "Only RouteSet#call is supported"
+      def recognize_path(path, environment = {})
+        env = Rack::MockRequest.env_for(path, environment)
+        env['action_controller.recognize'] = true
+        if result = @set.call(env)
+          status, headers, body = result
+          body
+        else
+          raise ActionController::RoutingError
+        end
       end
 
       def call(env)
