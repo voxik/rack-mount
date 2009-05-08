@@ -40,8 +40,8 @@ module Rack
               }.join
 
               method = <<-EOS, __FILE__, __LINE__
-                def optimized_each(env)
-                  req = Rack::Request.new(env)
+                def optimized_each(req)
+                  env = req.env
 #{body}
                   nil
                 end
@@ -55,14 +55,14 @@ module Rack
               def call(env)
                 env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
                 cache = {}
-                req = Rack::Request.new(env)
-                @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(env) || @throw
+                req = #{@request_class.name}.new(env)
+                @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(req) || @throw
               end
             EOS
           end
 
           def conditional_statement(route)
-            Mount::Route::VALID_CONDITIONS.map { |condition|
+            valid_conditions.map { |condition|
               if condition = route.conditions[condition]
                 "req.#{condition.method} =~ #{condition.inspect}"
               end

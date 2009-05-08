@@ -17,6 +17,7 @@ module Rack
         def initialize(*args)
           super
 
+          # TODO: Don't explict check for :path condition
           @segments = segments(@conditions[:path].to_regexp).freeze if @conditions.has_key?(:path)
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment) && !@defaults.include?(s.name)

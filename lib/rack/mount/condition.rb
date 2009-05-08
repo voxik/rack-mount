@@ -4,6 +4,7 @@ module Rack
       class << self
         alias_method :new2, :new
         def new(*args)
+          # TODO: Don't explict check for :path condition
           if args.first == :path
             PathCondition.new2(*args)
           else
@@ -54,6 +55,7 @@ module Rack
 
       def initialize(method, pattern)
         @method = method
+        # TODO: Don't explict check for :path condition
         raise ArgumentError unless @method == :path
 
         @pattern = pattern

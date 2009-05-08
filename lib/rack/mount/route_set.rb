@@ -18,6 +18,8 @@ module Rack
           extend Recognition::Optimizations
         end
 
+        @request_class = options.delete(:request_class) || Rack::Request
+
         @routes = []
 
         if block_given?
@@ -36,7 +38,7 @@ module Rack
       # <tt>name</tt>:: Symbol identifier for the route used with named 
       #                 route generations
       def add_route(app, conditions = {}, defaults = {}, name = nil)
-        route = Route.new(app, conditions, defaults, name)
+        route = Route.new(self, app, conditions, defaults, name)
         @routes << route
         route
       end

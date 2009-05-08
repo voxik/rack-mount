@@ -11,11 +11,12 @@ module Rack
           @throw          = Const::NOT_FOUND_RESPONSE
           @parameters_key = Const::RACK_ROUTING_ARGS
           @keys           = generate_keys
+          # TODO: Don't explict check for :path condition
           @named_captures = @conditions.has_key?(:path) ? named_captures(@conditions[:path].to_regexp) : []
         end
 
-        def call(env)
-          req = Rack::Request.new(env)
+        def call(req)
+          env = req.env
 
           routing_args = @defaults.dup
           if @conditions.all? { |method, condition|
@@ -37,7 +38,7 @@ module Rack
 
         private
           def generate_keys
-            Mount::Route::VALID_CONDITIONS.inject({}) do |keys, method|
+            @set.valid_conditions.inject({}) do |keys, method|
               if @conditions.has_key?(method)
                 keys.merge!(@conditions[method].keys)
               end

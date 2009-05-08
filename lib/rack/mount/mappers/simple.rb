@@ -10,8 +10,6 @@ module Rack
 
     module Mappers
       class Simple
-        REQUEST_METHODS = Mount::Route::VALID_CONDITIONS.map { |m| m.to_s }
-
         def initialize(set)
           @set = set
         end
@@ -31,7 +29,7 @@ module Rack
 
           (options[:conditions] || {}).each do |k,v|
             v = v.to_s unless v.is_a?(Regexp)
-            REQUEST_METHODS.include?(k.to_s) ?
+            @set.valid_conditions.include?(k.to_sym) ?
               conditions[k] = v :
               requirements[k] = v
           end

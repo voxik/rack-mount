@@ -42,16 +42,17 @@ module Rack
           env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
 
           cache = {}
-          req = Rack::Request.new(env)
+          req = @request_class.new(env)
           keys = @recognition_keys.map { |key|
             if key.is_a?(Array)
+              # TODO: Don't explict check for :path condition
               PathCondition.split(cache, req, key.first, key.last)
             else
               req.send(key)
             end
           }
           @recognition_graph[*keys].each do |route|
-            result = route.call(env)
+            result = route.call(req)
             return result unless result[0] == @catch
           end
           @throw
@@ -64,6 +65,19 @@ module Rack
           recognition_graph.freeze
 
           super
+        end
+
+        def valid_conditions #:nodoc:
+          @valid_conditions ||= begin
+            conditions = @request_class.instance_methods(false)
+            conditions.map! { |m| m.to_sym }
+
+            # FIXME: Hack to make sure path is at the end of the array
+            conditions.delete(:path)
+            conditions << :path
+
+            conditions.to_set.freeze
+          end
         end
 
         def height #:nodoc:

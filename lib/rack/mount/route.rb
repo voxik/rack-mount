@@ -11,17 +11,6 @@ module Rack
       # Include generation and recognition concerns
       include Generation::Route, Recognition::Route
 
-      VALID_CONDITIONS = begin
-        conditions = Rack::Request.instance_methods(false)
-        conditions.map! { |m| m.to_sym }
-
-        # FIXME: Hack to make sure path is at the end of the array
-        conditions.delete(:path)
-        conditions << :path
-
-        conditions.freeze
-      end
-
       # Valid rack application to call if conditions are met
       attr_reader :app
 
@@ -35,7 +24,8 @@ module Rack
       # Symbol identifier for the route used with named route generations
       attr_reader :name
 
-      def initialize(app, conditions, defaults, name)
+      def initialize(set, app, conditions, defaults, name)
+        @set = set
         @app = app
         validate_app!
 
@@ -45,7 +35,7 @@ module Rack
         @conditions = conditions
         validate_conditions!
 
-        VALID_CONDITIONS.each do |method|
+        set.valid_conditions.each do |method|
           if pattern = @conditions.delete(method)
             @conditions[method] = Condition.new(method, pattern)
           end
@@ -67,9 +57,9 @@ module Rack
             raise ArgumentError, 'conditions must be a Hash'
           end
 
-          unless @conditions.keys.all? { |k| VALID_CONDITIONS.include?(k) }
+          unless @conditions.keys.all? { |k| @set.valid_conditions.include?(k) }
             raise ArgumentError, 'conditions may only include ' +
-              VALID_CONDITIONS.inspect
+              @set.valid_conditions.inspect
           end
         end
     end
