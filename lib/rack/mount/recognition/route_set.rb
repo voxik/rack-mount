@@ -71,11 +71,6 @@ module Rack
           @valid_conditions ||= begin
             conditions = @request_class.instance_methods(false)
             conditions.map! { |m| m.to_sym }
-
-            # FIXME: Hack to make sure path is at the end of the array
-            conditions.delete(:path)
-            conditions << :path
-
             conditions.to_set.freeze
           end
         end

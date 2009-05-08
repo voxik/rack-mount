@@ -26,42 +26,34 @@ module Rack
 
       def initialize(set, app, conditions, defaults, name)
         @set = set
+
+        unless app.respond_to?(:call)
+          raise ArgumentError, 'app must be a valid rack application' \
+            ' and respond to call'
+        end
         @app = app
-        validate_app!
 
         @name = name.to_sym if name
         @defaults = (defaults || {}).freeze
 
-        @conditions = conditions
-        validate_conditions!
+        unless conditions.is_a?(Hash)
+          raise ArgumentError, 'conditions must be a Hash'
+        end
+        @conditions = {}
 
-        set.valid_conditions.each do |method|
-          if pattern = @conditions.delete(method)
+        conditions.each do |method, pattern|
+          unless @set.valid_conditions.include?(method)
+            raise ArgumentError, 'conditions may only include ' +
+              @set.valid_conditions.inspect
+          end
+
+          if method && pattern
             @conditions[method] = Condition.new(method, pattern)
           end
         end
 
         @conditions.freeze
       end
-
-      private
-        def validate_app!
-          unless @app.respond_to?(:call)
-            raise ArgumentError, 'app must be a valid rack application' \
-              ' and respond to call'
-          end
-        end
-
-        def validate_conditions!
-          unless @conditions.is_a?(Hash)
-            raise ArgumentError, 'conditions must be a Hash'
-          end
-
-          unless @conditions.keys.all? { |k| @set.valid_conditions.include?(k) }
-            raise ArgumentError, 'conditions may only include ' +
-              @set.valid_conditions.inspect
-          end
-        end
     end
   end
 end

@@ -22,16 +22,10 @@ module Rack
           def optimize_call!
             recognition_graph.lists.each do |list|
               body = (0...list.length).zip(list).map { |i, route|
-                assign_index_params = assign_index_params(route)
                 <<-EOS
+                  route = self[#{i}]
+                  routing_args = route.defaults.dup
                   if #{conditional_statement(route)}
-                    route = self[#{i}]
-                    #{if assign_index_params.any?
-                      'routing_args, param_matches = route.defaults.dup, $~.captures'
-                    else
-                      'routing_args = route.defaults.dup'
-                    end}
-                    #{assign_index_params.join("\n                  ")}
                     env[#{@parameters_key.inspect}] = routing_args
                     result = route.app.call(env)
                     return result unless result[0] == #{@catch}
@@ -62,10 +56,8 @@ module Rack
           end
 
           def conditional_statement(route)
-            valid_conditions.map { |condition|
-              if condition = route.conditions[condition]
-                "req.#{condition.method} =~ #{condition.inspect}"
-              end
+            route.conditions.values.map { |condition|
+              "route.conditions[:#{condition.method}].match!(req.#{condition.method}, routing_args)"
             }.compact.join(' && ')
           end
 
@@ -77,16 +69,6 @@ module Rack
                 "req.#{key}"
               end
             }.join(', ')
-          end
-
-          def assign_index_params(route)
-            if named_captures = route.instance_variable_get("@named_captures")
-              named_captures.map { |k, index|
-                "routing_args[#{k.inspect}] = param_matches[#{index}] if param_matches[#{index}]"
-              }
-            else
-              []
-            end
           end
       end
     end

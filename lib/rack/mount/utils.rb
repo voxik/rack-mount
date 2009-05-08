@@ -166,6 +166,7 @@ module Rack
       end
 
       def extract_named_captures(regexp)
+        options = regexp.is_a?(Regexp) ? regexp.options : nil
         source = Regexp.compile(regexp).source
         names, scanner = [], StringScanner.new(source)
 
@@ -178,7 +179,7 @@ module Rack
         end
 
         source.gsub!(NAMED_CAPTURE_REGEXP, '')
-        return Regexp.compile(source), names
+        return Regexp.compile(source, options), names
       end
       module_function :extract_named_captures
 
