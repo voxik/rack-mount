@@ -26,8 +26,7 @@ module Rack
       attr_reader :app
 
       # A hash of conditions to match against. Conditions may be expressed
-      # as strings or regexps to match against. Currently, <tt>:method</tt>
-      # and <tt>:path</tt> are the only valid conditions.
+      # as strings or regexps to match against.
       attr_reader :conditions
 
       # A hash of values that always gets merged into the parameters hash
