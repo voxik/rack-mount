@@ -247,7 +247,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   private
     def extract_static_segments(re)
       route = Rack::Mount::Route.new(EchoApp, { :path => re }, {}, nil)
-      route.conditions[:path].keys
+      route.conditions[:path].keys.sort { |(k1, v1), (k2, v2)| k1.to_s <=> k2.to_s }.map { |(k, v)| v }
     end
 
     def build_generation_segments(re)

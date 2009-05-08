@@ -21,16 +21,11 @@ module Rack
         @method = method.to_sym
 
         @pattern = pattern
-        if @pattern.is_a?(String)
-          @keys = [pattern]
-          @pattern = Regexp.compile("^#{@pattern}$")
-        else
-          @keys = [@pattern]
-        end
-      end
+        @keys = { method => pattern }
 
-      def key
-        @keys.first
+        if @pattern.is_a?(String)
+          @pattern = Regexp.compile("^#{@pattern}$")
+        end
       end
 
       def inspect
@@ -58,7 +53,13 @@ module Rack
           @pattern = RegexpWithNamedGroups.compile("^#{@pattern}$")
         end
 
-        @keys = generate_keys(@pattern, %w( / ))
+        @keys = {}
+        path_keys = generate_keys(@pattern, %w( / ))
+        10.times do |n|
+          if v = path_keys[n]
+            @keys[:"path_keys_at_#{n}"] = v
+          end
+        end
       end
 
       private

@@ -38,28 +38,13 @@ module Rack
         end
 
         private
-          #--
-          # TODO: Clean this up to dynamically support all condition types
-          #++
           def generate_keys
-            keys = {}
-
-            (Mount::Route::VALID_CONDITIONS - [:path]).each do |method|
+            Mount::Route::VALID_CONDITIONS.inject({}) do |keys, method|
               if @conditions.has_key?(method)
-                keys[method] = @conditions[method].key
+                keys.merge!(@conditions[method].keys)
               end
+              keys
             end
-
-            if @conditions.has_key?(:path)
-              path_keys = @conditions[:path].keys
-              10.times do |n|
-                if v = path_keys[n]
-                  keys[:"path_keys_at_#{n}"] = v
-                end
-              end
-            end
-
-            keys
           end
 
           # Maps named captures to their capture index
