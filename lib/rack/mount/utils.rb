@@ -2,6 +2,7 @@ require 'strscan'
 
 module Rack
   module Mount
+    # Private utility methods used throughout Rack::Mount.
     module Utils
       # Normalizes URI path.
       #
@@ -20,11 +21,16 @@ module Rack
       end
       module_function :normalize_path
 
+      # Removes trailing nils from array.
+      #
+      #   pop_trailing_nils!([1, 2, 3])           # => [1, 2, 3]
+      #   pop_trailing_nils!([1, 2, 3, nil, nil]) # => [1, 2, 3]
+      #   pop_trailing_nils!([nil])               # => []
       def pop_trailing_nils!(ary)
         while ary.length > 0 && ary.last.nil?
           ary.pop
         end
-        nil
+        ary
       end
       module_function :pop_trailing_nils!
 
