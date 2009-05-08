@@ -7,6 +7,12 @@ module ActionController
         raise RoutingError, "No route matches #{env[::Rack::Mount::Const::PATH_INFO].inspect} with #{env.inspect}"
       }
 
+      if defined? ActionDispatch
+        PARAMETERS_KEY = 'action_dispatch.request.path_parameters'
+      else
+        PARAMETERS_KEY = 'rack.routing_args'
+      end
+
       class Dispatcher
         def initialize(options = {})
           defaults = options[:defaults]
@@ -15,7 +21,7 @@ module ActionController
         end
 
         def call(env)
-          params = env[::Rack::Mount::Const::RACK_ROUTING_ARGS]
+          params = env[PARAMETERS_KEY]
           app = @app || controller(params)
           merge_default_action!(params)
           split_glob_param!(params) if @glob_param
@@ -76,7 +82,7 @@ module ActionController
         named_routes.clear
         @combined_regexp = nil
         @routes_by_controller = nil
-        @set = ::Rack::Mount::RouteSet.new
+        @set = ::Rack::Mount::RouteSet.new(:parameters_key => PARAMETERS_KEY)
       end
 
       def add_route(path, options = {})
