@@ -44,16 +44,10 @@ module Rack
           def generate_keys
             keys = {}
 
-            if @conditions.has_key?(:host)
-              keys[:host] = @conditions[:host].key
-            end
-
-            if @conditions.has_key?(:method)
-              keys[:method] = @conditions[:method].key
-            end
-
-            if @conditions.has_key?(:scheme)
-              keys[:scheme] = @conditions[:scheme].key
+            (Mount::Route::VALID_CONDITIONS - [:path]).each do |method|
+              if @conditions.has_key?(method)
+                keys[method] = @conditions[method].key
+              end
             end
 
             if @conditions.has_key?(:path)

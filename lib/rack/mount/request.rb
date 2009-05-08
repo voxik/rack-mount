@@ -1,6 +1,13 @@
 module Rack
   module Mount
     class Request #:nodoc:
+      def self.valid_conditions
+        conditions = instance_methods(false).map { |m| m.to_sym }
+        conditions.delete(:path)
+        conditions << :path
+        conditions.freeze
+      end
+
       def initialize(env)
         @env = env
       end

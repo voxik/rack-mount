@@ -54,8 +54,7 @@ module Rack
             instance_eval(<<-EOS, __FILE__, __LINE__)
               def call(env)
                 req = Request.new(env)
-                keys = [#{convert_keys_to_method_calls}]
-                @recognition_graph[*keys].optimized_each(env) || @throw
+                @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(env) || @throw
               end
             EOS
           end

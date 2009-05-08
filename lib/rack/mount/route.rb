@@ -11,10 +11,7 @@ module Rack
       # Include generation and recognition concerns
       include Generation::Route, Recognition::Route
 
-      #--
-      # TODO: Support any method on Request object
-      #++
-      VALID_CONDITIONS = [:host, :method, :path, :scheme].freeze
+      VALID_CONDITIONS = Request.valid_conditions
 
       # Valid rack application to call if conditions are met
       attr_reader :app
