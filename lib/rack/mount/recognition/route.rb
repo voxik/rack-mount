@@ -1,5 +1,3 @@
-require 'strscan'
-
 module Rack
   module Mount
     module Recognition

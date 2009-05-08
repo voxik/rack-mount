@@ -123,6 +123,7 @@ module Rack
           raise(ArgumentError, "#{source} needs to match the start of the string")
         source.gsub!(/\$$/, '')
 
+        require 'strscan'
         scanner = StringScanner.new(source)
         stack = [[]]
 
