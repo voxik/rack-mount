@@ -39,8 +39,15 @@ module Rack
         def call(env)
           raise 'route set not finalized' unless frozen?
 
+          cache = {}
           req = Request.new(env)
-          keys = @recognition_keys.map { |key| req.send(key) }
+          keys = @recognition_keys.map { |key|
+            if key.is_a?(Array)
+              PathCondition.split(cache, req, key.first, key.last)
+            else
+              req.send(key)
+            end
+          }
           @recognition_graph[*keys].each do |route|
             result = route.call(env)
             return result unless result[0] == @catch

@@ -53,6 +53,7 @@ module Rack
 
             instance_eval(<<-EOS, __FILE__, __LINE__)
               def call(env)
+                cache = {}
                 req = Request.new(env)
                 @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(env) || @throw
               end
@@ -69,7 +70,11 @@ module Rack
 
           def convert_keys_to_method_calls
             recognition_keys.map { |key|
-              "req.#{key}"
+              if key.is_a?(Array)
+                "PathCondition.split(cache, req, :#{key.first}, #{key.last})"
+              else
+                "req.#{key}"
+              end
             }.join(', ')
           end
 

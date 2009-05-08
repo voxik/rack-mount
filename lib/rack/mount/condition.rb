@@ -41,6 +41,17 @@ module Rack
     end
 
     class PathCondition < Condition #:nodoc:
+      def self.split(cache, request, method, index)
+        ary = cache[method] ||= begin
+          value = request.send(method)
+          keys = value.split(%r{/|\.|\?})
+          keys.shift
+          keys << Const::EOS_KEY
+          keys
+        end
+        ary[index]
+      end
+
       def initialize(method, pattern)
         @method = method
         raise ArgumentError unless @method == :path
@@ -54,11 +65,8 @@ module Rack
         end
 
         @keys = {}
-        path_keys = generate_keys(@pattern, %w( / ))
-        10.times do |n|
-          if v = path_keys[n]
-            @keys[:"path_keys_at_#{n}"] = v
-          end
+        generate_keys(@pattern, %w( / )).each_with_index do |value, index|
+          @keys[[method, index]] = value
         end
       end
 
