@@ -41,7 +41,7 @@ module Rack
 
               method = <<-EOS, __FILE__, __LINE__
                 def optimized_each(env)
-                  req = Request.new(env)
+                  req = Rack::Request.new(env)
 #{body}
                   nil
                 end
@@ -53,8 +53,9 @@ module Rack
 
             instance_eval(<<-EOS, __FILE__, __LINE__)
               def call(env)
+                env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
                 cache = {}
-                req = Request.new(env)
+                req = Rack::Request.new(env)
                 @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(env) || @throw
               end
             EOS

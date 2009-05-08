@@ -11,7 +11,16 @@ module Rack
       # Include generation and recognition concerns
       include Generation::Route, Recognition::Route
 
-      VALID_CONDITIONS = Request.valid_conditions
+      VALID_CONDITIONS = begin
+        conditions = Rack::Request.instance_methods(false)
+        conditions.map! { |m| m.to_sym }
+
+        # FIXME: Hack to make sure path is at the end of the array
+        conditions.delete(:path)
+        conditions << :path
+
+        conditions.freeze
+      end
 
       # Valid rack application to call if conditions are met
       attr_reader :app

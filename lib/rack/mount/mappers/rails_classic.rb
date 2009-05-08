@@ -116,7 +116,7 @@ module ActionController
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
-        conditions = { :method => method, :path => path }
+        conditions = { :request_method => method, :path => path }
         route = @set.add_route(app, conditions, defaults, name)
         route.extend(RouteExtensions)
         route

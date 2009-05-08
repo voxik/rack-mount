@@ -39,8 +39,10 @@ module Rack
         def call(env)
           raise 'route set not finalized' unless frozen?
 
+          env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
+
           cache = {}
-          req = Request.new(env)
+          req = Rack::Request.new(env)
           keys = @recognition_keys.map { |key|
             if key.is_a?(Array)
               PathCondition.split(cache, req, key.first, key.last)

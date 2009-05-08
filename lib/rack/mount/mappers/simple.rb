@@ -40,7 +40,7 @@ module Rack
             path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
           end
 
-          conditions.merge!(:method => method, :path => path)
+          conditions.merge!(:request_method => method, :path => path)
           @set.add_route(app, conditions, defaults, name)
         end
       end

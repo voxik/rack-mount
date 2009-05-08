@@ -110,7 +110,7 @@ module Rack
           new_conditions = {}
           new_conditions[:path] = conditions.delete(:path)[0]
           if method = conditions.delete(:method)
-            new_conditions[:method] = method.to_s.upcase
+            new_conditions[:request_method] = method.to_s.upcase
           end
 
           requirements = {}

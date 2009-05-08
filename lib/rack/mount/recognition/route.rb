@@ -17,7 +17,7 @@ module Rack
         end
 
         def call(env)
-          req = Request.new(env)
+          req = Rack::Request.new(env)
 
           routing_args = @defaults.dup
           if @conditions.all? { |method, condition|

@@ -107,7 +107,7 @@ module Rack
           if path.is_a?(String)
             path = Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
           end
-          conditions = { :method => method, :path => path }
+          conditions = { :request_method => method, :path => path }
           @set.add_route(app, conditions, defaults)
         end
 
