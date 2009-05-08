@@ -4,6 +4,7 @@ module Rack
   module Mount
     module Recognition
       module Route #:nodoc:
+        attr_reader :keys
         attr_writer :throw, :parameters_key
 
         def initialize(*args)
@@ -11,7 +12,6 @@ module Rack
 
           @throw          = Const::NOT_FOUND_RESPONSE
           @parameters_key = Const::RACK_ROUTING_ARGS
-          @path_keys      = @conditions[:path].keys if @conditions.has_key?(:path)
           @keys           = generate_keys
           @named_captures = @conditions.has_key?(:path) ? named_captures(@conditions[:path].to_regexp) : []
         end
@@ -37,38 +37,35 @@ module Rack
           end
         end
 
-        KEYS = []
-
-        def method
-          @conditions.has_key?(:method) ? @conditions[:method].key : nil
-        end
-        KEYS << :method
-
-        def path_keys_at(index)
-          @path_keys[index]
-        end
-
-        attr_reader :keys
-
-        10.times do |n|
-          module_eval(<<-EOS, __FILE__, __LINE__)
-            def path_keys_at_#{n}
-              @path_keys[#{n}] if @path_keys
-            end
-            KEYS << :"path_keys_at_#{n}"
-          EOS
-        end
-
-        KEYS.freeze
-
         private
+          #--
+          # TODO: Clean this up to dynamically support all condition types
+          #++
           def generate_keys
-            KEYS.inject({}) { |keys, k|
-              if v = send(k)
-                keys[k] = v
+            keys = {}
+
+            if @conditions.has_key?(:host)
+              keys[:host] = @conditions[:host].key
+            end
+
+            if @conditions.has_key?(:method)
+              keys[:method] = @conditions[:method].key
+            end
+
+            if @conditions.has_key?(:scheme)
+              keys[:scheme] = @conditions[:scheme].key
+            end
+
+            if @conditions.has_key?(:path)
+              path_keys = @conditions[:path].keys
+              10.times do |n|
+                if v = path_keys[n]
+                  keys[:"path_keys_at_#{n}"] = v
+                end
               end
-              keys
-            }
+            end
+
+            keys
           end
 
           # Maps named captures to their capture index

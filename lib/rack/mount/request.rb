@@ -23,10 +23,6 @@ module Rack
           Const::SLASH
       end
 
-      def path_keys_at(index)
-        path_keys[index]
-      end
-
       def path_keys
         @path_keys ||= begin
           keys = path.split(%r{/|\.|\?})

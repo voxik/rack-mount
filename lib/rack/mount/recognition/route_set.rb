@@ -64,7 +64,7 @@ module Rack
         private
           def recognition_graph
             @recognition_graph ||= begin
-              build_nested_route_set(recognition_keys) { |r, k| r.send(*k) }
+              build_nested_route_set(recognition_keys) { |r, k| r.keys[k] }
             end
           end
 
