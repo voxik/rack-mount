@@ -54,7 +54,7 @@ module Rack
         if @pattern.is_a?(Regexp)
           @pattern = RegexpWithNamedGroups.new(@pattern)
         elsif @pattern.is_a?(String)
-          @pattern = Utils.normalize(@pattern)
+          @pattern = Utils.normalize_path(@pattern)
           @pattern = RegexpWithNamedGroups.compile("^#{@pattern}$")
         end
 

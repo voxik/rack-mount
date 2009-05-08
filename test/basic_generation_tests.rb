@@ -3,6 +3,7 @@ module BasicGenerationTests
     assert_equal '/login', @app.url_for(:login)
     assert_equal '/logout', @app.url_for(:logout)
     assert_equal '/geocode/60622', @app.url_for(:geocode, :postalcode => '60622')
+    assert_equal '/', @app.url_for(:root)
 
     assert_equal '/global/export', @app.url_for(:export_request)
     assert_equal '/global/hide_notice', @app.url_for(:hide_notice)

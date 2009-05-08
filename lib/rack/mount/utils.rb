@@ -2,11 +2,23 @@ require 'strscan'
 
 module Rack
   module Mount
-    module Utils #:nodoc:
-      def normalize(path)
-        "/#{path}".squeeze("/").sub(%r'/+$', '')
+    module Utils
+      # Normalizes URI path.
+      #
+      # Strips off trailing slash and ensures there is a leading slash.
+      #
+      #   normalize_path("/foo")  # => "/foo"
+      #   normalize_path("/foo/") # => "/foo"
+      #   normalize_path("foo")   # => "/foo"
+      #   normalize_path("")      # => "/"
+      def normalize_path(path)
+        path = "/#{path}"
+        path.squeeze!(Const::SLASH)
+        path.sub!(%r'/+$', Const::EMPTY_STRING)
+        path = Const::SLASH if path == Const::EMPTY_STRING
+        path
       end
-      module_function :normalize
+      module_function :normalize_path
 
       def pop_trailing_nils!(ary)
         while ary.length > 0 && ary.last.nil?
@@ -25,7 +37,7 @@ module Rack
 
         str = Regexp.escape(str.dup)
         requirements = requirements || {}
-        str = normalize(str)
+        str = normalize_path(str)
 
         re = ''
 

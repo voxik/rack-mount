@@ -25,7 +25,7 @@ class RailsClassicApiTest < Test::Unit::TestCase
   ActionController::Routing::Routes.draw do |map|
     map.resources :people
 
-    map.connect '', :controller => 'homepage'
+    map.root :controller => 'homepage'
 
     map.geocode 'geocode/:postalcode', :controller => 'geocode',
                  :action => 'show', :postalcode => /\d{5}(-\d{4})?/

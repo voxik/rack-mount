@@ -19,7 +19,7 @@ module Rack
 
       def path
         @path ||= @env[Const::PATH_INFO] ?
-          Utils.normalize(@env[Const::PATH_INFO]) :
+          Utils.normalize_path(@env[Const::PATH_INFO]) :
           Const::SLASH
       end
 

@@ -7,7 +7,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)$}, :method => 'PUT' }, { :controller => 'people', :action => 'update' })
   set.add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)$}, :method => 'DELETE' }, { :controller => 'people', :action => 'destroy' })
 
-  set.add_route(EchoApp, { :path => '/' }, { :controller => 'homepage' })
+  set.add_route(EchoApp, { :path => '/' }, { :controller => 'homepage' }, :root)
 
   set.add_route(EchoApp, { :path => %r{^/geocode/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode)
   set.add_route(EchoApp, { :path => %r{^/geocode2/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode2)
