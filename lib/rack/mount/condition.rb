@@ -74,6 +74,7 @@ module Rack
       def self.split(cache, request, method, index)
         ary = cache[method] ||= begin
           value = request.send(method)
+          value = Utils.normalize_path(value)
           keys = value.split(%r{/|\.|\?})
           keys.shift
           keys << Const::EOS_KEY
