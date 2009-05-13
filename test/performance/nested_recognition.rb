@@ -1,4 +1,4 @@
-require 'performance_helper'
+require 'performance/test_helper'
 
 Map = lambda do |r|
   ('a'..'zz').each do |path|

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class RouteSetTest < Test::Unit::TestCase
-  include TestHelper
+  include RequestDSL
   include BasicRecognitionTests
   include BasicGenerationTests
 

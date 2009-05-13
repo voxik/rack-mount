@@ -1,4 +1,4 @@
-require 'performance_helper'
+require 'performance/test_helper'
 
 Env = EnvGenerator.env_for(2, '/account/credit_card/1')
 

@@ -1,4 +1,4 @@
-require 'performance_helper'
+require 'performance/test_helper'
 
 class Rack::Mount::NestedSet
   include Rack::Mount::NestedSetExt
