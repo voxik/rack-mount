@@ -1,1 +1,1 @@
-OptimizedBasicSet = Rack::Mount::RouteSet.new(:optimize => true, &BasicSetMap)
+OptimizedBasicSet = Rack::Mount::RouteSet.new(&BasicSetMap)

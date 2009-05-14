@@ -5,6 +5,7 @@ module Rack
 
       # Include generation and recognition concerns
       include Generation::RouteSet, Recognition::RouteSet
+      include Recognition::Optimizations
 
       # Basic RouteSet initializer.
       #
@@ -14,10 +15,6 @@ module Rack
       # - <tt>Generation::RouteSet.new</tt>
       # - <tt>Recognition::RouteSet.new</tt>
       def initialize(options = {}, &block)
-        if options.delete(:optimize) == true
-          extend Recognition::Optimizations
-        end
-
         @request_class = options.delete(:request_class) || Rack::Request
 
         @routes = []
