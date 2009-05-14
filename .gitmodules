@@ -1,6 +1,3 @@
-[submodule "vendor/rack"]
-	path = vendor/rack
-	url = git://github.com/rack/rack.git
 [submodule "vendor/rack-router"]
 	path = vendor/rack-router
 	url = git://github.com/carllerche/rack-router.git
