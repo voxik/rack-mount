@@ -7,6 +7,7 @@ class RouteSetTest < Test::Unit::TestCase
 
   def setup
     @app = BasicSet
+    assert !set_included_modules.include?(Rack::Mount::Recognition::Optimizations)
   end
 
   def test_slashes
@@ -102,10 +103,16 @@ class RouteSetTest < Test::Unit::TestCase
     # routes are added to the test fixture.
     assert_equal 3, @app.height
   end
+
+  private
+    def set_included_modules
+      class << @app; included_modules; end
+    end
 end
 
 class OptimizedRouteSetTest < RouteSetTest
   def setup
     @app = OptimizedBasicSet
+    assert set_included_modules.include?(Rack::Mount::Recognition::Optimizations)
   end
 end
