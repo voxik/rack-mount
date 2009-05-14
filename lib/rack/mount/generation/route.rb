@@ -64,9 +64,10 @@ module Rack
                   s << parse_segments(part)
                 end
               else
-                source = part.gsub('\\.', '.').gsub('\\/', '/')
-                if Regexp.compile("^(#{part})$") =~ source
-                  s << source
+                part = part.gsub('\\/', '/')
+                static = Utils.extract_static_regexp(part)
+                if static.is_a?(String)
+                  s << static
                 else
                   raise ArgumentError, "failed to parse #{part.inspect}"
                 end

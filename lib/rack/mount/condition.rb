@@ -24,12 +24,14 @@ module Rack
         @method = method.to_sym
 
         @pattern = pattern
-        @keys = { method => pattern }
+        @keys = {}
 
         if @pattern.is_a?(String)
+          @pattern = Regexp.escape(@pattern)
           @pattern = Regexp.compile("^#{@pattern}$")
         end
 
+        @keys[method] = Utils.extract_static_regexp(@pattern)
         @pattern = RegexpWithNamedGroups.new(@pattern)
       end
 
@@ -104,7 +106,8 @@ module Rack
 
                 s.gsub!(/\/$/, '')
                 raise ArgumentError if matches_separator?(s, separators)
-                segments << (clean_regexp?(s) ? s : nil)
+                static = Utils.extract_static_regexp(s)
+                segments << (static.is_a?(String) ? static : nil)
               end
             end
 
@@ -116,10 +119,6 @@ module Rack
           Utils.pop_trailing_nils!(segments)
 
           segments.freeze
-        end
-
-        def clean_regexp?(source)
-          source =~ /^\w+$/
         end
 
         def matches_separator?(source, separators)

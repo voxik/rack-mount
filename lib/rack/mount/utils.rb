@@ -34,6 +34,31 @@ module Rack
       end
       module_function :pop_trailing_nils!
 
+      # Returns static string source of Regexp if it only includes static
+      # characters and no metacharacters. Otherwise the original Regexp is
+      # returned.
+      #
+      #   extract_static_regexp(/^foo$/)      # => "foo"
+      #   extract_static_regexp(/^foo\.bar$/) # => "foo.bar"
+      #   extract_static_regexp(/^foo|bar$/)  # => /^foo|bar$/
+      def extract_static_regexp(regexp)
+        if regexp.is_a?(String)
+          regexp = Regexp.compile("^#{regexp}$")
+        end
+
+        source = regexp.source
+        if source =~ /^\^.*\$$/
+          source.sub!(/^\^(.*)\$$/, '\1')
+          unescaped_source = source.gsub(/\\/, '')
+          if source == Regexp.escape(unescaped_source) &&
+              Regexp.compile("^(#{source})$") =~ unescaped_source
+            return unescaped_source
+          end
+        end
+        regexp
+      end
+      module_function :extract_static_regexp
+
       GLOB_REGEXP = /\/\\\*(\w+)/
       OPTIONAL_SEGMENT_REGEXP = /\\\((.+?)\\\)/
       SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
