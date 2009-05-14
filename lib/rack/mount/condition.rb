@@ -13,6 +13,8 @@ module Rack
         end
       end
 
+      include Recognition::Condition
+
       attr_reader :method, :pattern
       alias_method :to_regexp, :pattern
 
@@ -31,38 +33,11 @@ module Rack
         @pattern = RegexpWithNamedGroups.new(@pattern)
       end
 
-      # Maps named captures to their capture index
-      # #=> { :controller => 0, :action => 1, :id => 2, :format => 4 }
-      def named_captures
-        @named_captures ||= begin
-          named_captures = {}
-          @pattern.named_captures.each { |k, v|
-            named_captures[k.to_sym] = v.last - 1
-          }
-          named_captures.freeze
-        end
-      end
-
-      def match!(value, params)
-        if value =~ to_regexp
-          matches = $~.captures
-          named_captures.each { |k, i|
-            if v = matches[i]
-              params[k] = v
-            end
-          }
-          true
-        else
-          false
-        end
-      end
-
       def inspect
         to_regexp.inspect
       end
 
       def freeze
-        named_captures
         @pattern.freeze
         @keys.freeze
 
