@@ -68,7 +68,6 @@ module Rack
 
         str = Regexp.escape(str.dup)
         requirements = requirements || {}
-        str = normalize_path(str)
 
         re = ''
 
@@ -85,7 +84,7 @@ module Rack
         re << str unless str.empty?
 
         if m = re.match(GLOB_REGEXP)
-          re.sub!(GLOB_REGEXP, "/#{Const::REGEXP_NAMED_CAPTURE % [$1, '.*']}")
+          re.sub!(GLOB_REGEXP, "/#{Const::REGEXP_NAMED_CAPTURE % [$1, '.+']}")
         end
 
         while re =~ OPTIONAL_SEGMENT_REGEXP

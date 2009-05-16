@@ -51,11 +51,19 @@ module Rack
         end
 
         if path.is_a?(String)
-          path = Rack::Mount::Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
+          path = Rack::Mount::Utils.normalize_path(path)
         end
 
         conditions[:request_method] = method if method
         conditions[:path_info] = path if path
+
+        conditions = conditions.inject({}) do |conditions, (key, value)|
+          conditions[key] = value.is_a?(String) ?
+            Rack::Mount::Utils.convert_segment_string_to_regexp(value, requirements, %w( / . ? )) :
+            value
+          conditions
+        end
+
         @set.add_route(app, conditions, defaults, name)
       end
     end
