@@ -54,6 +54,10 @@ module Rack
 
         @conditions.freeze
       end
+
+      def inspect
+        "#<#{self.class.name} @app=#{@app.inspect} @conditions=#{@conditions.inspect} @defaults=#{@defaults.inspect} @name=#{@name.inspect}>"
+      end
     end
   end
 end

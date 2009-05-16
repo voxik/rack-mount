@@ -55,7 +55,7 @@ module Rack
         end
 
         conditions[:request_method] = method if method
-        conditions[:path] = path if path
+        conditions[:path_info] = path if path
         @set.add_route(app, conditions, defaults, name)
       end
     end
