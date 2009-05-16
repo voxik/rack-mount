@@ -204,12 +204,12 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/files/(?<files>.*)$}"), re
     else
-      assert_equal %r{^/files/(.*)$}, re
+      assert_equal %r{^/files/(.+)$}, re
     end
 
     assert_equal ['files'], extract_static_segments(re)
-    assert_equal ['/files/', DynamicSegment.new(:files, /.*/)], build_generation_segments(re)
-    assert_equal ['/files/', Capture.new('.*', :name => 'files')],
+    assert_equal ['/files/', DynamicSegment.new(:files, /.+/)], build_generation_segments(re)
+    assert_equal ['/files/', Capture.new('.+', :name => 'files')],
       extract_regexp_parts(re)
   end
 
