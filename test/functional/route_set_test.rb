@@ -2,76 +2,12 @@ require 'test_helper'
 
 class RouteSetTest < Test::Unit::TestCase
   include RequestDSL
-  include BasicRecognitionTests
-  include BasicGenerationTests
+  include RecognitionTests
+  include GenerationTests
 
   def setup
     @app = BasicSet
     assert !set_included_modules.include?(Rack::Mount::Recognition::Optimizations)
-  end
-
-  def test_slashes
-    get '/slashes/trailing/'
-    assert_success
-    assert_equal({ :controller => 'slash', :action => 'trailing' }, routing_args)
-
-    get '/slashes/trailing'
-    assert_success
-    assert_equal({ :controller => 'slash', :action => 'trailing' }, routing_args)
-
-    get '/slashes/repeated'
-    assert_success
-    assert_equal({ :controller => 'slash', :action => 'repeated' }, routing_args)
-  end
-
-  def test_method_regexp
-    get '/method'
-    assert_success
-    assert_equal({ :controller => 'method', :action => 'index' }, routing_args)
-
-    post '/method'
-    assert_success
-    assert_equal({ :controller => 'method', :action => 'index' }, routing_args)
-
-    # put '/method'
-    # assert_not_found
-
-    # delete '/method'
-    # assert_not_found
-  end
-
-  def test_schema_condition
-    get '/ssl', 'rack.url_scheme' => 'http'
-    assert_success
-    assert_equal({ :controller => 'ssl', :action => 'nonssl' }, routing_args)
-
-    get '/ssl', 'rack.url_scheme' => 'https'
-    assert_success
-    assert_equal({ :controller => 'ssl', :action => 'ssl' }, routing_args)
-  end
-
-  def test_host_condition
-    get '/host', 'HTTP_HOST' => '37s.backpackit.com'
-    assert_success
-    assert_equal({ :controller => 'account', :account => '37s' }, routing_args)
-
-    get '/host', 'HTTP_HOST' => 'josh.backpackit.com'
-    assert_success
-    assert_equal({ :controller => 'account', :account => 'josh' }, routing_args)
-
-    get '/host', 'HTTP_HOST' => 'nil.backpackit.com'
-    assert_not_found
-  end
-
-  def test_path_prefix
-    get '/prefix/foo/bar/1'
-    assert_success
-    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
-  end
-
-  def test_uses_default_parameters_when_non_are_passed
-    assert_equal '/feed/atom', @app.url_for(:feed, :kind => 'atom')
-    assert_equal '/feed/rss', @app.url_for(:feed)
   end
 
   def test_ensure_routeset_needs_to_be_frozen
@@ -108,11 +44,4 @@ class RouteSetTest < Test::Unit::TestCase
     def set_included_modules
       class << @app; included_modules; end
     end
-end
-
-class OptimizedRouteSetTest < RouteSetTest
-  def setup
-    @app = OptimizedBasicSet
-    assert set_included_modules.include?(Rack::Mount::Recognition::Optimizations)
-  end
 end

@@ -31,4 +31,9 @@ module BasicGenerationTests
     assert_equal '/login?token=1', @app.url_for(:login, :token => '1')
     assert_equal '/login?token=1', @app.url_for(:controller => 'sessions', :action => 'new', :token => '1')
   end
+
+  def test_uses_default_parameters_when_non_are_passed
+    assert_equal '/feed/atom', @app.url_for(:feed, :kind => 'atom')
+    assert_equal '/feed/rss', @app.url_for(:feed)
+  end
 end

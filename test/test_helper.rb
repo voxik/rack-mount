@@ -5,12 +5,13 @@ require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
 
-autoload :BasicGenerationTests, 'functional/basic_generation_tests'
-autoload :BasicRecognitionTests, 'functional/basic_recognition_tests'
 autoload :ControllerConstants, 'lib/controller_constants'
 autoload :FrozenAssertions, 'lib/frozen_assertions'
 autoload :NestedSetGraphing, 'lib/nested_set_graphing'
 autoload :RequestDSL, 'lib/request_dsl'
+
+autoload :GenerationTests, 'functional/generation_tests'
+autoload :RecognitionTests, 'functional/recognition_tests'
 
 module Rack
   module Mount
