@@ -74,16 +74,18 @@ module Rack
             []
           end
 
-          def parse_segments(segments)
+          def parse_segments(segments, optional = false)
             s = []
             segments.each do |part|
-              if part.is_a?(Utils::Capture)
+              if part.is_a?(String) && part == '$'
+                return s
+              elsif part.is_a?(Utils::Capture)
                 if part.named?
                   source = part.map { |p| p.to_s }.join
                   requirement = Regexp.compile(source)
                   s << DynamicSegment.new(part.name, requirement)
                 else
-                  s << parse_segments(part)
+                  s << parse_segments(part, true)
                 end
               else
                 part = part.gsub('\\/', '/')
@@ -95,7 +97,12 @@ module Rack
                 end
               end
             end
-            s
+
+            if optional
+              return s
+            else
+              raise ArgumentError, 'path is unbounded'
+            end
           end
 
           def generate_from_segments(segments, params, defaults, optional = false)

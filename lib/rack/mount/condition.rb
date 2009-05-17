@@ -90,14 +90,17 @@ module Rack
                   scanner.terminate
                 end
 
+                if s == '$'
+                  segments << Const::EOS_KEY
+                  break
+                end
+
                 s.gsub!(/\/$/, '')
                 raise ArgumentError if matches_separator?(s, separators)
                 static = Utils.extract_static_regexp(s)
                 segments << (static.is_a?(String) ? static : nil)
               end
             end
-
-            segments << Const::EOS_KEY
           rescue ArgumentError
             # generation failed somewhere, but lets take what we can get
           end

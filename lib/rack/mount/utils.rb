@@ -138,8 +138,6 @@ module Rack
         end
       end
 
-      METACHARACTERS = %w( . [ ] ^ $ * + )
-
       def extract_regexp_parts(regexp)
         unless regexp.is_a?(RegexpWithNamedGroups)
           regexp = RegexpWithNamedGroups.new(regexp)
@@ -154,8 +152,6 @@ module Rack
 
         source =~ /^\^/ ? source.gsub!(/^\^/, '') :
           raise(ArgumentError, "#{source} needs to match the start of the string")
-        source =~ /\$$/ ? source.gsub!(/\$$/, '') :
-          raise(ArgumentError, "#{source} needs to match the end of the string")
 
         require 'strscan'
         scanner = StringScanner.new(source)
@@ -180,7 +176,8 @@ module Rack
               scanner.pos += 1
               capture.optionalize!
             end
-          # elsif !escaped && METACHARACTERS.include?(char)
+          elsif char == '$'
+            cur.push(Const::EOS_KEY)
           else
             cur.push('') unless cur.last.is_a?(String)
             cur.last << char
