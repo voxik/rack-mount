@@ -79,6 +79,7 @@ module Rack
       end
 
       def url(name, params = {}, fallback = {})
+        params = params.merge(fallback)
         @set.url_for(name, params) || raise(ArgumentError)
       end
 
