@@ -15,7 +15,6 @@ module ActionController
         def initialize(options = {})
           defaults = options[:defaults]
           @glob_param = options.delete(:glob)
-          @app = controller(defaults) if bind_controller_const?
         end
 
         def call(env)
@@ -32,14 +31,6 @@ module ActionController
         end
 
         private
-          def bind_controller_const?
-            if defined? Rails
-              Rails.env.production?
-            else
-              true
-            end
-          end
-
           def controller(params)
             if params && params.has_key?(:controller)
               controller = "#{params[:controller].camelize}Controller"
