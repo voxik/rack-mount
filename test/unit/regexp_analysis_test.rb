@@ -202,7 +202,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     re = convert_segment_string_to_regexp('/files/*files', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      assert_equal eval("%r{^/files/(?<files>.*)$}"), re
+      assert_equal eval("%r{^/files/(?<files>.+)$}"), re
     else
       assert_equal %r{^/files/(.+)$}, re
     end
