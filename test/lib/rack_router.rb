@@ -79,7 +79,7 @@ module Rack
       end
 
       def url(name, params = {}, fallback = {})
-        @set.url_for(name, params)
+        @set.url_for(name, params) || raise(ArgumentError)
       end
 
       def call(env)

@@ -19,8 +19,6 @@ module BasicGenerationTests
 
     assert_equal '/global/show', @app.url_for(:controller => 'global', :action => 'show')
     assert_equal '/global/export', @app.url_for(:controller => 'global', :action => 'export')
-    assert_equal '/global/hide_notice', @app.url_for(:controller => 'global', :action => 'hide_notice')
-    assert_equal '/global/export', @app.url_for(:controller => 'global', :action => 'export')
 
     assert_equal '/foo', @app.url_for(:controller => 'foo', :action => 'index')
     assert_equal '/foo/bar', @app.url_for(:controller => 'foo_bar', :action => 'index')

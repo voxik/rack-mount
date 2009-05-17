@@ -6,12 +6,27 @@ module Rack
           attr_reader :name, :requirement
 
           def initialize(name, requirement)
-            @name, @requirement = name.to_sym, requirement
+            @name, @requirement = name.to_sym, bound_expression(requirement)
           end
 
           def ==(obj)
             @name == obj.name && @requirement == obj.requirement
           end
+
+          def =~(str)
+            @requirement =~ str
+          end
+
+          def inspect
+            "/(?<#{@name}>#{@requirement.source})/"
+          end
+
+          private
+            def bound_expression(regexp)
+              source, options = regexp.source, regexp.options
+              source = "^#{source}$"
+              Regexp.compile(source, options)
+            end
         end
 
         # TODO: HAX HAX HAX
@@ -42,7 +57,9 @@ module Rack
           return nil if @segments.empty?
           return nil unless @required_params.all? { |p| params.include?(p) }
 
-          path = generate_from_segments(@segments, params, @defaults)
+          unless path = generate_from_segments(@segments, params, @defaults)
+            return
+          end
 
           @defaults.each do |key, value|
             params.delete(key)
@@ -105,7 +122,12 @@ module Rack
               when String
                 segment
               when DynamicSegment
-                params[segment.name] || defaults[segment.name]
+                value = params[segment.name] || defaults[segment.name]
+                if value && segment =~ value.to_s
+                  value.to_s
+                else
+                  return
+                end
               when Array
                 generate_from_segments(segment, params, defaults, true) || Const::EMPTY_STRING
               end
