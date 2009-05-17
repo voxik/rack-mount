@@ -24,6 +24,7 @@ module Rack
       POST            = 'POST'.freeze
       PUT             = 'PUT'.freeze
       REQUEST_METHOD  = 'REQUEST_METHOD'.freeze
+      SCRIPT_NAME     = 'SCRIPT_NAME'.freeze
       SLASH           = '/'.freeze
       TEXT_SLASH_HTML = 'text/html'.freeze
 
