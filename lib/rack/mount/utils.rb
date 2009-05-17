@@ -154,7 +154,8 @@ module Rack
 
         source =~ /^\^/ ? source.gsub!(/^\^/, '') :
           raise(ArgumentError, "#{source} needs to match the start of the string")
-        source.gsub!(/\$$/, '')
+        source =~ /\$$/ ? source.gsub!(/\$$/, '') :
+          raise(ArgumentError, "#{source} needs to match the end of the string")
 
         require 'strscan'
         scanner = StringScanner.new(source)

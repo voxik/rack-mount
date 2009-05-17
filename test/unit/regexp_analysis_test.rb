@@ -177,7 +177,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_regexp_simple_requirements
-    re = %r{^/foo/(bar|baz)/([a-z0-9]+)}
+    re = %r{^/foo/(bar|baz)/([a-z0-9]+)$}
 
     assert_equal ['foo'], extract_static_segments(re)
     assert_equal [], build_generation_segments(re)
@@ -231,11 +231,10 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_prefix_regexp
-    re = %r{^/prefix/.*$}
-    assert_equal ['prefix'], extract_static_segments(re)
+    re = %r{^/prefix}
+    assert_equal [], extract_static_segments(re)
     assert_equal [], build_generation_segments(re)
-    assert_equal ['/prefix/.*'],
-      extract_regexp_parts(re)
+    assert_raise(ArgumentError) { extract_regexp_parts(re) }
   end
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES

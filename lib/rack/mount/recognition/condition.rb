@@ -2,7 +2,7 @@ module Rack
   module Mount
     module Recognition
       module Condition #:nodoc:
-        def match!(value, params)
+        def match!(value, env, params)
           if value =~ to_regexp
             matches = $~.captures
             named_captures.each { |k, i|
@@ -10,6 +10,11 @@ module Rack
                 params[k] = v
               end
             }
+            if is_a?(PathCondition)
+              env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO].sub($~.to_s, Const::EMPTY_STRING))
+              env[Const::PATH_INFO] = Const::EMPTY_STRING if env[Const::PATH_INFO] == Const::SLASH
+              env[Const::SCRIPT_NAME] = Utils.normalize_path("#{env[Const::SCRIPT_NAME]}#{$~.to_s}")
+            end
             true
           else
             false

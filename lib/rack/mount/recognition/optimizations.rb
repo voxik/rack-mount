@@ -57,7 +57,7 @@ module Rack
 
           def conditional_statement(route)
             route.conditions.values.map { |condition|
-              "route.conditions[:#{condition.method}].match!(req.#{condition.method}, routing_args)"
+              "route.conditions[:#{condition.method}].match!(req.#{condition.method}, env, routing_args)"
             }.compact.join(' && ')
           end
 

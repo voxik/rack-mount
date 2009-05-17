@@ -19,11 +19,7 @@ module Rack
           routing_args = @defaults.dup
           if @conditions.all? { |method, condition|
             value = req.send(method)
-            # TODO: Temporary hack
-            if method == :path
-              value = Utils.normalize_path(value)
-            end
-            condition.match!(value, routing_args)
+            condition.match!(value, env, routing_args)
           }
             env[@parameters_key] = routing_args
             @app.call(env)

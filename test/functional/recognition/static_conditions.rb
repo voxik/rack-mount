@@ -126,6 +126,8 @@ module RecognitionTests
       get '/prefix/foo/bar/1'
       assert_success
       assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
+      assert_equal '', @env['PATH_INFO']
+      assert_equal '/prefix/foo/bar/1', @env['SCRIPT_NAME']
     end
 
     def test_not_found
