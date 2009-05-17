@@ -62,9 +62,12 @@ module Rack
           end
 
           @defaults.each do |key, value|
-            params.delete(key)
+            if params[key] == value
+              params.delete(key)
+            end
           end
 
+          params.delete_if { |k, v| v.nil? }
           if params.any?
             path << "?#{Rack::Utils.build_query(params)}"
           end
@@ -108,11 +111,13 @@ module Rack
           def generate_from_segments(segments, params, defaults, optional = false)
             if optional
               return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
-              return Const::EMPTY_STRING if segments.flatten.all? { |s|
-                if s.is_a?(DynamicSegment) && params[s.name]
-                  params[s.name].to_s !~ s.requirement
-                else
-                  true
+              return Const::EMPTY_STRING unless segments.flatten.any? { |s|
+                params[s.name] if s.is_a?(DynamicSegment)
+              }
+              return Const::EMPTY_STRING if segments.any? { |segment|
+                if segment.is_a?(DynamicSegment)
+                  value = params[segment.name] || defaults[segment.name]
+                  value.nil? || segment !~ value.to_s
                 end
               }
             end
