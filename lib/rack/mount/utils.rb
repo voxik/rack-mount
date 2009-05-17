@@ -126,6 +126,12 @@ module Rack
           name && name != ''
         end
 
+        def to_s
+          source = "(#{join})"
+          source << '?' if optional?
+          source
+        end
+
         def freeze
           each { |e| e.freeze }
           super

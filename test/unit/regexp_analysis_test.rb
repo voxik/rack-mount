@@ -73,6 +73,19 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     ], extract_regexp_parts(re)
   end
 
+  def test_requirements_with_capture_inside
+    re = convert_segment_string_to_regexp('/msg/get/:id', { :id => /\d+(?:,\d+)*/ }, %w( / . ? ))
+
+    assert_equal %r{^/msg/get/(\d+(?:,\d+)*)$}, re
+    assert_equal ['msg', 'get'], extract_static_segments(re)
+    assert_equal ['/msg/get/',
+      DynamicSegment.new(:id, %r{\d+(?:,\d+)*})
+    ], build_generation_segments(re)
+    assert_equal ['/msg/get/',
+      Capture.new('\\d+', Capture.new('?:,\\d+'), '*', :name => 'id')
+    ], extract_regexp_parts(re)
+  end
+
   def test_optional_capture
     re = convert_segment_string_to_regexp('/people/(:id)', {}, %w( / . ? ))
 
