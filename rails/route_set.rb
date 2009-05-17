@@ -49,7 +49,7 @@ module ActionController
 
       module RouteExtensions
         def segment_keys
-          conditions[:path].to_regexp.names.compact.map(&:to_sym)
+          conditions[:path_info].to_regexp.names.compact.map(&:to_sym)
         end
       end
 
@@ -61,7 +61,7 @@ module ActionController
 
       def draw
         yield Mapper.new(self)
-        @set.add_route(NotFound, :path => /.*/)
+        @set.add_route(NotFound, :path_info => /.*/)
         install_helpers
         @set.freeze
       end
@@ -106,7 +106,7 @@ module ActionController
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
-        conditions = { :request_method => method, :path => path }
+        conditions = { :request_method => method, :path_info => path }
         route = @set.add_route(app, conditions, defaults, name)
         route.extend(RouteExtensions)
         route

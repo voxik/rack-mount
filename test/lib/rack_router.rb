@@ -23,8 +23,6 @@ $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', '..'
 
 require 'rack/mount'
 
-Rack::Mount::Generation::Route.path_method = :path_info
-
 module Rack
   class Router
     class SimpleMapper

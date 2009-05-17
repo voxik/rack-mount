@@ -21,14 +21,14 @@ class RouteSetTest < Test::Unit::TestCase
 
   def test_ensure_each_route_requires_a_valid_rack_app
     set = Rack::Mount::RouteSet.new
-    assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path => '/foo') }
+    assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path_info => '/foo') }
     assert_raise(ArgumentError) { set.add_route({}) }
     assert_raise(ArgumentError) { set.add_route('invalid app') }
   end
 
   def test_ensure_route_has_valid_conditions
     set = Rack::Mount::RouteSet.new
-    assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path => '/foo') }
+    assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path_info => '/foo') }
     assert_raise(ArgumentError) { set.add_route(EchoApp, nil) }
     assert_raise(ArgumentError) { set.add_route(EchoApp, :foo => '/bar') }
   end

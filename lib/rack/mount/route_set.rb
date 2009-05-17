@@ -62,7 +62,7 @@ module Rack
         # An internal helper method for constructing a nested set from
         # the linear route set.
         #
-        # build_nested_route_set([:request_method, :path]) { |route, method|
+        # build_nested_route_set([:request_method, :path_info]) { |route, method|
         #   route.send(method)
         # }
         def build_nested_route_set(keys, &block)

@@ -76,7 +76,11 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   def test_requirements_with_capture_inside
     re = convert_segment_string_to_regexp('/msg/get/:id', { :id => /\d+(?:,\d+)*/ }, %w( / . ? ))
 
-    assert_equal %r{^/msg/get/(\d+(?:,\d+)*)$}, re
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^/msg/get/(?<id>\d+(?:,\d+)*)$}'), re
+    else
+      assert_equal %r{^/msg/get/(\d+(?:,\d+)*)$}, re
+    end
     assert_equal ['msg', 'get'], extract_static_segments(re)
     assert_equal ['/msg/get/',
       DynamicSegment.new(:id, %r{\d+(?:,\d+)*})
@@ -260,13 +264,13 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   private
     def extract_static_segments(re)
       set = Rack::Mount::RouteSet.new
-      route = Rack::Mount::Route.new(set, EchoApp, { :path => re }, {}, nil)
-      route.conditions[:path].keys.sort { |(k1, v1), (k2, v2)| k1.to_s <=> k2.to_s }.map { |(k, v)| v }
+      route = Rack::Mount::Route.new(set, EchoApp, { :path_info => re }, {}, nil)
+      route.conditions[:path_info].keys.sort { |(k1, v1), (k2, v2)| k1.to_s <=> k2.to_s }.map { |(k, v)| v }
     end
 
     def build_generation_segments(re)
       set = Rack::Mount::RouteSet.new
-      route = Rack::Mount::Route.new(set, EchoApp, { :path => re }, {}, nil)
+      route = Rack::Mount::Route.new(set, EchoApp, { :path_info => re }, {}, nil)
       route.instance_variable_get('@segments')
     end
 end

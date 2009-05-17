@@ -1,6 +1,6 @@
 module RecognitionTests
   module StaticConditions
-    # add_route(EchoApp, { :path => 'foo' }, { :controller => 'foo', :action => 'index' })
+    # add_route(EchoApp, { :path_info => 'foo' }, { :controller => 'foo', :action => 'index' })
     def test_path
       get '/foo'
       assert_success
@@ -19,23 +19,23 @@ module RecognitionTests
       assert_equal({ :controller => 'foo', :action => 'index' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => 'foo/bar' }, { :controller => 'foo_bar', :action => 'index' })
+    # add_route(EchoApp, { :path_info => 'foo/bar' }, { :controller => 'foo_bar', :action => 'index' })
     def test_nested_path
       get '/foo/bar'
       assert_success
       assert_equal({ :controller => 'foo_bar', :action => 'index' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => '/baz' }, { :controller => 'baz', :action => 'index' })
+    # add_route(EchoApp, { :path_info => '/baz' }, { :controller => 'baz', :action => 'index' })
     def test_path_mapped_with_leading_slash
       get '/baz'
       assert_success
       assert_equal({ :controller => 'baz', :action => 'index' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => '/people', :request_method => 'GET' }, { :controller => 'people', :action => 'index' })
-    # add_route(EchoApp, { :path => '/people', :request_method => 'POST' }, { :controller => 'people', :action => 'create' })
-    # add_route(EchoApp, { :path => '/people/new', :request_method => 'GET' }, { :controller => 'people', :action => 'new' })
+    # add_route(EchoApp, { :path_info => '/people', :request_method => 'GET' }, { :controller => 'people', :action => 'index' })
+    # add_route(EchoApp, { :path_info => '/people', :request_method => 'POST' }, { :controller => 'people', :action => 'create' })
+    # add_route(EchoApp, { :path_info => '/people/new', :request_method => 'GET' }, { :controller => 'people', :action => 'new' })
     def test_path_does_get_shadowed
       get '/people'
       assert_success
@@ -46,16 +46,16 @@ module RecognitionTests
       assert_equal({ :controller => 'people', :action => 'new' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => '/' }, { :controller => 'homepage' }, :root)
+    # add_route(EchoApp, { :path_info => '/' }, { :controller => 'homepage' }, :root)
     def test_root_path
       get '/'
       assert_success
       assert_equal({ :controller => 'homepage' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => '/login', :request_method => 'GET' }, { :controller => 'sessions', :action => 'new' }, :login)
-    # add_route(EchoApp, { :path => '/login', :request_method => 'POST' }, { :controller => 'sessions', :action => 'create' })
-    # add_route(EchoApp, { :path => '/logout', :request_method => 'DELETE' }, { :controller => 'sessions', :action => 'destroy' }, :logout)
+    # add_route(EchoApp, { :path_info => '/login', :request_method => 'GET' }, { :controller => 'sessions', :action => 'new' }, :login)
+    # add_route(EchoApp, { :path_info => '/login', :request_method => 'POST' }, { :controller => 'sessions', :action => 'create' })
+    # add_route(EchoApp, { :path_info => '/logout', :request_method => 'DELETE' }, { :controller => 'sessions', :action => 'destroy' }, :logout)
     def test_another_with_controller_scope
       get '/login'
       assert_success
@@ -106,8 +106,8 @@ module RecognitionTests
       assert_not_found
     end
 
-    # set.add_route(EchoApp, { :path => '/slashes/trailing/' }, { :controller => 'slash', :action => 'trailing' })
-    # set.add_route(EchoApp, { :path => '//slashes/repeated' }, { :controller => 'slash', :action => 'repeated' })
+    # set.add_route(EchoApp, { :path_info => '/slashes/trailing/' }, { :controller => 'slash', :action => 'trailing' })
+    # set.add_route(EchoApp, { :path_info => '//slashes/repeated' }, { :controller => 'slash', :action => 'repeated' })
     def test_slashes
       get '/slashes/trailing/'
       assert_success

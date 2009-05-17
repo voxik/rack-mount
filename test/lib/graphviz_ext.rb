@@ -31,10 +31,10 @@ class GraphViz
       obj.inspect
     when Rack::Mount::Route
       label = []
-      if method = obj.conditions[:method]
+      if method = obj.conditions[:request_method]
         label << escape(to_label(method))
       end
-      if path = obj.conditions[:path]
+      if path = obj.conditions[:path_info]
         label << escape(to_label(path))
       end
       label.join(' ')

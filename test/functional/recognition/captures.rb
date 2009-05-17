@@ -1,9 +1,9 @@
 module RecognitionTests
   module Captures
-    # add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)/edit$}, :request_method => 'GET' }, { :controller => 'people', :action => 'edit' })
-    # add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'GET' }, { :controller => 'people', :action => 'show' })
-    # add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'PUT' }, { :controller => 'people', :action => 'update' })
-    # add_route(EchoApp, { :path => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'DELETE' }, { :controller => 'people', :action => 'destroy' })
+    # add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)/edit$}, :request_method => 'GET' }, { :controller => 'people', :action => 'edit' })
+    # add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'GET' }, { :controller => 'people', :action => 'show' })
+    # add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'PUT' }, { :controller => 'people', :action => 'update' })
+    # add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'DELETE' }, { :controller => 'people', :action => 'destroy' })
     def test_extracts_id
       get '/people/1'
       assert_success
@@ -22,8 +22,8 @@ module RecognitionTests
       assert_equal({ :controller => 'people', :action => 'edit', :id => '2' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => %r{^/geocode/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode)
-    # add_route(EchoApp, { :path => %r{^/geocode2/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode2)
+    # add_route(EchoApp, { :path_info => %r{^/geocode/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode)
+    # add_route(EchoApp, { :path_info => %r{^/geocode2/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode2)
     def test_requirements
       get '/geocode/60614'
       assert_success
@@ -34,7 +34,7 @@ module RecognitionTests
       assert_equal({ :controller => 'geocode', :action => 'show', :postalcode => '60614' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
+    # add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
     def test_path_with_globbing
       get '/files/images/photo.jpg'
       assert_success
@@ -42,10 +42,10 @@ module RecognitionTests
       assert_equal({ :controller => 'files', :action => 'index', :files => 'images/photo.jpg' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => %r{^/global/(?<action>[a-z0-9]+)$} }, { :controller => 'global' })
-    # add_route(EchoApp, { :path => '/global/export' }, { :controller => 'global', :action => 'export' }, :export_request)
-    # add_route(EchoApp, { :path => '/global/hide_notice' }, { :controller => 'global', :action => 'hide_notice' }, :hide_notice)
-    # add_route(EchoApp, { :path => %r{^/export/(?<id>[a-z0-9]+)/(?<file>.*)$} }, { :controller => 'global', :action => 'export' }, :export_download)
+    # add_route(EchoApp, { :path_info => %r{^/global/(?<action>[a-z0-9]+)$} }, { :controller => 'global' })
+    # add_route(EchoApp, { :path_info => '/global/export' }, { :controller => 'global', :action => 'export' }, :export_request)
+    # add_route(EchoApp, { :path_info => '/global/hide_notice' }, { :controller => 'global', :action => 'hide_notice' }, :hide_notice)
+    # add_route(EchoApp, { :path_info => %r{^/export/(?<id>[a-z0-9]+)/(?<file>.*)$} }, { :controller => 'global', :action => 'export' }, :export_download)
     def test_with_controller_scope
       get '/global/index'
       assert_success
@@ -68,7 +68,7 @@ module RecognitionTests
       assert_equal({ :controller => 'global', :action => 'export', :id => '1', :file => 'foo' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => %r{^/optional/index(\.(?<format>[a-z]+))?$} }, { :controller => 'optional', :action => 'index' })
+    # add_route(EchoApp, { :path_info => %r{^/optional/index(\.(?<format>[a-z]+))?$} }, { :controller => 'optional', :action => 'index' })
     def test_optional_route
       get '/optional/index'
       assert_success
@@ -79,8 +79,8 @@ module RecognitionTests
       assert_equal({ :controller => 'optional', :action => 'index', :format => 'xml' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => '/account/subscription', :request_method => 'GET' }, { :controller => 'account/subscription', :action => 'index' })
-    # add_route(EchoApp, { :path => '/account/credit', :request_method => 'GET' }, { :controller => 'account/credit', :action => 'index' })
+    # add_route(EchoApp, { :path_info => '/account/subscription', :request_method => 'GET' }, { :controller => 'account/subscription', :action => 'index' })
+    # add_route(EchoApp, { :path_info => '/account/credit', :request_method => 'GET' }, { :controller => 'account/credit', :action => 'index' })
     def test_namespaced_resources
       get '/account/subscription'
       assert_success
@@ -91,9 +91,9 @@ module RecognitionTests
       assert_equal({ :controller => 'account/credit', :action => 'index' }, routing_args)
     end
 
-    # add_route(EchoApp, { :path => %r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$} }, { :controller => 'foo' })
-    # add_route(EchoApp, { :path => %r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$} }, { :controller => 'foo' }, :complex_regexp)
-    # add_route(EchoApp, { :path => %r{^/regexp/baz/[a-z]+/[0-9]+$} }, { :controller => 'foo' }, :complex_regexp_fail)
+    # add_route(EchoApp, { :path_info => %r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$} }, { :controller => 'foo' })
+    # add_route(EchoApp, { :path_info => %r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$} }, { :controller => 'foo' }, :complex_regexp)
+    # add_route(EchoApp, { :path_info => %r{^/regexp/baz/[a-z]+/[0-9]+$} }, { :controller => 'foo' }, :complex_regexp_fail)
     def test_regexp
       get '/regexp/foo/bar/123'
       assert_success

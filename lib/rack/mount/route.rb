@@ -48,8 +48,8 @@ module Rack
           end
 
           if method && pattern
-            # TODO: Don't explict check for :path condition
-            klass = method == Generation::Route.path_method ? PathCondition : Condition
+            # TODO: Don't explict check for :path_info condition
+            klass = method == :path_info ? PathCondition : Condition
             @conditions[method] = klass.new(method, pattern)
           end
         end
