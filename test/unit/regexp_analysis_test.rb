@@ -106,6 +106,23 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     :optional => true), '$'], extract_regexp_parts(re)
   end
 
+  def test_leading_dynamic_segment
+    re = convert_segment_string_to_regexp('/:foo/bar(.:format)', {}, %w( / . ? ))
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^/(?<foo>[^/.?]+)/bar(\.(?<format>[^/.?]+))?$}'), re
+    else
+      assert_equal %r{^/([^/.?]+)/bar(\.([^/.?]+))?$}, re
+    end
+
+    assert_equal [], extract_static_segments(re)
+    assert_equal ['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
+      '/bar', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
+    assert_equal ['/', Capture.new('[^/.?]+', :name => 'foo'), '/bar',
+      Capture.new('\\.', Capture.new('[^/.?]+', :name => 'format'), :optional => true),
+    '$'], extract_regexp_parts(re)
+  end
+
   def test_optional_capture_within_segment
     re = convert_segment_string_to_regexp('/people(.:format)', {}, %w( / . ? ))
 
