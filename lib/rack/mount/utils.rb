@@ -74,7 +74,10 @@ module Rack
         while m = (str.match(SEGMENT_REGEXP))
           re << m.pre_match unless m.pre_match.empty?
           if requirement = requirements[$2.to_sym]
-            re << Const::REGEXP_NAMED_CAPTURE % [$2, requirement.source]
+            source = requirement.is_a?(String) ?
+              Regexp.escape(requirement) :
+              requirement.source
+            re << Const::REGEXP_NAMED_CAPTURE % [$2, source]
           else
             re << Const::REGEXP_NAMED_CAPTURE % [$2, "[^#{separators.join}]+"]
           end

@@ -14,11 +14,23 @@ module Rack
           end
         end
 
+        # TODO: HAX HAX HAX
+        def self.path_method=(value)
+          @@path_method = value
+        end
+
+        # TODO: HAX HAX HAX
+        def self.path_method
+          @@path_method ||= :path
+        end
+
         def initialize(*args)
           super
 
           # TODO: Don't explict check for :path condition
-          @segments = segments(@conditions[:path].to_regexp).freeze if @conditions.has_key?(:path)
+          @segments = @conditions.has_key?(Generation::Route.path_method) ?
+            segments(@conditions[Generation::Route.path_method].to_regexp).freeze :
+            []
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
           }.map { |s| s.name }.freeze if @segments

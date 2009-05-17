@@ -48,7 +48,9 @@ module Rack
           end
 
           if method && pattern
-            @conditions[method] = Condition.new(method, pattern)
+            # TODO: Don't explict check for :path condition
+            klass = method == Generation::Route.path_method ? PathCondition : Condition
+            @conditions[method] = klass.new(method, pattern)
           end
         end
 
