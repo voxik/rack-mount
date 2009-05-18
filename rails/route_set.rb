@@ -117,6 +117,14 @@ module ActionController
         named_routes[name.to_sym] = add_route(path, options)
       end
 
+      def extra_keys(options, recall = {})
+        options
+      end
+
+      def generate_extras(options, recall = {})
+        raise NotImplemented
+      end
+
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
         expire_on = build_expiry(options, recall)
