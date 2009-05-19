@@ -71,7 +71,7 @@ module Rack
           @valid_conditions ||= begin
             conditions = @request_class.instance_methods(false)
             conditions.map! { |m| m.to_sym }
-            conditions.to_set.freeze
+            conditions.freeze
           end
         end
 
