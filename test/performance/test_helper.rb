@@ -1,7 +1,6 @@
 $: << File.join(File.dirname(__FILE__), '..', '..', 'lib')
 
 require 'rubygems'
-require 'rack'
 require 'rack/mount'
 require 'benchmark'
 require 'fixtures'
