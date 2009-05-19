@@ -24,6 +24,25 @@ def Object.const_missing(name)
   end
 end
 
+require 'set'
+
+def track_new_objects
+  object_ids  = Set.new
+  new_objects = Set.new
+
+  ObjectSpace.each_object { |obj| object_ids << obj.object_id }
+
+  yield
+
+  ObjectSpace.each_object { |obj|
+    unless object_ids.include?(obj.object_id)
+      new_objects << obj
+    end
+  }
+
+  new_objects
+end
+
 begin
   gem 'ruby-prof'
   require 'ruby-prof'
