@@ -7,6 +7,15 @@ module Rack
       include Generation::RouteSet, Recognition::RouteSet
       include Recognition::Optimizations
 
+      # Initialize a new RouteSet without optimizations
+      def self.new_without_optimizations(*args, &block)
+        @included_modules ||= []
+        @included_modules.delete(Recognition::Optimizations)
+        new(*args, &block)
+      ensure
+        @included_modules.push(Recognition::Optimizations)
+      end
+
       # Basic RouteSet initializer.
       #
       # If a block is given, the set is yielded and finalized.
