@@ -1,5 +1,3 @@
-require 'strscan'
-
 module Rack
   module Mount
     unless Const::SUPPORTS_NAMED_CAPTURES

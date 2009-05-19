@@ -83,7 +83,6 @@ module Rack
               part.gsub!(/\\\//, '/')
               part.gsub!(/^\//, '')
 
-              require 'strscan'
               scanner = StringScanner.new(part)
 
               until scanner.eos?

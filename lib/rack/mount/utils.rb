@@ -1,5 +1,3 @@
-require 'strscan'
-
 module Rack
   module Mount
     # Private utility methods used throughout Rack::Mount.
@@ -216,7 +214,6 @@ module Rack
         source =~ /^\^/ ? source.gsub!(/^\^/, '') :
           raise(ArgumentError, "#{source} needs to match the start of the string")
 
-        require 'strscan'
         scanner = StringScanner.new(source)
         stack = [[]]
 
