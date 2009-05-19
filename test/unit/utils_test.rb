@@ -28,4 +28,18 @@ class UtilsTest < Test::Unit::TestCase
     assert_equal 'foo.bar', extract_static_regexp(/^foo\.bar$/)
     assert_equal(/^foo|bar$/, extract_static_regexp(/^foo|bar$/))
   end
+
+  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    def test_extract_19_named_captures
+      assert_equal [/[a-z]+/, []], extract_named_captures(eval('/[a-z]+/'))
+      assert_equal [/([a-z]+)/, ['foo']], extract_named_captures(eval('/(?<foo>[a-z]+)/'))
+      assert_equal [/([a-z]+)([a-z]+)/, [nil, 'foo']], extract_named_captures(eval('/([a-z]+)(?<foo>[a-z]+)/'))
+    end
+  else
+    def test_extract_18_named_captures
+      assert_equal [/[a-z]+/, []], extract_named_captures(/[a-z]+/)
+      assert_equal [/([a-z]+)/, ['foo']], extract_named_captures(/(?:<foo>[a-z]+)/)
+      assert_equal [/([a-z]+)([a-z]+)/, [nil, 'foo']], extract_named_captures(/([a-z]+)(?:<foo>[a-z]+)/)
+    end
+  end
 end
