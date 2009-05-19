@@ -59,6 +59,11 @@ module Rack
         raise NotImplementedError
       end
 
+      # Number of routes in the set
+      def length
+        @routes.length
+      end
+
       # Finalizes the set and builds optimized data structures. You *must*
       # freeze the set before you can use <tt>call</tt> and <tt>url_for</tt>.
       # So remember to call freeze after you are done adding routes.
