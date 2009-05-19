@@ -101,7 +101,7 @@ module ActionController
         if path.is_a?(String)
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
           path = ::Rack::Mount::Utils.normalize_path(path)
-          path = ::Rack::Mount::Utils.convert_segment_string_to_regexp(path, requirements, %w( / . ? ))
+          path = ::Rack::Mount::Utils.parse_segmented_string(path, requirements, %w( / . ? ))
         end
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)

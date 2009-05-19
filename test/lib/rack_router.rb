@@ -59,7 +59,7 @@ module Rack
 
         conditions = conditions.inject({}) do |conditions, (key, value)|
           conditions[key] = value.is_a?(String) ?
-            Rack::Mount::Utils.convert_segment_string_to_regexp(value, requirements, %w( / . ? )) :
+            Rack::Mount::Utils.parse_segmented_string(value, requirements, %w( / . ? )) :
             value
           conditions
         end

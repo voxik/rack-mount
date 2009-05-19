@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class RegexpAnalysisTest < Test::Unit::TestCase
-  include Rack::Mount::Utils
   DynamicSegment = Rack::Mount::Generation::Route::DynamicSegment
+  Capture = Rack::Mount::Utils::Capture
 
   def test_requires_match_start_of_string
     re = %r{/foo$}
@@ -12,7 +12,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_simple_static_string
-    re = convert_segment_string_to_regexp('/foo', {}, %w( / . ? ))
+    re = parse_segmented_string('/foo', {}, %w( / . ? ))
 
     assert_equal %r{^/foo$}, re
     assert_equal ['foo', '$'], extract_static_segments(re)
@@ -21,7 +21,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_root_path
-    re = convert_segment_string_to_regexp('/', {}, %w( / . ? ))
+    re = parse_segmented_string('/', {}, %w( / . ? ))
 
     assert_equal %r{^/$}, re
     assert_equal ['$'], extract_static_segments(re)
@@ -30,7 +30,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_multisegment_static_string
-    re = convert_segment_string_to_regexp('/people/show/1', {}, %w( / . ? ))
+    re = parse_segmented_string('/people/show/1', {}, %w( / . ? ))
 
     assert_equal %r{^/people/show/1$}, re
     assert_equal ['people', 'show', '1', '$'], extract_static_segments(re)
@@ -39,7 +39,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_segments
-    re = convert_segment_string_to_regexp('/foo/:action/:id', {}, %w( / . ? ))
+    re = parse_segmented_string('/foo/:action/:id', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}'), re
@@ -56,7 +56,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_segments_with_requirements
-    re = convert_segment_string_to_regexp('/foo/:action/:id',
+    re = parse_segmented_string('/foo/:action/:id',
       { :action => /bar|baz/, :id => /[a-z0-9]+/ }, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
@@ -74,7 +74,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_requirements_with_capture_inside
-    re = convert_segment_string_to_regexp('/msg/get/:id', { :id => /\d+(?:,\d+)*/ }, %w( / . ? ))
+    re = parse_segmented_string('/msg/get/:id', { :id => /\d+(?:,\d+)*/ }, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/msg/get/(?<id>\d+(?:,\d+)*)$}'), re
@@ -91,7 +91,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_optional_capture
-    re = convert_segment_string_to_regexp('/people/(:id)', {}, %w( / . ? ))
+    re = parse_segmented_string('/people/(:id)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/people/((?<id>[^/.?]+))?$}'), re
@@ -107,7 +107,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_leading_dynamic_segment
-    re = convert_segment_string_to_regexp('/:foo/bar(.:format)', {}, %w( / . ? ))
+    re = parse_segmented_string('/:foo/bar(.:format)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^/(?<foo>[^/.?]+)/bar(\.(?<format>[^/.?]+))?$}'), re
@@ -124,7 +124,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_optional_capture_within_segment
-    re = convert_segment_string_to_regexp('/people(.:format)', {}, %w( / . ? ))
+    re = parse_segmented_string('/people(.:format)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people(\\.(?<format>[^/.?]+))?$}"), re
@@ -140,7 +140,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_dynamic_and_optional_segment
-    re = convert_segment_string_to_regexp('/people/:id(.:format)', {}, %w( / . ? ))
+    re = parse_segmented_string('/people/:id(.:format)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/people/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?$}"), re
@@ -154,7 +154,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_multiple_optional_captures
-    re = convert_segment_string_to_regexp('/:foo(/:bar)(/:baz)', {}, %w( / . ? ))
+    re = parse_segmented_string('/:foo(/:bar)(/:baz)', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<foo>[^/.?]+)(/(?<bar>[^/.?]+))?(/(?<baz>[^/.?]+))?$}"), re
@@ -174,7 +174,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_nested_optional_captures
-    re = convert_segment_string_to_regexp('/:controller(/:action(/:id(.:format)))', {}, %w( / . ? ))
+    re = parse_segmented_string('/:controller(/:action(/:id(.:format)))', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/(?<controller>[^/.?]+)(/(?<action>[^/.?]+)(/(?<id>[^/.?]+)(\\.(?<format>[^/.?]+))?)?)?$}"), re
@@ -217,7 +217,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_period_separator
-    re = convert_segment_string_to_regexp('/foo/:id.:format', {}, %w( / . ? ))
+    re = parse_segmented_string('/foo/:id.:format', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/foo/(?<id>[^/.?]+)\\.(?<format>[^/.?]+)$}"), re
@@ -233,7 +233,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   def test_glob
-    re = convert_segment_string_to_regexp('/files/*files', {}, %w( / . ? ))
+    re = parse_segmented_string('/files/*files', {}, %w( / . ? ))
 
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval("%r{^/files/(?<files>.+)$}"), re
@@ -278,6 +278,14 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   end
 
   private
+    def parse_segmented_string(*args)
+      Rack::Mount::RegexpWithNamedGroups.new(Rack::Mount::Utils.parse_segmented_string(*args))
+    end
+
+    def extract_regexp_parts(*args)
+      Rack::Mount::Utils.extract_regexp_parts(*args)
+    end
+
     def extract_static_segments(re)
       set = Rack::Mount::RouteSet.new
       route = Rack::Mount::Route.new(set, EchoApp, { :path_info => re }, {}, nil)
