@@ -5,15 +5,15 @@ module Rack
 
       # Include generation and recognition concerns
       include Generation::RouteSet, Recognition::RouteSet
-      include Recognition::Optimizations
+      include Recognition::CodeGeneration
 
       # Initialize a new RouteSet without optimizations
       def self.new_without_optimizations(*args, &block)
         @included_modules ||= []
-        @included_modules.delete(Recognition::Optimizations)
+        @included_modules.delete(Recognition::CodeGeneration)
         new(*args, &block)
       ensure
-        @included_modules.push(Recognition::Optimizations)
+        @included_modules.push(Recognition::CodeGeneration)
       end
 
       # Basic RouteSet initializer.

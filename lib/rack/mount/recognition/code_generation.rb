@@ -1,7 +1,7 @@
 module Rack
   module Mount
     module Recognition
-      module Optimizations #:nodoc:
+      module CodeGeneration #:nodoc:
         def freeze
           optimize_call! unless frozen?
           super

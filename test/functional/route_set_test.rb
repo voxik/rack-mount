@@ -7,7 +7,7 @@ class RouteSetTest < Test::Unit::TestCase
 
   def setup
     @app = BasicSet
-    assert !set_included_modules.include?(Rack::Mount::Recognition::Optimizations)
+    assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
 
   def test_ensure_routeset_needs_to_be_frozen
