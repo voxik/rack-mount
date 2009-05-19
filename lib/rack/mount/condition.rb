@@ -36,11 +36,13 @@ module Rack
     end
 
     class PathCondition < Condition #:nodoc:
+      SEPARATORS_REGEXP = Regexp.union('/', '.', '?').freeze
+
       def self.split(cache, request, method, index)
         ary = cache[method] ||= begin
           value = request.send(method)
           value = Utils.normalize_path(value)
-          keys = value.split(%r{/|\.|\?})
+          keys = value.split(SEPARATORS_REGEXP)
           keys.shift
           keys << Const::EOS_KEY
           keys
@@ -70,7 +72,7 @@ module Rack
         # #=> ['people', /[0-9]+/, 'edit']
         def generate_keys(regexp, separators)
           escaped_separators = separators.map { |s| Regexp.escape(s) }
-          separators_regexp = Regexp.compile(escaped_separators.join('|'))
+          separators_regexp = Regexp.union(*escaped_separators)
           segments = []
 
           begin
