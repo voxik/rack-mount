@@ -10,7 +10,7 @@ module Rack
                 params[k] = v
               end
             }
-            if is_a?(PathCondition)
+            if is_a?(PathCondition) && !Utils.regexp_anchored?(@pattern)
               env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO].sub($~.to_s, Const::EMPTY_STRING))
               env[Const::PATH_INFO] = Const::EMPTY_STRING if env[Const::PATH_INFO] == Const::SLASH
               env[Const::SCRIPT_NAME] = Utils.normalize_path("#{env[Const::SCRIPT_NAME]}#{$~.to_s}")

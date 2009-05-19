@@ -34,6 +34,17 @@ module Rack
       end
       module_function :pop_trailing_nils!
 
+      # Determines whether the regexp must match the entire string
+      #
+      #   regexp_anchored?(/^foo$/) # => true
+      #   regexp_anchored?(/foo/)   # => false
+      #   regexp_anchored?(/^foo/)  # => false
+      #   regexp_anchored?(/foo$/)  # => false
+      def regexp_anchored?(regexp)
+        regexp.source =~ /^\^.*\$$/ ? true : false
+      end
+      module_function :regexp_anchored?
+
       # Returns static string source of Regexp if it only includes static
       # characters and no metacharacters. Otherwise the original Regexp is
       # returned.
@@ -47,7 +58,7 @@ module Rack
         end
 
         source = regexp.source
-        if source =~ /^\^.*\$$/
+        if regexp_anchored?(regexp)
           source.sub!(/^\^(.*)\$$/, '\1')
           unescaped_source = source.gsub(/\\/, '')
           if source == Regexp.escape(unescaped_source) &&
