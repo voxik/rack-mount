@@ -28,7 +28,7 @@ begin
   gem 'ruby-prof'
   require 'ruby-prof'
 
-  OUTPUT = File.join(File.dirname(__FILE__), '..', 'tmp', 'performance')
+  OUTPUT = File.join(File.dirname(__FILE__), '..', '..', 'tmp', 'performance')
 
   PRINTERS = {
     :flat => RubyProf::FlatPrinter,
