@@ -22,7 +22,7 @@ module Rack
           def optimize_call!
             recognition_graph.lists.each do |list|
               body = (0...list.length).zip(list).map { |i, route|
-                <<-EOS
+                <<-RUBY_EVAL
                   route = self[#{i}]
                   routing_args = route.defaults.dup
                   if #{conditional_statement(route)}
@@ -30,29 +30,29 @@ module Rack
                     result = route.app.call(env)
                     return result unless result[0] == #{@catch}
                   end
-                EOS
+                RUBY_EVAL
               }.join
 
-              method = <<-EOS, __FILE__, __LINE__
+              method = <<-RUBY_EVAL, __FILE__, __LINE__
                 def optimized_each(req)
                   env = req.env
 #{body}
                   nil
                 end
-              EOS
+              RUBY_EVAL
 
               puts method if ENV[Const::RACK_MOUNT_DEBUG]
               list.instance_eval(*method)
             end
 
-            instance_eval(<<-EOS, __FILE__, __LINE__)
+            instance_eval(<<-RUBY_EVAL, __FILE__, __LINE__)
               def call(env)
                 env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
                 cache = {}
                 req = #{@request_class.name}.new(env)
                 @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(req) || @throw
               end
-            EOS
+            RUBY_EVAL
           end
 
           def conditional_statement(route)
