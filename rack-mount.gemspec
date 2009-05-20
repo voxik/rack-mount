@@ -34,5 +34,5 @@ Gem::Specification.new do |s|
   ]
   s.extra_rdoc_files = %w[README.rdoc MIT-LICENSE]
   s.require_paths = %w[lib]
-  s.add_dependency 'rack', '> 1.0.0'
+  s.add_dependency 'rack', '>= 1.0.0'
 end
