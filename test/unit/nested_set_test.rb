@@ -132,48 +132,8 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal 3, set.height
   end
 
-  def test_deeply_nested_set
-    set = DeeplyNestedSet
-
-    assert_equal ['a:a:a', 'a:a:*', 'a:*:*'], set['a', 'a', 'a']
-    assert_equal ['a:a:*', 'a:*:*'], set['a', 'a', '!']
-    assert_equal ['a:a:*', 'a:*:*'], set['a', 'a']
-    assert_equal ['a:*:*'], set['a', '!']
-    assert_equal ['a:*:*'], set['a']
-    assert_equal [], set['!']
-  end
-
-  def test_freeze
-    set['/admin', '/people'] = '/admin/people'
-    set['/admin', '/people'] = '/admin/people/1'
-    set['/admin'] = '/admin/:controller/edit'
-    set['/admin', '/people'] = '/admin/people/new'
-    set['/admin', '/companies'] = '/admin/companies'
-    set[nil] = '/:controller/:action'
-
-    set.freeze
-
-    assert_frozen(set)
-  end
-
   private
     def set
       @set ||= Rack::Mount::NestedSet.new
     end
-end
-
-begin
-  class NativeNestedSetTest < NestedSetTest
-    class NativeNestedSet < Rack::Mount::NestedSet
-      include Rack::Mount::NestedSetExt
-      alias_method :[], :cfetch
-    end
-
-    private
-      def set
-        @set ||= NativeNestedSet.new
-      end
-  end
-rescue Exception
-  puts "Skipping native nested set tests"
 end

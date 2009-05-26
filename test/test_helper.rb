@@ -7,19 +7,10 @@ require 'fixtures'
 
 autoload :ControllerConstants, 'lib/controller_constants'
 autoload :FrozenAssertions, 'lib/frozen_assertions'
-autoload :NestedSetGraphing, 'lib/nested_set_graphing'
 autoload :RequestDSL, 'lib/request_dsl'
 
 autoload :GenerationTests, 'functional/generation_tests'
 autoload :RecognitionTests, 'functional/recognition_tests'
-
-module Rack
-  module Mount
-    class RouteSet
-      include NestedSetGraphing
-    end
-  end
-end
 
 module Account
   extend ControllerConstants

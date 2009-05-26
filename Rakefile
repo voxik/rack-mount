@@ -58,15 +58,3 @@ Spec::Rake::SpecTask.new('rack_router_spec') do |t|
   t.spec_files = FileList['vendor/rack-router/spec/**/*.rb']
   t.spec_opts = ['-c', '-fs']
 end
-
-begin
-  gem 'rake-compiler'
-  require 'rake/extensiontask'
-
-  Rake::ExtensionTask.new do |ext|
-    ext.name = 'nested_set_ext'
-    ext.ext_dir = 'ext/rack/mount'
-    ext.lib_dir = 'lib/rack/mount'
-  end
-rescue Gem::LoadError
-end

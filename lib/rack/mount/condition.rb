@@ -68,7 +68,7 @@ module Rack
       end
 
       private
-        # Keys for inserting into NestedSet
+        # Keys for inserting into grapp
         # #=> ['people', /[0-9]+/, 'edit']
         def generate_keys(regexp, separators)
           escaped_separators = separators.map { |s| Regexp.escape(s) }

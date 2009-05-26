@@ -37,7 +37,7 @@ class RouteSetTest < Test::Unit::TestCase
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
-    assert_equal 3, @app.height
+    assert_equal 4, @app.height
   end
 
   private
