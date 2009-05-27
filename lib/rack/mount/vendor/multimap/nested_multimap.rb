@@ -35,16 +35,43 @@ class NestedMultimap < Multimap
     r
   end
 
-  def each_pair_list
+  def each_association
     super do |key, container|
-      if container.respond_to?(:each_pair_list)
-        container.each_pair_list do |nested_key, value|
+      if container.respond_to?(:each_association)
+        container.each_association do |nested_key, value|
           yield [key, nested_key].flatten, value
         end
       else
         yield key, container
       end
     end
+  end
+
+  def each_container_with_default
+    each_container = Proc.new do |container|
+      if container.respond_to?(:each_container_with_default)
+        container.each_container_with_default do |value|
+          yield value
+        end
+      else
+        yield container
+      end
+    end
+
+    hash_each_pair { |_, container| each_container.call(container) }
+    each_container.call(default)
+
+    self
+  end
+
+  def containers_with_default
+    containers = []
+    each_container_with_default { |container| containers << container }
+    containers
+  end
+
+  def height
+    containers_with_default.max { |a, b| a.length <=> b.length }.length
   end
 
   def inspect

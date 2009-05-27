@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class NestedSetTest < Test::Unit::TestCase
+class MultimapTest < Test::Unit::TestCase
   def test_one_level
     set['/people'] = '/people'
     set['/people'] = '/people/1'
@@ -11,7 +11,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/companies'], set['/companies']
     assert_equal [], set['/notfound']
 
-    assert_equal 3, set.lists.length
+    assert_equal 3, set.containers_with_default.length
     assert_equal 3, set.height
   end
 
@@ -27,7 +27,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/:controller/edit', '/companies', '/:controller/:action'], set['/companies']
     assert_equal ['/:controller/edit', '/:controller/:action'], set['/notfound']
 
-    assert_equal 3, set.lists.length
+    assert_equal 3, set.containers_with_default.length
     assert_equal 5, set.height
   end
 
@@ -45,7 +45,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/:id', '/:action'], set['/789']
     assert_equal ['/:id', '/:action'], set['/notfound']
 
-    assert_equal 4, set.lists.length
+    assert_equal 4, set.containers_with_default.length
     assert_equal 3, set.height
   end
 
@@ -61,7 +61,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal [], set['/admin', '/notfound']
     assert_equal [], set['/notfound']
 
-    assert_equal 4, set.lists.length
+    assert_equal 4, set.containers_with_default.length
     assert_equal 3, set.height
   end
 
@@ -80,7 +80,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/:controller/:action'], set['/admin', '/notfound']
     assert_equal ['/:controller/:action'], set['/notfound']
 
-    assert_equal 5, set.lists.length
+    assert_equal 5, set.containers_with_default.length
     assert_equal 6, set.height
   end
 
@@ -99,7 +99,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['ANY /messages/export'], set['GET', '/messages']
     assert_equal ['POST /messages', 'ANY /messages/export'], set['POST', '/messages']
 
-    assert_equal 12, set.lists.length
+    assert_equal 12, set.containers_with_default.length
     assert_equal 4, set.height
   end
 
@@ -118,7 +118,7 @@ class NestedSetTest < Test::Unit::TestCase
     assert_equal ['GET /people', 'GET /people/:id'], set['GET', 'people', '1']
     assert_equal ['GET /people', 'GET /people/:id', 'GET /people/:id/edit'], set['GET', 'people', '1', 'edit']
 
-    assert_equal 11, set.lists.length
+    assert_equal 11, set.containers_with_default.length
     assert_equal 3, set.height
   end
 
@@ -128,12 +128,12 @@ class NestedSetTest < Test::Unit::TestCase
     set[nil, '/messages'] = 'POST /messages'
     set[nil] = 'ANY /:controller/:action'
 
-    assert_equal 3, set.lists.length
+    assert_equal 3, set.containers_with_default.length
     assert_equal 3, set.height
   end
 
   private
     def set
-      @set ||= Rack::Mount::NestedSet.new
+      @set ||= Rack::Mount::Multimap.new
     end
 end

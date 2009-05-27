@@ -6,7 +6,7 @@ module Rack #:nodoc:
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'
     autoload :Mixover, 'rack/mount/mixover'
-    autoload :NestedSet, 'rack/mount/nested_set'
+    autoload :Multimap, 'rack/mount/multimap'
     autoload :PathCondition, 'rack/mount/condition'
     autoload :Recognition, 'rack/mount/recognition'
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'

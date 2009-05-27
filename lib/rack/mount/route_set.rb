@@ -80,7 +80,7 @@ module Rack
         #   route.send(method)
         # }
         def build_nested_route_set(keys, &block)
-          graph = NestedSet.new
+          graph = Multimap.new
           @routes.each do |route|
             k = keys.map { |key| block.call(route, key) }
             Utils.pop_trailing_nils!(k)

@@ -20,7 +20,7 @@ module Rack
 
         private
           def optimize_call!
-            recognition_graph.lists.each do |list|
+            recognition_graph.containers_with_default.each do |list|
               body = (0...list.length).zip(list).map { |i, route|
                 <<-RUBY_EVAL
                   route = self[#{i}]
