@@ -18,10 +18,10 @@ class MultimapTest < Test::Unit::TestCase
   def test_one_level_with_defaults
     set['/people'] = '/people'
     set['/people'] = '/people/1'
-    set[nil] = '/:controller/edit'
+    set[/.+/] = '/:controller/edit'
     set['/people'] = '/people/new'
     set['/companies'] = '/companies'
-    set[nil] = '/:controller/:action'
+    set[/.+/] = '/:controller/:action'
 
     assert_equal ['/people', '/people/1', '/:controller/edit', '/people/new', '/:controller/:action'], set['/people']
     assert_equal ['/:controller/edit', '/companies', '/:controller/:action'], set['/companies']
@@ -37,7 +37,7 @@ class MultimapTest < Test::Unit::TestCase
     set['/123'] = '/123'
     set['/456'] = '/456'
     set[/\d{3}/] = '/:id'
-    set[nil] = '/:action'
+    set[/.+/] = '/:action'
 
     assert_equal ['/abc', '/abc/show', '/:action'], set['/abc']
     assert_equal ['/123', '/:id', '/:action'], set['/123']
@@ -72,8 +72,8 @@ class MultimapTest < Test::Unit::TestCase
     set['/admin'] = '/admin/:controller/edit'
     set['/admin', '/people'] = '/admin/people/new'
     set['/admin', '/companies'] = '/admin/companies'
-    set[nil, '/companies'] = '/:namespace/companies'
-    set[nil] = '/:controller/:action'
+    set[/.+/, '/companies'] = '/:namespace/companies'
+    set[/.+/] = '/:controller/:action'
 
     assert_equal ['/admin/accounts/new', '/admin/people', '/admin/people/1', '/admin/:controller/edit', '/admin/people/new', '/:controller/:action'], set['/admin', '/people']
     assert_equal ['/admin/accounts/new', '/admin/:controller/edit', '/admin/companies', '/:namespace/companies', '/:controller/:action'], set['/admin', '/companies']
@@ -86,12 +86,12 @@ class MultimapTest < Test::Unit::TestCase
 
   def test_another_nested_buckets_with_defaults
     set['DELETE'] = 'DELETE .*'
-    set[nil, '/people'] = 'ANY /people/new'
+    set[/.+/, '/people'] = 'ANY /people/new'
     set['GET', '/people'] = 'GET /people'
-    set[nil, '/people'] = 'ANY /people/export'
+    set[/.+/, '/people'] = 'ANY /people/export'
     set['GET', '/people'] = 'GET /people/1'
     set['POST', '/messages'] = 'POST /messages'
-    set[nil, '/messages'] = 'ANY /messages/export'
+    set[/.+/, '/messages'] = 'ANY /messages/export'
 
     assert_equal ['ANY /people/new', 'GET /people', 'ANY /people/export', 'GET /people/1'], set['GET', '/people']
     assert_equal ['ANY /people/new', 'ANY /people/export'], set['POST', '/people']
@@ -123,10 +123,10 @@ class MultimapTest < Test::Unit::TestCase
   end
 
   def test_nested_default_bucket
-    set[nil, '/people'] = 'GET /people'
-    set[nil, '/people'] = 'GET /people/1'
-    set[nil, '/messages'] = 'POST /messages'
-    set[nil] = 'ANY /:controller/:action'
+    set[/.+/, '/people'] = 'GET /people'
+    set[/.+/, '/people'] = 'GET /people/1'
+    set[/.+/, '/messages'] = 'POST /messages'
+    set[/.+/] = 'ANY /:controller/:action'
 
     assert_equal 3, set.containers_with_default.length
     assert_equal 3, set.height

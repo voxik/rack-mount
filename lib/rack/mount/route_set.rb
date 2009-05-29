@@ -84,6 +84,7 @@ module Rack
           @routes.each do |route|
             k = keys.map { |key| block.call(route, key) }
             Utils.pop_trailing_nils!(k)
+            k.map! { |key| key || /.+/ }
             graph[*k] = route
           end
           graph

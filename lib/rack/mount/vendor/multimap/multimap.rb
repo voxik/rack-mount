@@ -79,6 +79,11 @@ class Multimap < Hash
     original.each_pair { |key, container| self[key] = container }
   end
 
+  #--
+  # Setting a default proc is not supported
+  #++
+  undef :default_proc
+
   # call-seq:
   #   map[key] = value        => value
   #   map.store(key, value)   => value
@@ -145,7 +150,7 @@ class Multimap < Hash
   # the key and container to the block as parameters.
   #
   #   map = Multimap["a" => 100, "b" => [200, 300]]
-  #   map.each_association { |key, container| puts "#{key} is #{value}" }
+  #   map.each_association { |key, container| puts "#{key} is #{container}" }
   #
   # <em>produces:</em>
   #
@@ -307,7 +312,7 @@ class Multimap < Hash
   #   map = Multimap["n" => 100, "m" => 100, "d" => [200, 300]]
   #   map.invert #=> Multimap[100 => ["n", "m"], 200 => "d", 300 => "d"]
   def invert
-    h = Multimap.new(default.dup)
+    h = self.class.new(default.dup)
     each_pair { |key, value| h[value] = key }
     h
   end
