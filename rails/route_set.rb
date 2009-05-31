@@ -19,14 +19,18 @@ module ActionController
 
         def call(env)
           params = env[PARAMETERS_KEY]
-          app = @app || controller(params)
+          controller = controller(params)
           merge_default_action!(params)
           split_glob_param!(params) if @glob_param
 
           if env['action_controller.recognize']
             [200, {}, params]
           else
-            app.call(env).to_a
+            if defined? ActionDispatch
+              controller.action(params[:action]).call(env)
+            else
+              controller.call(env).to_a
+            end
           end
         end
 
