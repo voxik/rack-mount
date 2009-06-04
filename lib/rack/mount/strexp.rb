@@ -25,7 +25,7 @@ module Rack
       #   Strexp.compile('src/*files')
       #     # => %r{^src/(?<files>.+)$}
       def initialize(str, requirements = {}, separators = [])
-        raise ArgumentError unless str.is_a?(String)
+        return super(str) if str.is_a?(Regexp)
 
         str = Regexp.escape(str.dup)
         requirements = requirements || {}
