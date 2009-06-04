@@ -279,7 +279,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
 
   private
     def parse_segmented_string(*args)
-      Rack::Mount::RegexpWithNamedGroups.new(Rack::Mount::Utils.parse_segmented_string(*args))
+      Rack::Mount::RegexpWithNamedGroups.new(Rack::Mount::Strexp.new(*args))
     end
 
     def extract_regexp_parts(*args)

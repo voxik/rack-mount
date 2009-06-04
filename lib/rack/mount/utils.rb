@@ -99,66 +99,6 @@ module Rack
       end
       module_function :extract_named_captures
 
-      GLOB_REGEXP = /\\\*(\w+)/
-      OPTIONAL_SEGMENT_REGEXP = /\\\((.+?)\\\)/
-      SEGMENT_REGEXP = /(:([a-z](_?[a-z0-9])*))/
-
-      # Parses segmented string DSL and converts it into a Regexp
-      #
-      #   parse_segmented_string('foo')
-      #     # => %r{^foo$}
-      #
-      #   parse_segmented_string('foo/:bar', {}, ['/'])
-      #     # => %r{^foo/(?<bar>[^/]+)$}
-      #
-      #   parse_segmented_string(':foo.example.com')
-      #     # => %r{^(?<foo>.+)\.example\.com$}
-      #
-      #   parse_segmented_string('foo/:bar', {:bar => /[a-z]+/}, ['/'])
-      #     # => %r{^foo/(?<bar>[a-z]+)$}
-      #
-      #   parse_segmented_string('foo(.:extension)')
-      #     # => %r{^foo(\.(?<extension>.+))?$}
-      #
-      #   parse_segmented_string('src/*files')
-      #     # => %r{^src/(?<files>.+)$}
-      def parse_segmented_string(str, requirements = {}, separators = [])
-        raise ArgumentError unless str.is_a?(String)
-
-        str = Regexp.escape(str.dup)
-        requirements = requirements || {}
-        default_requirement = separators.any? ?
-          "[^#{separators.join}]+" : '.+'
-
-        re = ''
-
-        while m = (str.match(SEGMENT_REGEXP))
-          re << m.pre_match unless m.pre_match.empty?
-          if requirement = requirements[$2.to_sym]
-            source = requirement.is_a?(String) ?
-              Regexp.escape(requirement) :
-              requirement.source
-            re << Const::REGEXP_NAMED_CAPTURE % [$2, source]
-          else
-            re << Const::REGEXP_NAMED_CAPTURE % [$2, default_requirement]
-          end
-          str = m.post_match
-        end
-
-        re << str unless str.empty?
-
-        if m = re.match(GLOB_REGEXP)
-          re.sub!(GLOB_REGEXP, Const::REGEXP_NAMED_CAPTURE % [$1, '.+'])
-        end
-
-        while re =~ OPTIONAL_SEGMENT_REGEXP
-          re.gsub!(OPTIONAL_SEGMENT_REGEXP, '(\1)?')
-        end
-
-        Regexp.compile("^#{re}$")
-      end
-      module_function :parse_segmented_string
-
       class Capture < Array #:nodoc:
         attr_reader :name, :optional
         alias_method :optional?, :optional
