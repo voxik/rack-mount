@@ -68,6 +68,30 @@ class StrexpTest < Test::Unit::TestCase
     end
   end
 
+  def test_glob_segment_at_the_beginning
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^(?<files>.+)/foo\.txt$}'), Strexp.compile('*files/foo.txt')
+    else
+      assert_equal %r{^(?:<files>.+)/foo\.txt$}, Strexp.compile('*files/foo.txt')
+    end
+  end
+
+  def test_glob_segment_in_the_middle
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^src/(?<files>.+)/foo\.txt$}'), Strexp.compile('src/*files/foo.txt')
+    else
+      assert_equal %r{^src/(?:<files>.+)/foo\.txt$}, Strexp.compile('src/*files/foo.txt')
+    end
+  end
+
+  def test_multiple_glob_segments
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^src/(?<files>.+)/dir/(?<morefiles>.+)/foo\.txt$}'), Strexp.compile('src/*files/dir/*morefiles/foo.txt')
+    else
+      assert_equal %r{^src/(?:<files>.+)/dir/(?:<morefiles>.+)/foo\.txt$}, Strexp.compile('src/*files/dir/*morefiles/foo.txt')
+    end
+  end
+
   def test_escaped_glob_segment
     assert_equal %r{^src/\*files$}, Strexp.compile('src/\*files')
   end

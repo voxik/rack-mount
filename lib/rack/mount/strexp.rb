@@ -28,7 +28,6 @@ module Rack
 
         normalize_requirements!(requirements, separators)
         parse_dynamic_segments!(re, requirements)
-        parse_glob_segment!(re)
         parse_optional_segments!(re)
 
         super("^#{re}$")
@@ -47,25 +46,19 @@ module Rack
 
         def parse_dynamic_segments!(str, requirements)
           re, pos, scanner = '', 0, StringScanner.new(str)
-          while scanner.scan_until(/:([a-zA-Z_]\w*)/)
+          while scanner.scan_until(/(:|\\\*)([a-zA-Z_]\w*)/)
             pre, pos = scanner.pre_match[pos..-1], scanner.pos
             if pre =~ /(.*)\\\\$/
               re << $1 + scanner.matched
             else
-              name = scanner[1].to_sym
-              re << pre + Const::REGEXP_NAMED_CAPTURE % [name, requirements[name]]
+              name = scanner[2].to_sym
+              requirement = scanner[1] == ':' ?
+                requirements[name] : '.+'
+              re << pre + Const::REGEXP_NAMED_CAPTURE % [name, requirement]
             end
           end
           re << scanner.rest
           str.replace(re)
-        end
-
-        def parse_glob_segment!(str)
-          if str =~ /\\\\(\*\w+)$/
-            str.sub!(/\\\\\*\w+$/, $1)
-          else
-            str.sub!(/\\\*(\w+)$/, Const::REGEXP_NAMED_CAPTURE % ['\1', '.+'])
-          end
         end
 
         def parse_optional_segments!(str)
