@@ -162,9 +162,12 @@ module Rack
           char = scanner.getch
           cur  = stack.last
 
-          escaped = cur.last.is_a?(String) && cur.last == '\\'
+          escaped = cur.last.is_a?(String) && cur.last[-1, 1] == '\\'
 
-          if char == '('
+          if escaped
+            cur.push('') unless cur.last.is_a?(String)
+            cur.last << char
+          elsif char == '('
             name = names[capture_index]
             capture = Capture.new(:name => name)
             capture_index += 1

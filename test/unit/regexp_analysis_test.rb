@@ -106,6 +106,20 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     :optional => true), '$'], extract_regexp_parts(re)
   end
 
+  def test_escaped_optional_capture
+    re = parse_segmented_string('/foo/\(bar', {}, %w( / . ? ))
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^/foo/\(bar$}'), re
+    else
+      assert_equal %r{^/foo/\(bar$}, re
+    end
+
+    assert_equal ['foo', '(bar', '$'], extract_static_segments(re)
+    assert_equal ['/foo/(bar'], build_generation_segments(re)
+    assert_equal ['/foo/\\(bar', '$'], extract_regexp_parts(re)
+  end
+
   def test_leading_dynamic_segment
     re = parse_segmented_string('/:foo/bar(.:format)', {}, %w( / . ? ))
 
