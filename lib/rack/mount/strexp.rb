@@ -61,7 +61,11 @@ module Rack
         end
 
         def parse_glob_segment!(str)
-          str.sub!(/\\\*(\w+)$/, Const::REGEXP_NAMED_CAPTURE % ['\1', '.+'])
+          if str =~ /\\\\(\*\w+)$/
+            str.sub!(/\\\\\*\w+$/, $1)
+          else
+            str.sub!(/\\\*(\w+)$/, Const::REGEXP_NAMED_CAPTURE % ['\1', '.+'])
+          end
         end
 
         def parse_optional_segments!(str)

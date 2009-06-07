@@ -68,6 +68,10 @@ class StrexpTest < Test::Unit::TestCase
     end
   end
 
+  def test_escaped_glob_segment
+    assert_equal %r{^src/\*files$}, Strexp.compile('src/\*files')
+  end
+
   def test_optional_segment
     assert_equal %r{^/foo(/bar)?$}, Strexp.compile('/foo(/bar)')
   end
