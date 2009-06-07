@@ -1,9 +1,6 @@
 module Rack
   module Mount
     class Strexp < Regexp
-      GLOB_REGEXP = /\\\*(\w+)/
-      OPTIONAL_SEGMENT_REGEXP = /\\\((.+?)\\\)/
-
       # Parses segmented string expression and converts it into a Regexp
       #
       #   Strexp.compile('foo')
@@ -26,25 +23,19 @@ module Rack
       def initialize(str, requirements = {}, separators = [])
         return super(str) if str.is_a?(Regexp)
 
-        str = Regexp.escape(str.dup)
-        requirements = normalize_requirements!(requirements, separators)
+        re = Regexp.escape(str)
+        requirements ||= {}
 
-        re = parse_dynamic_segments(str, requirements)
-
-        if m = re.match(GLOB_REGEXP)
-          re.sub!(GLOB_REGEXP, Const::REGEXP_NAMED_CAPTURE % [$1, '.+'])
-        end
-
-        while re =~ OPTIONAL_SEGMENT_REGEXP
-          re.gsub!(OPTIONAL_SEGMENT_REGEXP, '(\1)?')
-        end
+        normalize_requirements!(requirements, separators)
+        parse_dynamic_segments!(re, requirements)
+        parse_glob_segment!(re)
+        parse_optional_segments!(re)
 
         super("^#{re}$")
       end
 
       private
         def normalize_requirements!(requirements, separators)
-          requirements ||= {}
           requirements.each do |key, value|
             requirements[key] = value.is_a?(Regexp) ?
               value.source : Regexp.escape(value)
@@ -54,7 +45,7 @@ module Rack
           requirements
         end
 
-        def parse_dynamic_segments(str, requirements)
+        def parse_dynamic_segments!(str, requirements)
           re, pos, scanner = '', 0, StringScanner.new(str)
           while scanner.scan_until(/:([a-zA-Z_]\w*)/)
             pre, pos = scanner.pre_match[pos..-1], scanner.pos
@@ -66,7 +57,17 @@ module Rack
             end
           end
           re << scanner.rest
-          re
+          str.replace(re)
+        end
+
+        def parse_glob_segment!(str)
+          str.sub!(/\\\*(\w+)$/, Const::REGEXP_NAMED_CAPTURE % ['\1', '.+'])
+        end
+
+        def parse_optional_segments!(str)
+          while str =~ /\\\((.+?)\\\)/
+            str.gsub!(/\\\((.+?)\\\)/, '(\1)?')
+          end
         end
     end
   end
