@@ -19,6 +19,23 @@ class StrexpTest < Test::Unit::TestCase
     end
   end
 
+  def test_dynamic_segment_with_leading_underscore
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{^(?<_foo>.+)\.example\.com$}'), Strexp.compile(':_foo.example.com')
+    else
+      assert_equal %r{^(?:<_foo>.+)\.example\.com$}, Strexp.compile(':_foo.example.com')
+    end
+  end
+
+  def test_skips_invalid_group_names
+    assert_equal %r{^:123\.example\.com$}, Strexp.compile(':123.example.com')
+    assert_equal %r{^:\$\.example\.com$}, Strexp.compile(':$.example.com')
+  end
+
+  def test_escaped_dynamic_segment
+    assert_equal %r{^:foo\.example\.com$}, Strexp.compile('\:foo.example.com')
+  end
+
   def test_dynamic_segment_with_separators
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{^foo/(?<bar>[^/]+)$}'), Strexp.compile('foo/:bar', {}, ['/'])
