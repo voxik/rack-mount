@@ -62,9 +62,19 @@ module Rack
         end
 
         def parse_optional_segments!(str)
-          while str =~ /\\\((.+?)\\\)/
-            str.gsub!(/\\\((.+?)\\\)/, '(\1)?')
+          re, pos, scanner = '', 0, StringScanner.new(str)
+          while scanner.scan_until(/\\\(|\\\)/)
+            pre, pos = scanner.pre_match[pos..-1], scanner.pos
+            if pre =~ /(.*)\\\\$/
+              re << $1 + scanner.matched
+            elsif scanner.matched == '\\('
+              re << pre + '('
+            elsif scanner.matched == '\\)'
+              re << pre + ')?'
+            end
           end
+          re << scanner.rest
+          str.replace(re)
         end
     end
   end

@@ -108,19 +108,16 @@ class StrexpTest < Test::Unit::TestCase
     assert_equal %r{^(/foo)?(/bar)?(/baz)?$}, Strexp.compile('(/foo)(/bar)(/baz)')
   end
 
-  # Pending
-  # def test_escapes_optional_segment_parenthesis
-  #   assert_equal %r{^/foo\(/bar\)$}, Strexp.compile('/foo\(/bar\)')
-  # end
+  def test_escapes_optional_segment_parenthesis
+    assert_equal %r{^/foo\(/bar\)$}, Strexp.compile('/foo\(/bar\)')
+  end
 
-  # Pending
-  # def test_escapes_one_optional_segment_parenthesis
-  #   assert_equal %r{^/foo\((/bar)?$}, Strexp.compile('/foo\((/bar)')
-  # end
+  def test_escapes_one_optional_segment_parenthesis
+    assert_equal %r{^/foo\((/bar)?$}, Strexp.compile('/foo\((/bar)')
+  end
 
-  # Pending
-  # def test_raises_argument_error_if_optional_segment_parenthesises_are_unblanced
-  #   assert_raise(ArgumentError) { Strexp.compile('/foo((/bar)') }
-  #   assert_raise(ArgumentError) { Strexp.compile('/foo(/bar))') }
-  # end
+  def test_raises_regexp_error_if_optional_segment_parenthesises_are_unblanced
+    assert_raise(RegexpError) { Strexp.compile('/foo((/bar)') }
+    assert_raise(RegexpError) { Strexp.compile('/foo(/bar))') }
+  end
 end
