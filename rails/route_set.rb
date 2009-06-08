@@ -135,7 +135,6 @@ module ActionController
         expire_on.each { |k, v| recall.delete(k) unless v }
         options = recall.merge(options)
         options.each { |k, v| options[k] = v.to_param }
-        puts [named_route, options].inspect
         @set.url_for(named_route, options)
       end
 
