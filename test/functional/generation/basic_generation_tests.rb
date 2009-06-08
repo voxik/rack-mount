@@ -11,6 +11,8 @@ module BasicGenerationTests
 
     assert_equal '/regexp/bar/abc/123', @app.url_for(:complex_regexp, :action => 'abc', :id => '123')
     assert_equal nil, @app.url_for(:complex_regexp_fail)
+
+    assert_equal '/prefix', @app.url_for(:prefix)
   end
 
   def test_url_for_with_hash

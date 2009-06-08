@@ -264,7 +264,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   def test_prefix_regexp
     re = %r{^/prefix}
     assert_equal ['prefix'], extract_static_segments(re)
-    assert_equal [], build_generation_segments(re)
+    assert_equal ['/prefix'], build_generation_segments(re)
     assert_equal ['/prefix'], extract_regexp_parts(re)
   end
 
