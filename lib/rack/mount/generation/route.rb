@@ -122,7 +122,7 @@ module Rack
               when DynamicSegment
                 value = params[segment.name] || defaults[segment.name]
                 if value && segment =~ value.to_s
-                  value.to_s
+                  URI.escape(value.to_s)
                 else
                   return
                 end

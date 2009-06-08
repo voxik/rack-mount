@@ -5,6 +5,10 @@ module BasicGenerationTests
     assert_equal '/geocode/60622', @app.url_for(:geocode, :postalcode => '60622')
     assert_equal '/', @app.url_for(:root)
 
+    assert_equal '/people/1', @app.url_for(:person, :id => '1')
+    assert_equal '/people/%231', @app.url_for(:person, :id => '#1')
+    assert_equal '/people/number%20one', @app.url_for(:person, :id => 'number one')
+
     assert_equal '/global/export', @app.url_for(:export_request)
     assert_equal '/global/hide_notice', @app.url_for(:hide_notice)
     assert_equal '/export/1/file.txt', @app.url_for(:export_download, :id => '1', :file => 'file.txt')

@@ -18,3 +18,5 @@ module Rack #:nodoc:
     autoload :Utils, 'rack/mount/utils'
   end
 end
+
+autoload :URI, 'uri'

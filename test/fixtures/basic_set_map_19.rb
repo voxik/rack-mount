@@ -2,10 +2,10 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => '/people', :request_method => 'GET' }, { :controller => 'people', :action => 'index' })
   set.add_route(EchoApp, { :path_info => '/people', :request_method => 'POST' }, { :controller => 'people', :action => 'create' })
   set.add_route(EchoApp, { :path_info => '/people/new', :request_method => 'GET' }, { :controller => 'people', :action => 'new' })
-  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)/edit$}, :request_method => 'GET' }, { :controller => 'people', :action => 'edit' })
-  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'GET' }, { :controller => 'people', :action => 'show' })
-  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'PUT' }, { :controller => 'people', :action => 'update' })
-  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[a-z0-9]+)$}, :request_method => 'DELETE' }, { :controller => 'people', :action => 'destroy' })
+  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[^/]+)/edit$}, :request_method => 'GET' }, { :controller => 'people', :action => 'edit' })
+  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[^/]+)$}, :request_method => 'GET' }, { :controller => 'people', :action => 'show' }, :person)
+  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[^/]+)$}, :request_method => 'PUT' }, { :controller => 'people', :action => 'update' })
+  set.add_route(EchoApp, { :path_info => %r{^/people/(?<id>[^/]+)$}, :request_method => 'DELETE' }, { :controller => 'people', :action => 'destroy' })
 
   set.add_route(EchoApp, { :path_info => '/' }, { :controller => 'homepage' }, :root)
 
