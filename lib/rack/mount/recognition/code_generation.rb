@@ -19,39 +19,44 @@ module Rack
                 m << 'old_script_name = env[Const::SCRIPT_NAME].dup'
                 m << 'path_name_match = nil'
                 m << 'routing_args = route.defaults.dup'
-                m << <<-RUBY_EVAL
-if route.conditions.all? { |method, condition|
-    value = req.send(method)
-    if m = value.match(condition.to_regexp)
-      matches = m.captures
-      condition.named_captures.each { |k, i|
-        if v = matches[i]
-          routing_args[k] = v
-        end
-      }
-      if condition.is_a?(PathCondition) && !condition.anchored?
-        path_name_match = m.to_s
-      end
-      true
-    else
-      false
-    end
-  }
-    if path_name_match
-      env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO].sub(path_name_match, Const::EMPTY_STRING))
-      env[Const::PATH_INFO] = Const::EMPTY_STRING if env[Const::PATH_INFO] == Const::SLASH
-      env[Const::SCRIPT_NAME] = Utils.normalize_path(env[Const::SCRIPT_NAME].to_s + path_name_match)
-    end
-    env[#{@parameters_key.inspect}] = routing_args
-    response = route.app.call(env)
-    env[Const::PATH_INFO] = old_path_info
-    env[Const::SCRIPT_NAME] = old_script_name
-    return response unless response[0] == #{@catch}
-  end
-RUBY_EVAL
+
+                m << matchers = MetaMethod::Condition.new do |body|
+                  body << path_name_condition = MetaMethod::Condition.new do |b|
+                    b << "env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO].sub(path_name_match, Const::EMPTY_STRING))"
+                    b << "env[Const::PATH_INFO] = Const::EMPTY_STRING if env[Const::PATH_INFO] == Const::SLASH"
+                    b << "env[Const::SCRIPT_NAME] = Utils.normalize_path(env[Const::SCRIPT_NAME].to_s + path_name_match)"
+                  end
+                  path_name_condition << MetaMethod::Block.new("path_name_match")
+                  body << "env[#{@parameters_key.inspect}] = routing_args"
+                  body << "response = route.app.call(env)"
+                  body << "env[Const::PATH_INFO] = old_path_info"
+                  body << "env[Const::SCRIPT_NAME] = old_script_name"
+                  body << "return response unless response[0] == #{@catch}"
+                end
+
+                route.conditions.each do |method, condition|
+                  matchers << MetaMethod::Block.new do |b|
+                    b << "value = req.#{method}"
+                    b << "if m = value.match(#{condition.inspect})"
+                    b << "  matches = m.captures"
+                    b << "  #{condition.named_captures.inspect}.each { |k, i|"
+                    b << "    if v = matches[i]"
+                    b << "      routing_args[k] = v"
+                    b << "    end"
+                    b << "  }"
+                    if condition.is_a?(PathCondition) && !condition.anchored?
+                      b << "  path_name_match = m.to_s"
+                    end
+                    b << "  true"
+                    b << "else"
+                    b << "  false"
+                    b << "end"
+                  end
+                end
               }
 
               m << 'nil'
+              # puts "\n#{m.inspect}"
               list.instance_eval(m, __FILE__, __LINE__)
             end
 

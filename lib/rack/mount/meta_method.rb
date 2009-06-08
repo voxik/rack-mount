@@ -1,10 +1,77 @@
 module Rack
   module Mount
     class MetaMethod
+      class Block < Array
+        def initialize(*parts)
+          super()
+          replace(parts)
+          yield(self) if block_given?
+        end
+
+        def multiline?
+          length > 1
+        end
+
+        def inspect(indented = 2)
+          return '' if empty?
+          space = ' ' * indented
+          space + map { |p|
+            if p.is_a?(Condition)
+              p.inspect(indented)
+            else
+              p
+            end
+          }.join("\n#{space}")
+        end
+
+        def to_str
+          map { |p| p.to_str }.join('; ')
+        end
+      end
+
+      class Condition
+        attr_accessor :body
+
+        def initialize
+          @conditions = []
+          @body = Block.new
+          yield(@body) if block_given?
+        end
+
+        def <<(condition)
+          @conditions << condition
+        end
+
+        def inspect(indented = 2)
+          return @body.inspect(indented) if @conditions.empty?
+          space = ' ' * indented
+          str = 'if '
+          str << @conditions.map { |b|
+            b.multiline? ?
+              "begin\n#{b.inspect(indented + 4)}\n#{space}  end" :
+              b.inspect(0)
+          }.join(' && ')
+          str << "\n#{@body.inspect(indented + 2)}" if @body.any?
+          str << "\n#{space}end"
+          str
+        end
+
+        def to_str
+          return @body.to_str if @conditions.empty?
+          str = 'if '
+          str << @conditions.map { |b|
+            b.multiline? ? "(#{b.to_str})" : b.to_str
+          }.join(' && ')
+          str << "; #{@body.to_str}" if @body.any?
+          str << "; end"
+          str
+        end
+      end
+
       def initialize(sym, *args)
         @sym = sym
         @args = args
-        @body = []
+        @body = Block.new
       end
 
       def <<(line)
@@ -12,19 +79,21 @@ module Rack
       end
 
       def inspect
-<<-RUBY_EVAL
-def #{@sym}(#{@args.join(', ')})
-  #{@body.join("\n  ")}
-end
-RUBY_EVAL
+        str = ""
+        str << "def #{@sym}"
+        str << "(#{@args.join(', ')})" if @args.any?
+        str << "\n#{@body.inspect}" if @body.any?
+        str << "\nend\n"
+        str
       end
 
       def to_str
-        <<-RUBY_EVAL
-          def #{@sym}(#{@args.join(', ')})
-            #{@body.join('; ')}
-          end
-        RUBY_EVAL
+        str = []
+        str << "def #{@sym}"
+        str << "(#{@args.join(', ')})" if @args.any?
+        str << "\n#{@body.to_str}" if @body.any?
+        str << "\nend"
+        str.join
       end
     end
   end
