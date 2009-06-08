@@ -7,58 +7,60 @@ module Rack
           super
         end
 
-        if ENV[Const::RACK_MOUNT_DEBUG]
-          def instance_eval(*args)
-            puts
-            puts "#{args[1]}##{args[2]}"
-            puts args[0]
-            puts
-
-            super
-          end
-        end
-
         private
           def optimize_call!
             recognition_graph.containers_with_default.each do |list|
-              body = (0...list.length).zip(list).map { |i, route|
-                <<-RUBY_EVAL
-                  route = self[#{i}]
-                  routing_args = route.defaults.dup
-                  if #{conditional_statement(route)}
-                    env[#{@parameters_key.inspect}] = routing_args
-                    result = route.app.call(env)
-                    return result unless result[0] == #{@catch}
-                  end
-                RUBY_EVAL
-              }.join
+              m = MetaMethod.new(:optimized_each, :req)
+              m << 'env = req.env'
 
-              method = <<-RUBY_EVAL, __FILE__, __LINE__
-                def optimized_each(req)
-                  env = req.env
-#{body}
-                  nil
-                end
-              RUBY_EVAL
+              list.each_with_index { |route, i|
+                m << "route = self[#{i}]"
+                m << 'old_path_info = env[Const::PATH_INFO].dup'
+                m << 'old_script_name = env[Const::SCRIPT_NAME].dup'
+                m << 'path_name_match = nil'
+                m << 'routing_args = route.defaults.dup'
+                m << <<-RUBY_EVAL
+if route.conditions.all? { |method, condition|
+    value = req.send(method)
+    if m = value.match(condition.to_regexp)
+      matches = m.captures
+      condition.named_captures.each { |k, i|
+        if v = matches[i]
+          routing_args[k] = v
+        end
+      }
+      if condition.is_a?(PathCondition) && !condition.anchored?
+        path_name_match = m.to_s
+      end
+      true
+    else
+      false
+    end
+  }
+    if path_name_match
+      env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO].sub(path_name_match, Const::EMPTY_STRING))
+      env[Const::PATH_INFO] = Const::EMPTY_STRING if env[Const::PATH_INFO] == Const::SLASH
+      env[Const::SCRIPT_NAME] = Utils.normalize_path(env[Const::SCRIPT_NAME].to_s + path_name_match)
+    end
+    env[#{@parameters_key.inspect}] = routing_args
+    response = route.app.call(env)
+    env[Const::PATH_INFO] = old_path_info
+    env[Const::SCRIPT_NAME] = old_script_name
+    return response unless response[0] == #{@catch}
+  end
+RUBY_EVAL
+              }
 
-              puts method if ENV[Const::RACK_MOUNT_DEBUG]
-              list.instance_eval(*method)
+              m << 'nil'
+              list.instance_eval(m, __FILE__, __LINE__)
             end
 
-            instance_eval(<<-RUBY_EVAL, __FILE__, __LINE__)
-              def call(env)
-                env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
-                cache = {}
-                req = #{@request_class.name}.new(env)
-                @recognition_graph[#{convert_keys_to_method_calls}].optimized_each(req) || @throw
-              end
-            RUBY_EVAL
-          end
-
-          def conditional_statement(route)
-            route.conditions.values.map { |condition|
-              "route.conditions[:#{condition.method}].match!(req.#{condition.method}, env, routing_args)"
-            }.compact.join(' && ')
+            method = MetaMethod.new(:call, :env)
+            method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
+            method << 'cache = {}'
+            method << "req = #{@request_class.name}.new(env)"
+            method << "@recognition_graph[#{convert_keys_to_method_calls}].optimized_each(req) || @throw"
+            instance_eval(method, __FILE__, __LINE__)
           end
 
           def convert_keys_to_method_calls

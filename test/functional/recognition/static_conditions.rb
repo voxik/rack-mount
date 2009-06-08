@@ -122,14 +122,6 @@ module RecognitionTests
       assert_equal({ :controller => 'slash', :action => 'repeated' }, routing_args)
     end
 
-    def test_path_prefix
-      get '/prefix/foo/bar/1'
-      assert_success
-      assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
-      assert_equal '/foo/bar/1', @env['PATH_INFO']
-      assert_equal '/prefix', @env['SCRIPT_NAME']
-    end
-
     def test_not_found
       get '/admin/widgets/show/random'
       assert_not_found

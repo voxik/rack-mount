@@ -23,6 +23,10 @@ module Rack
         @pattern = RegexpWithNamedGroups.new(@pattern)
       end
 
+      def anchored?
+        Utils.regexp_anchored?(@pattern)
+      end
+
       def inspect
         to_regexp.inspect
       end

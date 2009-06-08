@@ -2,7 +2,6 @@ module Rack
   module Mount
     module Const #:nodoc:
       RACK_ROUTING_ARGS = 'rack.routing_args'.freeze
-      RACK_MOUNT_DEBUG  = 'RACKMOUNT_DEBUG'.freeze
 
       begin
         eval('/(?<foo>.*)/').named_captures

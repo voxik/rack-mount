@@ -68,6 +68,7 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
+  set.add_route(lambda { |env| Rack::Mount::Const::NOT_FOUND_RESPONSE }, { :path_info => %r{^/prefix} })
   set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
 
   set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :controller => 'foo' })

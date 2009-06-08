@@ -5,6 +5,7 @@ module Rack #:nodoc:
     autoload :Condition, 'rack/mount/condition'
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'
+    autoload :MetaMethod, 'rack/mount/meta_method'
     autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
     autoload :PathCondition, 'rack/mount/condition'
