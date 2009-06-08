@@ -96,13 +96,22 @@ class MetaMethodConditionTest < Test::Unit::TestCase
   end
 
   def test_condition_with_body_block
-    c = Condition.new do |body|
+    c = Condition.new('true') do |body|
       body << 'foo'
-      body << "bar"
+      body << 'bar'
     end
-    c << Block.new('true')
     assert_equal "if true; foo; bar; end", c.to_str
     assert_equal "if true\n    foo\n    bar\n  end", c.inspect
+  end
+
+  def test_condition_with_else_body
+    c = Condition.new('true') do |body|
+      body << 'foo'
+      body << 'bar'
+    end
+    c.else = Block.new('baz')
+    assert_equal "if true; foo; bar; else; baz; end", c.to_str
+    assert_equal "if true\n    foo\n    bar\n  else\n    baz\n  end", c.inspect
   end
 
   def test_multiple_conditions

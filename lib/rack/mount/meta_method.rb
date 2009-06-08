@@ -3,7 +3,6 @@ module Rack
     class MetaMethod
       class Block < Array
         def initialize(*parts)
-          super()
           replace(parts)
           yield(self) if block_given?
         end
@@ -30,11 +29,12 @@ module Rack
       end
 
       class Condition
-        attr_accessor :body
+        attr_accessor :body, :else
 
-        def initialize
-          @conditions = []
+        def initialize(*conditions)
+          @conditions = conditions.map { |c| c.is_a?(Block) ? c : Block.new(c) }
           @body = Block.new
+          @else = Block.new
           yield(@body) if block_given?
         end
 
@@ -52,6 +52,9 @@ module Rack
               b.inspect(0)
           }.join(' && ')
           str << "\n#{@body.inspect(indented + 2)}" if @body.any?
+          if @else.any?
+            str << "\n#{space}else\n#{@else.inspect(indented + 2)}"
+          end
           str << "\n#{space}end"
           str
         end
@@ -63,6 +66,9 @@ module Rack
             b.multiline? ? "(#{b.to_str})" : b.to_str
           }.join(' && ')
           str << "; #{@body.to_str}" if @body.any?
+          if @else.any?
+            str << "; else; #{@else.to_str}"
+          end
           str << "; end"
           str
         end
