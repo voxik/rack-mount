@@ -122,27 +122,26 @@ module ActionController
         named_routes[name.to_sym] = add_route(path, options)
       end
 
-      def generate_extras(options, recall = {})
-        path = generate(options, recall)
-        uri = URI(path)
-        extras = uri.query ?
-          uri.query.split('&').map { |v| v.split('=').first.to_sym } :
-          []
-        [uri.path, extras]
-      end
-
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
+
         expire_on = build_expiry(options, recall)
         expire_on.each { |k, v| recall.delete(k) unless v }
+
         options = recall.merge(options)
         options.each { |k, v| options[k] = v.to_param }
         options[:action] ||= 'index' if options[:controller]
-        @set.url_for(named_route, options)
-      end
 
-      def url_for(*args)
-        @set.url_for(*args)
+        path = @set.url_for(named_route, options)
+        if method == :generate_extras
+          uri = URI(path)
+          extras = uri.query ?
+            uri.query.split('&').map { |v| v.split('=').first.to_sym } :
+            []
+          [uri.path, extras]
+        else
+          path
+        end
       end
 
       def recognize_path(path, environment = {})
