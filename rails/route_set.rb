@@ -101,6 +101,7 @@ module ActionController
             defaults[k.to_sym] = options.delete(k)
           end
         end
+        defaults[:action] ||= 'index' if defaults[:controller]
 
         if path.is_a?(String)
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
@@ -121,12 +122,13 @@ module ActionController
         named_routes[name.to_sym] = add_route(path, options)
       end
 
-      def extra_keys(options, recall = {})
-        options
-      end
-
       def generate_extras(options, recall = {})
-        raise NotImplemented
+        path = generate(options, recall)
+        uri = URI(path)
+        extras = uri.query ?
+          uri.query.split('&').map { |v| v.split('=').first.to_sym } :
+          []
+        [uri.path, extras]
       end
 
       def generate(options, recall = {}, method = :generate)
@@ -135,6 +137,7 @@ module ActionController
         expire_on.each { |k, v| recall.delete(k) unless v }
         options = recall.merge(options)
         options.each { |k, v| options[k] = v.to_param }
+        options[:action] ||= 'index' if options[:controller]
         @set.url_for(named_route, options)
       end
 
