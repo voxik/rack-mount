@@ -81,11 +81,6 @@ module ActionController
       def add_route(path, options = {})
         clear! unless @set
 
-        if path.is_a?(String)
-          path = path.gsub('.:format', '(.:format)')
-          path = optionalize_trailing_dynamic_segments(path)
-        end
-
         if conditions = options.delete(:conditions)
           method = conditions.delete(:method).to_s.upcase
         end
@@ -101,9 +96,15 @@ module ActionController
             defaults[k.to_sym] = options.delete(k)
           end
         end
+
+        possible_names = Routing.possible_controllers.collect { |n| Regexp.escape(n) }
+        requirements[:controller] ||= Regexp.union(*possible_names)
+
         defaults[:action] ||= 'index' if defaults[:controller]
 
         if path.is_a?(String)
+          path = path.gsub('.:format', '(.:format)')
+          path = optionalize_trailing_dynamic_segments(path, requirements)
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
           path = ::Rack::Mount::Utils.normalize_path(path)
           path = ::Rack::Mount::Strexp.compile(path, requirements, %w( / . ? ))
@@ -160,7 +161,7 @@ module ActionController
       end
 
       private
-        def optionalize_trailing_dynamic_segments(path)
+        def optionalize_trailing_dynamic_segments(path, requirements)
           path = (path =~ /^\//) ? path.dup : "/#{path}"
           optional, segments = true, []
 
@@ -169,6 +170,13 @@ module ActionController
           length = old_segments.length
 
           old_segments.reverse.each_with_index do |segment, index|
+            requirements.keys.each do |required|
+              if segment =~ /#{required}/
+                optional = false
+                break
+              end
+            end
+
             if optional && !(segment =~ /^:\w+$/) && !(segment =~ /^:\w+\(\.:format\)$/)
               optional = false
             end

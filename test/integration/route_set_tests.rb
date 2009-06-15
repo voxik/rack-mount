@@ -20,16 +20,16 @@ module RouteSetTests
   def test_recognize_path
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
     assert_equal({:controller => 'people', :action => 'create'}, @routes.recognize_path('/people', :method => :post))
-    # assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people', :method => :put) }
-    # assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people', :method => :delete) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people', :method => :put) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people', :method => :delete) }
     assert_equal({:controller => 'people', :action => 'new'}, @routes.recognize_path('/people/new', :method => :get))
-    # assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/new', :method => :post) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/new', :method => :post) }
     assert_equal({:controller => 'people', :action => 'show', :id => '1'}, @routes.recognize_path('/people/1', :method => :get))
-    # assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/1', :method => :post) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1', :method => :post) }
     assert_equal({:controller => 'people', :action => 'update', :id => '1'}, @routes.recognize_path('/people/1', :method => :put))
     assert_equal({:controller => 'people', :action => 'destroy', :id => '1'}, @routes.recognize_path('/people/1', :method => :delete))
     assert_equal({:controller => 'people', :action => 'edit', :id => '1'}, @routes.recognize_path('/people/1/edit', :method => :get))
-    # assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/1/edit', :method => :post) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
 
     assert_equal({:controller => 'posts', :action => 'index'}, @routes.recognize_path('/posts', :method => :get))
     assert_equal({:controller => 'posts', :action => 'index'}, @routes.recognize_path('/posts/index', :method => :get))
@@ -51,4 +51,12 @@ module RouteSetTests
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')
     # assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
   end
+
+  private
+    def assert_raise(e)
+      yield
+      flunk
+    rescue e
+      assert true
+    end
 end
