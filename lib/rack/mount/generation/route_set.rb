@@ -28,8 +28,30 @@ module Rack
         #   url_for(:controller => "people", :action => "show", :id => "1")
         #     # => "/people/1"
         def url_for(*args)
-          params = args.last.is_a?(Hash) ? args.pop : {}
-          named_route = args.shift
+          case args.length
+          when 3
+            named_route, params, recall = args
+          when 2
+            if args[0].is_a?(Hash) && args[1].is_a?(Hash)
+              params, recall = args
+            else
+              named_route, params = args
+            end
+          when 1
+            if args[0].is_a?(Hash)
+              params = args[0]
+            else
+              named_route = args[0]
+            end
+          else
+            raise ArgumentError
+          end
+
+          named_route ||= nil
+          params ||= {}
+          recall ||= {}
+          merged = recall.merge(params)
+
           route = nil
 
           if named_route
@@ -38,14 +60,14 @@ module Rack
             end
           else
             keys = @generation_keys.map { |key|
-              if k = params[key]
+              if k = merged[key]
                 k.to_s
               else
                 nil
               end
             }
             @generation_graph[*keys].each do |r|
-              if r.defaults.all? { |k, v| params[k] == v }
+              if r.defaults.all? { |k, v| merged[k] == v }
                 route = r
                 break
               end

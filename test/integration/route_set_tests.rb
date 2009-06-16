@@ -39,8 +39,12 @@ module RouteSetTests
 
   def test_generate
     assert_equal '/people', @routes.generate(:use_route => 'people')
+    assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
+    assert_equal '/people', @routes.generate({:use_route => 'people', :controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'index'})
     assert_equal '/people', @routes.generate(:controller => 'people')
     assert_equal '/people', @routes.generate(:controller => 'people', :action => 'index')
+    assert_equal '/people', @routes.generate({:action => 'index'}, {:controller => 'people'})
+    assert_equal '/people', @routes.generate({:action => 'index'}, {:controller => 'people', :action => 'show', :id => '1'})
     assert_equal '/people/new', @routes.generate(:use_route => 'new_person')
     assert_equal '/people/new', @routes.generate(:controller => 'people', :action => 'new')
     assert_equal '/people/1', @routes.generate(:use_route => 'person', :id => '1')
@@ -49,7 +53,9 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
 
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')
-    # assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
+    assert_equal '/posts', @routes.generate(:controller => 'posts')
+    assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
+    assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
   end
 
   private

@@ -126,14 +126,12 @@ module ActionController
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
 
-        expire_on = build_expiry(options, recall)
-        expire_on.each { |k, v| recall.delete(k) unless v }
-
-        options = recall.merge(options)
+        merged = options.merge(recall)
         options.each { |k, v| options[k] = v.to_param }
-        options[:action] ||= 'index' if options[:controller]
+        recall[:action] ||= 'index' if merged[:controller]
+        recall[:action] = options.delete(:action) if options[:action] == 'index'
 
-        path = @set.url_for(named_route, options)
+        path = @set.url_for(named_route, options, recall)
         if method == :generate_extras
           uri = URI(path)
           extras = uri.query ?
