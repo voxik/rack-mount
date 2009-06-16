@@ -58,6 +58,22 @@ module RouteSetTests
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
   end
 
+  def test_extras
+    assert_equal [], @routes.extra_keys(:controller => 'people')
+    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :foo => 'bar')
+    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'index')
+    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :action => 'index', :foo => 'bar')
+    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'new')
+    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :action => 'new', :foo => 'bar')
+    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'show', :id => '1')
+    assert_equal [:bar, :foo], @routes.extra_keys(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+
+    assert_equal [], @routes.extra_keys(:controller => 'posts', :action => 'show', :id => '1')
+    assert_equal [:bar, :foo], @routes.extra_keys(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+    assert_equal [], @routes.extra_keys(:controller => 'posts', :action => 'index')
+    assert_equal [:foo], @routes.extra_keys(:controller => 'posts', :action => 'index', :foo => 'bar')
+  end
+
   private
     def assert_raise(e)
       yield
