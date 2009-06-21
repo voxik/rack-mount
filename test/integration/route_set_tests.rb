@@ -91,6 +91,8 @@ module RouteSetTests
     assert_equal '/posts', @routes.generate(:controller => 'posts')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
+
+    assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }
   end
 
   def test_extras
@@ -111,8 +113,8 @@ module RouteSetTests
 
   private
     def assert_raise(e)
-      yield
-      flunk
+      result = yield
+      flunk "Did not raise #{e}, but returned #{result.inspect}"
     rescue e
       assert true
     end

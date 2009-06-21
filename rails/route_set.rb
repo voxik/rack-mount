@@ -141,14 +141,16 @@ module ActionController
         options[:controller] = options[:controller][1..-1] if options[:controller] && options[:controller][0] == ?/
 
         path = @set.url_for(named_route, options, recall)
-        if method == :generate_extras
+        if path && method == :generate_extras
           uri = URI(path)
           extras = uri.query ?
             uri.query.split('&').map { |v| v.split('=').first.to_sym } :
             []
           [uri.path, extras]
-        else
+        elsif path
           path
+        else
+          raise RoutingError, "No route matches #{options.inspect}"
         end
       end
 
