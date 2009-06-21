@@ -1,7 +1,12 @@
 require 'action_controller'
 
 module RouteSetTests
+  Model = Struct.new(:to_param)
+
   Mapping = lambda { |map|
+    map.namespace :admin do |admin|
+      admin.resources :users
+    end
     map.resources :people
     map.connect ':controller/:action/:id'
   }
@@ -18,6 +23,19 @@ module RouteSetTests
   end
 
   def test_recognize_path
+    assert_equal({:controller => 'admin/users', :action => 'index'}, @routes.recognize_path('/admin/users', :method => :get))
+    assert_equal({:controller => 'admin/users', :action => 'create'}, @routes.recognize_path('/admin/users', :method => :post))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users', :method => :put) }
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users', :method => :delete) }
+    assert_equal({:controller => 'admin/users', :action => 'new'}, @routes.recognize_path('/admin/users/new', :method => :get))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users/new', :method => :post) }
+    assert_equal({:controller => 'admin/users', :action => 'show', :id => '1'}, @routes.recognize_path('/admin/users/1', :method => :get))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users/1', :method => :post) }
+    assert_equal({:controller => 'admin/users', :action => 'update', :id => '1'}, @routes.recognize_path('/admin/users/1', :method => :put))
+    assert_equal({:controller => 'admin/users', :action => 'destroy', :id => '1'}, @routes.recognize_path('/admin/users/1', :method => :delete))
+    assert_equal({:controller => 'admin/users', :action => 'edit', :id => '1'}, @routes.recognize_path('/admin/users/1/edit', :method => :get))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users/1/edit', :method => :post) }
+
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
     assert_equal({:controller => 'people', :action => 'create'}, @routes.recognize_path('/people', :method => :post))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people', :method => :put) }
@@ -35,9 +53,23 @@ module RouteSetTests
     assert_equal({:controller => 'posts', :action => 'index'}, @routes.recognize_path('/posts/index', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show'}, @routes.recognize_path('/posts/show', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show', :id => '1'}, @routes.recognize_path('/posts/show/1', :method => :get))
+    assert_equal({:controller => 'posts', :action => 'create'}, @routes.recognize_path('/posts/create', :method => :post))
+
+    assert_raise(ActionController::RoutingError) { @routes.recognize_path('/', :method => :get) }
+    assert_raise(ActionController::RoutingError) { @routes.recognize_path('/none', :method => :get) }
   end
 
   def test_generate
+    assert_equal '/admin/users', @routes.generate(:use_route => 'admin_users')
+    assert_equal '/admin/users', @routes.generate(:controller => 'admin/users')
+    assert_equal '/admin/users', @routes.generate(:controller => 'admin/users', :action => 'index')
+    assert_equal '/admin/users', @routes.generate({:action => 'index'}, {:controller => 'admin/users'})
+    assert_equal '/admin/users', @routes.generate({:controller => 'users', :action => 'index'}, {:controller => 'admin/accounts'})
+    assert_equal '/people', @routes.generate({:controller => '/people', :action => 'index'}, {:controller => 'admin/accounts'})
+
+    # Passes on AC, but it doesn't seem correct
+    # assert_equal '/admin/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'admin/accounts'})
+
     assert_equal '/people', @routes.generate(:use_route => 'people')
     assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
     assert_equal '/people', @routes.generate({:use_route => 'people', :controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'index'})
@@ -49,6 +81,9 @@ module RouteSetTests
     assert_equal '/people/new', @routes.generate(:controller => 'people', :action => 'new')
     assert_equal '/people/1', @routes.generate(:use_route => 'person', :id => '1')
     assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => '1')
+    assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => 1)
+    assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => Model.new('1'))
+    assert_equal '/people/1', @routes.generate({:action => 'show', :id => '1'}, {:controller => 'people', :action => 'index'})
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
 

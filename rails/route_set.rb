@@ -19,13 +19,13 @@ module ActionController
 
         def call(env)
           params = env[PARAMETERS_KEY]
-          controller = controller(params)
           merge_default_action!(params)
           split_glob_param!(params) if @glob_param
 
           if env['action_controller.recognize']
             [200, {}, params]
           else
+            controller = controller(params)
             if defined? ActionDispatch
               controller.action(params[:action]).call(env)
             else
@@ -130,6 +130,15 @@ module ActionController
         options.each { |k, v| options[k] = v.to_param }
         recall[:action] ||= 'index' if merged[:controller]
         recall[:action] = options.delete(:action) if options[:action] == 'index'
+
+        if !named_route && recall[:controller] && options[:controller] && options[:controller][0] != ?/
+          old_parts = recall[:controller].split('/')
+          new_parts = options[:controller].split('/')
+          parts = old_parts[0..-(new_parts.length + 1)] + new_parts
+          options[:controller] = parts.join('/')
+        end
+
+        options[:controller] = options[:controller][1..-1] if options[:controller] && options[:controller][0] == ?/
 
         path = @set.url_for(named_route, options, recall)
         if method == :generate_extras
