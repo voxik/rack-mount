@@ -29,6 +29,8 @@ module Rack
             end
         end
 
+        attr_reader :required_params
+
         def initialize(*args)
           super
 

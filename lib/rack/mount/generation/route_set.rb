@@ -67,7 +67,8 @@ module Rack
               end
             }
             @generation_graph[*keys].each do |r|
-              if r.defaults.all? { |k, v| merged[k] == v }
+              if r.defaults.all? { |k, v| merged[k] == v } &&
+                  r.required_params.all? { |p| merged.include?(p) }
                 route = r
                 break
               end

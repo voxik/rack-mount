@@ -8,11 +8,13 @@ module RouteSetTests
       admin.resources :users
     end
     map.resources :people
+    map.connect 'pages/:page_id/:controller/:action/:id'
+    map.connect ':controller/ping', :action => 'ping'
     map.connect ':controller/:action/:id'
   }
 
   def setup
-    ActionController::Routing.use_controllers! ['posts']
+    ActionController::Routing.use_controllers! ['posts', 'notes']
     @routes = ActionController::Routing::RouteSet.new
     @routes.draw(&Mapping)
     assert_loaded!
@@ -49,6 +51,11 @@ module RouteSetTests
     assert_equal({:controller => 'people', :action => 'edit', :id => '1'}, @routes.recognize_path('/people/1/edit', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
 
+    assert_equal({:page_id => '1', :controller => 'notes', :action => 'index'}, @routes.recognize_path('/pages/1/notes', :method => :get))
+    assert_equal({:page_id => '1', :controller => 'notes', :action => 'list'}, @routes.recognize_path('/pages/1/notes/list', :method => :get))
+    assert_equal({:page_id => '1', :controller => 'notes', :action => 'show', :id => '2'}, @routes.recognize_path('/pages/1/notes/show/2', :method => :get))
+
+    assert_equal({:controller => 'posts', :action => 'ping'}, @routes.recognize_path('/posts/ping', :method => :get))
     assert_equal({:controller => 'posts', :action => 'index'}, @routes.recognize_path('/posts', :method => :get))
     assert_equal({:controller => 'posts', :action => 'index'}, @routes.recognize_path('/posts/index', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show'}, @routes.recognize_path('/posts/show', :method => :get))
@@ -87,6 +94,7 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
 
+    assert_equal '/posts/ping', @routes.generate(:controller => 'posts', :action => 'ping')
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')
     assert_equal '/posts', @routes.generate(:controller => 'posts')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')

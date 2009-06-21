@@ -29,6 +29,9 @@ module BasicGenerationTests
     assert_equal '/foo', @app.url_for(:controller => 'foo', :action => 'index')
     assert_equal '/foo/bar', @app.url_for(:controller => 'foo_bar', :action => 'index')
     assert_equal '/baz', @app.url_for(:controller => 'baz', :action => 'index')
+
+    assert_equal '/pages/1/users/show/2', @app.url_for(:page_id => '1', :controller => 'users', :action => 'show', :id => '2')
+    assert_equal '/default/users/show/1', @app.url_for(:controller => 'users', :action => 'show', :id => '1')
   end
 
   def test_url_for_with_query_string

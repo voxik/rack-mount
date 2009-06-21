@@ -68,10 +68,11 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
-  set.add_route(lambda { |env| Rack::Mount::Const::NOT_FOUND_RESPONSE }, { :path_info => %r{^/prefix} })
-  set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
-
+  set.add_route(EchoApp, :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :controller => 'foo' })
   set.add_route(EchoApp, :path_info => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :request_method => 'DELETE' }, { :controller => 'global', :action => 'destroy' })
+
+  set.add_route(lambda { |env| Rack::Mount::Const::NOT_FOUND_RESPONSE }, { :path_info => %r{^/prefix} })
+  set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
 end
