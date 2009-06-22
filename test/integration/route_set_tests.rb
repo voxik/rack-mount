@@ -8,6 +8,7 @@ module RouteSetTests
       admin.resources :users
     end
     map.resources :people
+    map.connect 'account/:action', :controller => 'account', :action => 'subscription'
     map.connect 'pages/:page_id/:controller/:action/:id'
     map.connect ':controller/ping', :action => 'ping'
     map.connect ':controller/:action/:id'
@@ -50,6 +51,10 @@ module RouteSetTests
     assert_equal({:controller => 'people', :action => 'destroy', :id => '1'}, @routes.recognize_path('/people/1', :method => :delete))
     assert_equal({:controller => 'people', :action => 'edit', :id => '1'}, @routes.recognize_path('/people/1/edit', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
+
+    assert_equal({:controller => 'account', :action => 'subscription'}, @routes.recognize_path('/account', :method => :get))
+    assert_equal({:controller => 'account', :action => 'subscription'}, @routes.recognize_path('/account/subscription', :method => :get))
+    assert_equal({:controller => 'account', :action => 'billing'}, @routes.recognize_path('/account/billing', :method => :get))
 
     assert_equal({:page_id => '1', :controller => 'notes', :action => 'index'}, @routes.recognize_path('/pages/1/notes', :method => :get))
     assert_equal({:page_id => '1', :controller => 'notes', :action => 'list'}, @routes.recognize_path('/pages/1/notes/list', :method => :get))
@@ -94,29 +99,40 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
 
+    assert_equal '/account', @routes.generate(:controller => 'account', :action => 'subscription')
+    assert_equal '/account/billing', @routes.generate(:controller => 'account', :action => 'billing')
+
     assert_equal '/posts/ping', @routes.generate(:controller => 'posts', :action => 'ping')
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')
     assert_equal '/posts', @routes.generate(:controller => 'posts')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
+    assert_equal '/posts?foo=bar', @routes.generate(:controller => 'posts', :foo => 'bar')
 
     assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }
+  end
+
+  def test_generate_extras
+    assert_equal ['/people', []], @routes.generate_extras(:controller => 'people')
+    assert_equal ['/people', [:foo]], @routes.generate_extras(:controller => 'people', :foo => 'bar')
+    assert_equal ['/people', []], @routes.generate_extras(:controller => 'people', :action => 'index')
+    assert_equal ['/people', [:foo]], @routes.generate_extras(:controller => 'people', :action => 'index', :foo => 'bar')
+    assert_equal ['/people/new', []], @routes.generate_extras(:controller => 'people', :action => 'new')
+    assert_equal ['/people/new', [:foo]], @routes.generate_extras(:controller => 'people', :action => 'new', :foo => 'bar')
+    assert_equal ['/people/1', []], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1')
+    assert_equal ['/people/1', [:foo, :bar]], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+    assert_equal ['/people', [:person]], @routes.generate_extras(:controller => 'people', :action => 'create', :person => { :first_name => 'Josh', :last_name => 'Peek' })
+    assert_equal ['/people', [:people]], @routes.generate_extras(:controller => 'people', :action => 'create', :people => ['Josh', 'Dave'])
+
+    assert_equal ['/posts/show/1', []], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1')
+    assert_equal ['/posts/show/1', [:foo, :bar]], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+    assert_equal ['/posts', []], @routes.generate_extras(:controller => 'posts', :action => 'index')
+    assert_equal ['/posts', [:foo]], @routes.generate_extras(:controller => 'posts', :action => 'index', :foo => 'bar')
   end
 
   def test_extras
     assert_equal [], @routes.extra_keys(:controller => 'people')
     assert_equal [:foo], @routes.extra_keys(:controller => 'people', :foo => 'bar')
-    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'index')
-    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :action => 'index', :foo => 'bar')
-    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'new')
-    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :action => 'new', :foo => 'bar')
-    assert_equal [], @routes.extra_keys(:controller => 'people', :action => 'show', :id => '1')
-    assert_equal [:bar, :foo], @routes.extra_keys(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
-
-    assert_equal [], @routes.extra_keys(:controller => 'posts', :action => 'show', :id => '1')
-    assert_equal [:bar, :foo], @routes.extra_keys(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
-    assert_equal [], @routes.extra_keys(:controller => 'posts', :action => 'index')
-    assert_equal [:foo], @routes.extra_keys(:controller => 'posts', :action => 'index', :foo => 'bar')
   end
 
   private

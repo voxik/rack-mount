@@ -152,6 +152,8 @@ module ActionController
         else
           raise RoutingError, "No route matches #{options.inspect}"
         end
+      rescue Rack::Mount::RoutingError
+        raise RoutingError, "No route matches #{options.inspect}"
       end
 
       def recognize_path(path, environment = {})

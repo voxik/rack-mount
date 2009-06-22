@@ -29,7 +29,7 @@ module Rack
             end
         end
 
-        attr_reader :required_params
+        attr_reader :generation_keys
 
         def initialize(*args)
           super
@@ -40,7 +40,14 @@ module Rack
             []
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
-          }.map { |s| s.name }.freeze if @segments
+          }.map { |s| s.name }.freeze
+          @generation_keys = @defaults.dup
+          @segments.flatten.each { |s|
+            if s.is_a?(DynamicSegment) && @defaults.include?(s.name)
+              @generation_keys.delete(s.name)
+            end
+          }
+          @generation_keys.freeze
         end
 
         def url_for(params = {})
@@ -112,7 +119,7 @@ module Rack
               return Const::EMPTY_STRING if segments.any? { |segment|
                 if segment.is_a?(DynamicSegment)
                   value = params[segment.name] || defaults[segment.name]
-                  value.nil? || segment !~ value.to_s
+                  value.nil? || segment !~ value.to_s || params[segment.name] == defaults[segment.name]
                 end
               }
             end

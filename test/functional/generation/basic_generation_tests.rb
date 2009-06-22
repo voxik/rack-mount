@@ -26,9 +26,15 @@ module BasicGenerationTests
     assert_equal '/global/show', @app.url_for(:controller => 'global', :action => 'show')
     assert_equal '/global/export', @app.url_for(:controller => 'global', :action => 'export')
 
+    assert_equal '/account2', @app.url_for(:controller => 'account2', :action => 'subscription')
+    assert_equal '/account2/billing', @app.url_for(:controller => 'account2', :action => 'billing')
+
     assert_equal '/foo', @app.url_for(:controller => 'foo', :action => 'index')
     assert_equal '/foo/bar', @app.url_for(:controller => 'foo_bar', :action => 'index')
     assert_equal '/baz', @app.url_for(:controller => 'baz', :action => 'index')
+
+    assert_equal '/params_with_defaults', @app.url_for(:prefix => 'params_with_defaults', :controller => 'foo')
+    assert_equal '/params_with_defaults/bar', @app.url_for(:prefix => 'params_with_defaults', :controller => 'bar')
 
     assert_equal '/pages/1/users/show/2', @app.url_for(:page_id => '1', :controller => 'users', :action => 'show', :id => '2')
     assert_equal '/default/users/show/1', @app.url_for(:controller => 'users', :action => 'show', :id => '1')

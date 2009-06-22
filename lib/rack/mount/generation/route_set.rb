@@ -55,7 +55,9 @@ module Rack
           route = nil
 
           if named_route
-            unless route = @named_routes[named_route.to_sym]
+            if route = @named_routes[named_route.to_sym]
+              route.url_for(params)
+            else
               raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
             end
           else
@@ -67,19 +69,13 @@ module Rack
               end
             }
             @generation_graph[*keys].each do |r|
-              if r.defaults.all? { |k, v| merged[k] == v } &&
-                  r.required_params.all? { |p| merged.include?(p) }
-                route = r
-                break
+              if url = r.url_for(params)
+                return url
               end
             end
 
-            unless route
-              raise RoutingError, "No route matches #{params.inspect}"
-            end
+            raise RoutingError, "No route matches #{params.inspect}"
           end
-
-          route.url_for(params)
         end
 
         # Adds the generation aspect to RouteSet#freeze. Generation keys
@@ -96,7 +92,7 @@ module Rack
           def generation_graph
             @generation_graph ||= begin
               build_nested_route_set(generation_keys) { |r, k|
-                if k = r.defaults[k]
+                if k = r.generation_keys[k]
                   k.to_s
                 else
                   nil

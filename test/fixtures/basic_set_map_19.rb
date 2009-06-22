@@ -45,6 +45,8 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/account/credit_card/(?<id>[a-z0-9]+)$}, :request_method => 'PUT' }, { :controller => 'account/credit_card', :action => 'update' })
   set.add_route(EchoApp, { :path_info => %r{^/account/credit_card/(?<id>[a-z0-9]+)$}, :request_method => 'DELETE' }, { :controller => 'account/credit_card', :action => 'destroy' })
 
+  set.add_route(EchoApp, { :path_info => %r{^/account2(/(?<action>[a-z]+))?$} }, { :controller => 'account2', :action => 'subscription' })
+
   set.add_route(EchoApp, { :path_info => %r{^/feed/(?<kind>[a-z]+)$} }, { :controller => 'feed', :kind => 'rss' }, :feed)
 
   set.add_route(EchoApp, { :path_info => 'foo' }, { :controller => 'foo', :action => 'index' })
@@ -69,7 +71,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
   set.add_route(EchoApp, :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
-  set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :controller => 'foo' })
+  set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :prefix => 'params_with_defaults', :controller => 'foo' })
   set.add_route(EchoApp, :path_info => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :request_method => 'DELETE' }, { :controller => 'global', :action => 'destroy' })
 
