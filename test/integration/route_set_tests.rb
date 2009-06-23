@@ -107,6 +107,7 @@ module RouteSetTests
     assert_equal '/posts', @routes.generate(:controller => 'posts')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
+    assert_equal '/posts/create', @routes.generate({:action => 'create'}, {:controller => 'posts'})
     assert_equal '/posts?foo=bar', @routes.generate(:controller => 'posts', :foo => 'bar')
 
     assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }

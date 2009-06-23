@@ -50,13 +50,14 @@ module Rack
           @generation_keys.freeze
         end
 
-        def url_for(params = {})
+        def url_for(params = {}, recall = {})
           params = (params || {}).dup
+          merged = recall.merge(params)
 
           return nil if @segments.empty?
-          return nil unless @required_params.all? { |p| params.include?(p) }
+          return nil unless @required_params.all? { |p| merged.include?(p) }
 
-          unless path = generate_from_segments(@segments, params, @defaults)
+          unless path = generate_from_segments(@segments, params, merged, @defaults)
             return
           end
 
@@ -110,7 +111,7 @@ module Rack
             s
           end
 
-          def generate_from_segments(segments, params, defaults, optional = false)
+          def generate_from_segments(segments, params, merged, defaults, optional = false)
             if optional
               return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
               return Const::EMPTY_STRING unless segments.flatten.any? { |s|
@@ -129,14 +130,14 @@ module Rack
               when String
                 segment
               when DynamicSegment
-                value = params[segment.name] || defaults[segment.name]
+                value = merged[segment.name] || defaults[segment.name]
                 if value && segment =~ value.to_s
                   URI.escape(value.to_s)
                 else
                   return
                 end
               when Array
-                generate_from_segments(segment, params, defaults, true) || Const::EMPTY_STRING
+                generate_from_segments(segment, params, merged, defaults, true) || Const::EMPTY_STRING
               end
             end
 

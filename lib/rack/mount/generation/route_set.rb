@@ -56,7 +56,7 @@ module Rack
 
           if named_route
             if route = @named_routes[named_route.to_sym]
-              route.url_for(params)
+              route.url_for(params, recall)
             else
               raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
             end
@@ -69,7 +69,7 @@ module Rack
               end
             }
             @generation_graph[*keys].each do |r|
-              if url = r.url_for(params)
+              if url = r.url_for(params, recall)
                 return url
               end
             end
