@@ -50,7 +50,7 @@ module Rack
           @generation_keys.freeze
         end
 
-        def url_for(params = {}, recall = {})
+        def generate(params = {}, recall = {})
           params = (params || {}).dup
           merged = recall.merge(params)
 
