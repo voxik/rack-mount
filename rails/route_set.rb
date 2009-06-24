@@ -164,7 +164,8 @@ module ActionController
       end
 
       def recognize_path(path, environment = {})
-        env = Rack::MockRequest.env_for(path, {:method => environment[:method].to_s.upcase})
+        method = (environment[:method] || "GET").to_s.upcase
+        env = Rack::MockRequest.env_for(path, {:method => method})
         env['action_controller.recognize'] = true
         if result = call(env)
           status, headers, body = result
