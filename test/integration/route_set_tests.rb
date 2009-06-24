@@ -102,6 +102,13 @@ module RouteSetTests
     assert_equal '/account', @routes.generate(:controller => 'account', :action => 'subscription')
     assert_equal '/account/billing', @routes.generate(:controller => 'account', :action => 'billing')
 
+    assert_equal '/pages/1/notes/show/1', @routes.generate(:page_id => '1', :controller => 'notes', :action => 'show', :id => '1')
+    assert_equal '/pages/1/notes/list', @routes.generate(:page_id => '1', :controller => 'notes', :action => 'list')
+    assert_equal '/pages/1/notes', @routes.generate(:page_id => '1', :controller => 'notes', :action => 'index')
+    assert_equal '/pages/1/notes', @routes.generate(:page_id => '1', :controller => 'notes')
+    assert_equal '/notes', @routes.generate(:page_id => nil, :controller => 'notes')
+    assert_equal '/notes', @routes.generate(:controller => 'notes')
+
     assert_equal '/posts/ping', @routes.generate(:controller => 'posts', :action => 'ping')
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')
     assert_equal '/posts', @routes.generate(:controller => 'posts')
@@ -121,12 +128,12 @@ module RouteSetTests
     assert_equal ['/people/new', []], @routes.generate_extras(:controller => 'people', :action => 'new')
     assert_equal ['/people/new', [:foo]], @routes.generate_extras(:controller => 'people', :action => 'new', :foo => 'bar')
     assert_equal ['/people/1', []], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1')
-    assert_equal ['/people/1', [:foo, :bar]], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+    assert_equal ['/people/1', [:foo, :bar]], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3')
     assert_equal ['/people', [:person]], @routes.generate_extras(:controller => 'people', :action => 'create', :person => { :first_name => 'Josh', :last_name => 'Peek' })
     assert_equal ['/people', [:people]], @routes.generate_extras(:controller => 'people', :action => 'create', :people => ['Josh', 'Dave'])
 
     assert_equal ['/posts/show/1', []], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1')
-    assert_equal ['/posts/show/1', [:foo, :bar]], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3').sort { |a, b| a.to_s <=> b.to_s }
+    assert_equal ['/posts/show/1', [:foo, :bar]], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3')
     assert_equal ['/posts', []], @routes.generate_extras(:controller => 'posts', :action => 'index')
     assert_equal ['/posts', [:foo]], @routes.generate_extras(:controller => 'posts', :action => 'index', :foo => 'bar')
   end

@@ -103,7 +103,7 @@ module Rack
 
           def generation_keys
             @generation_keys ||= begin
-              Utils.analysis_keys(@routes.map { |r| r.defaults })
+              Utils.analysis_keys(@routes.map { |r| r.generation_keys })
             end
           end
       end
