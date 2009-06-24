@@ -65,7 +65,7 @@ module ActionController
 
       def draw
         yield Mapper.new(self)
-        @set.add_route(NotFound, :path_info => /.*/)
+        @set.add_route(NotFound, :path_info => /^.*$/)
         install_helpers
         @set.freeze
       end
@@ -166,7 +166,7 @@ module ActionController
       def recognize_path(path, environment = {})
         env = Rack::MockRequest.env_for(path, {:method => environment[:method].to_s.upcase})
         env['action_controller.recognize'] = true
-        if result = @set.call(env)
+        if result = call(env)
           status, headers, body = result
           body
         else
