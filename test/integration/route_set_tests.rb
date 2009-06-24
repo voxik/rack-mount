@@ -132,8 +132,17 @@ module RouteSetTests
   end
 
   def test_extras
-    assert_equal [], @routes.extra_keys(:controller => 'people')
-    assert_equal [:foo], @routes.extra_keys(:controller => 'people', :foo => 'bar')
+    params = {:controller => 'people'}
+    assert_equal [], @routes.extra_keys(params)
+    assert_equal({:controller => 'people'}, params)
+
+    params = {:controller => 'people', :foo => 'bar'}
+    assert_equal [:foo], @routes.extra_keys(params)
+    assert_equal({:controller => 'people', :foo => 'bar'}, params)
+
+    params = {:controller => 'people', :action => 'create', :person => { :name => 'Josh'}}
+    assert_equal [:person], @routes.extra_keys(params)
+    assert_equal({:controller => 'people', :action => 'create', :person => { :name => 'Josh'}}, params)
   end
 
   private

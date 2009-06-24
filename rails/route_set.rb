@@ -126,12 +126,15 @@ module ActionController
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
 
-        merged = options.merge(recall)
+        options = options_as_params(options)
+        expire_on = build_expiry(options, recall)
         options.each { |k, v| options[k] = v.to_param }
-        recall[:action] ||= 'index' if merged[:controller]
-        recall[:action] = options.delete(:action) if options[:action] == 'index'
 
-        if !named_route && recall[:controller] && options[:controller] && options[:controller][0] != ?/
+        if options[:controller]
+          options[:controller] = options[:controller].to_s
+        end
+
+        if !named_route && expire_on[:controller] && options[:controller] && options[:controller][0] != ?/
           old_parts = recall[:controller].split('/')
           new_parts = options[:controller].split('/')
           parts = old_parts[0..-(new_parts.length + 1)] + new_parts
@@ -140,11 +143,15 @@ module ActionController
 
         options[:controller] = options[:controller][1..-1] if options[:controller] && options[:controller][0] == ?/
 
+        merged = options.merge(recall)
+        recall[:action] ||= 'index' if merged[:controller]
+        recall[:action] = options.delete(:action) if options[:action] == 'index'
+
         path = @set.url_for(named_route, options, recall)
         if path && method == :generate_extras
           uri = URI(path)
           extras = uri.query ?
-            uri.query.split('&').map { |v| v.split('=').first.to_sym } :
+            uri.query.split('&').map { |v| v.split('=').first.to_sym }.uniq :
             []
           [uri.path, extras]
         elsif path
