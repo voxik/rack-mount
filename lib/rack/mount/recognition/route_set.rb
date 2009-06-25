@@ -75,10 +75,6 @@ module Rack
           end
         end
 
-        def height #:nodoc:
-          @recognition_graph.height
-        end
-
         private
           def recognition_graph
             @recognition_graph ||= begin

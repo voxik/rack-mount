@@ -7,6 +7,7 @@ class LinearRouteSetTest < RouteSetTest
   end
 
   def test_worst_case
-    assert_equal @app.length, @app.height
+    assert_equal @app.length, @app.instance_variable_get('@recognition_graph').height
+    assert_equal @app.length, @app.instance_variable_get('@generation_graph').height
   end
 end
