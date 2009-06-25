@@ -56,6 +56,7 @@ module Rack
 
           if named_route
             if route = @named_routes[named_route.to_sym]
+              recall = route.defaults.merge(recall)
               route.generate(params, recall)
             else
               raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
@@ -103,7 +104,8 @@ module Rack
 
           def generation_keys
             @generation_keys ||= begin
-              Utils.analysis_keys(@routes.map { |r| r.generation_keys })
+              # FIXME: Work around graph limit by only using the first 4 keys
+              Utils.analysis_keys(@routes.map { |r| r.generation_keys })[0...4]
             end
           end
       end

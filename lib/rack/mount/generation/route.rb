@@ -38,6 +38,9 @@ module Rack
           @segments = @conditions.has_key?(:path_info) ?
             segments(@conditions[:path_info].to_regexp).freeze :
             []
+
+          # TODO: Way too may types of requirement hashes,
+          # need to consolidate
           @required_params = @segments.find_all { |s|
             s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
           }.map { |s| s.name }.freeze
@@ -48,6 +51,13 @@ module Rack
             end
           }
           @generation_keys.freeze
+          @required_defaults = @defaults.dup
+          @segments.flatten.each { |s|
+            if s.is_a?(DynamicSegment)
+              @required_defaults.delete(s.name)
+            end
+          }
+          @required_defaults
         end
 
         def generate(params = {}, recall = {})
@@ -56,6 +66,7 @@ module Rack
 
           return nil if @segments.empty?
           return nil unless @required_params.all? { |p| merged.include?(p) }
+          return nil unless @required_defaults.all? { |k, v| merged[k] == v }
 
           unless path = generate_from_segments(@segments, params, merged, @defaults)
             return

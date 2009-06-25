@@ -33,8 +33,11 @@ module BasicGenerationTests
     assert_equal '/foo/bar', @app.url_for(:controller => 'foo_bar', :action => 'index')
     assert_equal '/baz', @app.url_for(:controller => 'baz', :action => 'index')
 
-    assert_equal '/params_with_defaults', @app.url_for(:prefix => 'params_with_defaults', :controller => 'foo')
-    assert_equal '/params_with_defaults/bar', @app.url_for(:prefix => 'params_with_defaults', :controller => 'bar')
+    assert_equal '/ws/foo', @app.url_for(:ws => true, :controller => 'foo')
+    assert_equal '/ws/foo/list', @app.url_for(:ws => true, :controller => 'foo', :action => 'list')
+
+    assert_equal '/params_with_defaults', @app.url_for(:params_with_defaults => true, :controller => 'foo')
+    assert_equal '/params_with_defaults/bar', @app.url_for(:params_with_defaults => true, :controller => 'bar')
 
     assert_equal '/pages/1/users/show/2', @app.url_for(:page_id => '1', :controller => 'users', :action => 'show', :id => '2')
     assert_equal '/default/users/show/1', @app.url_for(:controller => 'users', :action => 'show', :id => '1')

@@ -23,11 +23,11 @@ module RecognitionTests
     def test_params_override_defaults
       get '/params_with_defaults/bar'
       assert_success
-      assert_equal({ :prefix => 'params_with_defaults', :controller => 'bar' }, routing_args)
+      assert_equal({ :params_with_defaults => true, :controller => 'bar' }, routing_args)
 
       get '/params_with_defaults'
       assert_success
-      assert_equal({ :prefix => 'params_with_defaults', :controller => 'foo' }, routing_args)
+      assert_equal({ :params_with_defaults => true, :controller => 'foo' }, routing_args)
     end
   end
 end

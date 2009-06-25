@@ -201,8 +201,15 @@ module Rack
             keys[key] += 1
           end
         end
+        if keys.values.size > 0
+          avg_size = keys.values.inject(0) { |sum, n| sum =+ n } / keys.values.size
+        else
+          avg_size = 0
+        end
+
         keys = keys.sort { |e1, e2| e1[1] <=> e2[1] }
         keys.reverse!
+        keys = keys.select { |e| e[1] >= avg_size }
         keys.map! { |e| e[0] }
         keys
       end

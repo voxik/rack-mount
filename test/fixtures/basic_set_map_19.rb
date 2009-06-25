@@ -9,6 +9,8 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path_info => '/' }, { :controller => 'homepage' }, :root)
 
+  set.add_route(EchoApp, { :path_info => %r{^/ws/(?<controller>[a-z]+)(/(?<action>[a-z]+)(/(?<id>[0-9]+))?)?$} }, { :ws => true })
+
   set.add_route(EchoApp, { :path_info => %r{^/geocode/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode)
   set.add_route(EchoApp, { :path_info => %r{^/geocode2/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode2)
 
@@ -71,7 +73,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
   set.add_route(EchoApp, :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
-  set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :prefix => 'params_with_defaults', :controller => 'foo' })
+  set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :params_with_defaults => true, :controller => 'foo' })
   set.add_route(EchoApp, :path_info => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :request_method => 'DELETE' }, { :controller => 'global', :action => 'destroy' })
 

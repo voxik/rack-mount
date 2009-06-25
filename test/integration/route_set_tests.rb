@@ -8,6 +8,7 @@ module RouteSetTests
       admin.resources :users
     end
     map.resources :people
+    map.connect 'ws/:controller/:action/:id', :ws => true
     map.connect 'account/:action', :controller => 'account', :action => 'subscription'
     map.connect 'pages/:page_id/:controller/:action/:id'
     map.connect ':controller/ping', :action => 'ping'
@@ -51,6 +52,10 @@ module RouteSetTests
     assert_equal({:controller => 'people', :action => 'destroy', :id => '1'}, @routes.recognize_path('/people/1', :method => :delete))
     assert_equal({:controller => 'people', :action => 'edit', :id => '1'}, @routes.recognize_path('/people/1/edit', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
+
+    assert_equal({:controller => 'posts', :action => 'show', :id => '1', :ws => true}, @routes.recognize_path('/ws/posts/show/1', :method => :get))
+    assert_equal({:controller => 'posts', :action => 'list', :ws => true}, @routes.recognize_path('/ws/posts/list', :method => :get))
+    assert_equal({:controller => 'posts', :action => 'index', :ws => true}, @routes.recognize_path('/ws/posts', :method => :get))
 
     assert_equal({:controller => 'account', :action => 'subscription'}, @routes.recognize_path('/account', :method => :get))
     assert_equal({:controller => 'account', :action => 'subscription'}, @routes.recognize_path('/account/subscription', :method => :get))
@@ -99,6 +104,9 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
 
+    assert_equal '/ws/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1', :ws => true)
+    assert_equal '/ws/posts', @routes.generate(:controller => 'posts', :action => 'index', :ws => true)
+
     assert_equal '/account', @routes.generate(:controller => 'account', :action => 'subscription')
     assert_equal '/account/billing', @routes.generate(:controller => 'account', :action => 'billing')
 
@@ -128,12 +136,12 @@ module RouteSetTests
     assert_equal ['/people/new', []], @routes.generate_extras(:controller => 'people', :action => 'new')
     assert_equal ['/people/new', [:foo]], @routes.generate_extras(:controller => 'people', :action => 'new', :foo => 'bar')
     assert_equal ['/people/1', []], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1')
-    assert_equal ['/people/1', [:foo, :bar]], @routes.generate_extras(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3')
+    assert_equal ['/people/1', [:bar, :foo]], sort_extras!(@routes.generate_extras(:controller => 'people', :action => 'show', :id => '1', :foo => '2', :bar => '3'))
     assert_equal ['/people', [:person]], @routes.generate_extras(:controller => 'people', :action => 'create', :person => { :first_name => 'Josh', :last_name => 'Peek' })
     assert_equal ['/people', [:people]], @routes.generate_extras(:controller => 'people', :action => 'create', :people => ['Josh', 'Dave'])
 
     assert_equal ['/posts/show/1', []], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1')
-    assert_equal ['/posts/show/1', [:foo, :bar]], @routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3')
+    assert_equal ['/posts/show/1', [:bar, :foo]], sort_extras!(@routes.generate_extras(:controller => 'posts', :action => 'show', :id => '1', :foo => '2', :bar => '3'))
     assert_equal ['/posts', []], @routes.generate_extras(:controller => 'posts', :action => 'index')
     assert_equal ['/posts', [:foo]], @routes.generate_extras(:controller => 'posts', :action => 'index', :foo => 'bar')
   end
@@ -153,6 +161,13 @@ module RouteSetTests
   end
 
   private
+    def sort_extras!(extras)
+      if extras.length == 2
+        extras[1].sort! { |a, b| a.to_s <=> b.to_s }
+      end
+      extras
+    end
+
     def assert_raise(e)
       result = yield
       flunk "Did not raise #{e}, but returned #{result.inspect}"

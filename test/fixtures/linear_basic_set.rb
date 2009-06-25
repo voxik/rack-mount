@@ -1,5 +1,9 @@
 module ForceLinearGraph
   private
+    def generation_keys
+      @generation_keys ||= []
+    end
+
     def recognition_keys
       @recognition_keys ||= []
     end
