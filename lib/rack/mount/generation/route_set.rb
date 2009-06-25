@@ -104,8 +104,7 @@ module Rack
 
           def generation_keys
             @generation_keys ||= begin
-              # FIXME: Work around graph limit by only using the first 4 keys
-              Utils.analysis_keys(@routes.map { |r| r.generation_keys })[0...3]
+              Utils.analysis_keys(@routes.map { |r| r.generation_keys })
             end
           end
       end
