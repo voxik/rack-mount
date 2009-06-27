@@ -84,13 +84,15 @@ module Rack
               raise ArgumentError if part.is_a?(Utils::Capture)
 
               part = part.dup
-              part.gsub!(/\\\//, '/')
               part.gsub!(/^\//, '')
 
               scanner = StringScanner.new(part)
 
               until scanner.eos?
-                unless s = scanner.scan_until(separators_regexp)
+                if s = scanner.scan_until(separators_regexp)
+                  # Pop off matched separator
+                  s.gsub!(/.$/, '')
+                else
                   s = scanner.rest
                   scanner.terminate
                 end
@@ -100,7 +102,6 @@ module Rack
                   break
                 end
 
-                s.gsub!(/\/$/, '')
                 raise ArgumentError if matches_separator?(s, separators)
                 static = Utils.extract_static_regexp(s)
                 segments << (static.is_a?(String) ? static : nil)
