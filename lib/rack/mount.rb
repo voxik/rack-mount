@@ -9,6 +9,7 @@ module Rack #:nodoc:
     autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
     autoload :PathCondition, 'rack/mount/condition'
+    autoload :Prefix, 'rack/mount/prefix'
     autoload :Recognition, 'rack/mount/recognition'
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'
     autoload :Route, 'rack/mount/route'
