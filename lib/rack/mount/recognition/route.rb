@@ -32,7 +32,7 @@ module Rack
                   routing_args[k] = v
                 end
               }
-              if condition.is_a?(PathCondition) && !condition.anchored?
+              if condition.method == :path_info && !condition.anchored?
                 env[Prefix::KEY] = m.to_s
               end
               true

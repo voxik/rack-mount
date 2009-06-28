@@ -58,7 +58,7 @@ module Rack
         source = regexp.source
         if regexp_anchored?(regexp)
           source.sub!(/^\^(.*)\$$/, '\1')
-          unescaped_source = source.gsub(/\\/, '')
+          unescaped_source = source.gsub(/\\/, Const::EMPTY_STRING)
           if source == Regexp.escape(unescaped_source) &&
               Regexp.compile("^(#{source})$") =~ unescaped_source
             return unescaped_source
@@ -94,7 +94,7 @@ module Rack
           end
         end
 
-        source.gsub!(NAMED_CAPTURE_REGEXP, '')
+        source.gsub!(NAMED_CAPTURE_REGEXP, Const::EMPTY_STRING)
         return Regexp.compile(source, options), names
       end
       module_function :extract_named_captures
@@ -124,7 +124,7 @@ module Rack
         end
 
         def named?
-          name && name != ''
+          name && name != Const::EMPTY_STRING
         end
 
         def to_s
@@ -151,7 +151,7 @@ module Rack
         end
         source = regexp.source
 
-        source =~ /^\^/ ? source.gsub!(/^\^/, '') :
+        source =~ /^\^/ ? source.gsub!(/^\^/, Const::EMPTY_STRING) :
           raise(ArgumentError, "#{source} needs to match the start of the string")
 
         scanner = StringScanner.new(source)

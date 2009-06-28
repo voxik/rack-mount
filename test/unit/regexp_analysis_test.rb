@@ -146,7 +146,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/people(\.([^/.?]+))?$}, re
     end
 
-    assert_equal ['people'], extract_static_segments(re)
+    assert_equal [], extract_static_segments(re)
     assert_equal ['/people', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
     assert_equal ['/people', Capture.new('\\.',
       Capture.new('[^/.?]+', :name => 'format'),

@@ -45,8 +45,7 @@ module Rack
           req = @request_class.new(env)
           keys = @recognition_keys.map { |key|
             if key.is_a?(Array)
-              # TODO: Don't explict check for :path condition
-              PathCondition.split(cache, req, key.first, key.last)
+              (cache[key[0]] ||= SplitCondition.apply(req.send(key[0]), %r{/}))[key[1]]
             else
               req.send(key)
             end

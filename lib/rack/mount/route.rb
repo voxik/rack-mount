@@ -49,8 +49,14 @@ module Rack
 
           if method && pattern
             # TODO: Don't explict check for :path_info condition
-            klass = method == :path_info ? PathCondition : Condition
-            @conditions[method] = klass.new(method, pattern)
+            if method == :path_info
+              if pattern.is_a?(String)
+                pattern = Utils.normalize_path(pattern)
+              end
+              @conditions[method] = SplitCondition.new(method, pattern, %w( / ))
+            else
+              @conditions[method] = Condition.new(method, pattern)
+            end
           end
         end
 

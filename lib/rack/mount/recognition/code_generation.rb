@@ -34,7 +34,7 @@ module Rack
                           c2 << "routing_args[#{k.inspect}] = p"
                         end
                       end
-                      if condition.is_a?(PathCondition) && !condition.anchored?
+                      if condition.method == :path_info && !condition.anchored?
                         b << "env[Prefix::KEY] = m.to_s"
                       end
                       b << "true"
@@ -60,7 +60,7 @@ module Rack
           def convert_keys_to_method_calls
             recognition_keys.map { |key|
               if key.is_a?(Array)
-                "PathCondition.split(cache, req, :#{key.first}, #{key.last})"
+                "(cache[:#{key.first}] ||= SplitCondition.apply(req.#{key.first}, %r{/}))[#{key.last}]"
               else
                 "req.#{key}"
               end

@@ -12,7 +12,7 @@ module Rack
         end
 
         def inspect(indented = 2)
-          return '' if empty?
+          return Const::EMPTY_STRING if empty?
           space = ' ' * indented
           space + map { |p|
             if p.is_a?(Condition)
