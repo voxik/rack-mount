@@ -12,6 +12,8 @@ module Rack
         private
           def optimize_call!
             recognition_graph.containers_with_default.each do |list|
+              break unless list.any?
+
               m = MetaMethod.new(:optimized_each, :req)
               m << 'env = req.env'
 
@@ -52,21 +54,27 @@ module Rack
             end
 
             method = MetaMethod.new(:call, :env)
-            method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
-            method << 'cache = {}'
-            method << "req = #{@request_class.name}.new(env)"
-            method << "@recognition_graph[#{convert_keys_to_method_calls}].optimized_each(req) || @throw"
-            instance_eval(method)
-          end
 
-          def convert_keys_to_method_calls
-            recognition_keys.map { |key|
-              if key.is_a?(Array)
-                "(cache[:#{key.first}] ||= SplitCondition.apply(req.#{key.first}, %r{/}))[#{key.last}]"
-              else
-                "req.#{key}"
-              end
-            }.join(', ')
+            if @routes.empty?
+              method << '@throw'
+            else
+              method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
+              method << "req = #{@request_class.name}.new(env)"
+              cache = false
+              keys = recognition_keys.map { |key|
+                if key.is_a?(Array)
+                  cache = true
+                  "(cache[:#{key.first}] ||= SplitCondition.apply(req.#{key.first}, %r{/}))[#{key.last}]"
+                else
+                  "req.#{key}"
+                end
+              }.join(', ')
+              method << 'cache = {}' if cache
+              method << "@recognition_graph[#{keys}].optimized_each(req) || @throw"
+            end
+
+            # puts "\n#{method.inspect}"
+            instance_eval(method)
           end
       end
     end
