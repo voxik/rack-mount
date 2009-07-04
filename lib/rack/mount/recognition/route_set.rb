@@ -14,10 +14,14 @@ module Rack
         # <tt>:catch</tt>:: A "magic" status code that signals a non-match.
         #                   Defaults to 404.
         def initialize(options = {})
-          @catch = options.delete(:catch) || DEFAULT_CATCH_STATUS
-          @throw = Const::NOT_FOUND_RESPONSE.dup
-          @throw[0] = @catch
-          @throw.freeze
+          if @catch = options.delete(:catch)
+            @throw = Const::NOT_FOUND_RESPONSE.dup
+            @throw[0] = @catch
+            @throw.freeze
+          else
+            @catch = DEFAULT_CATCH_STATUS
+            @throw = Const::NOT_FOUND_RESPONSE
+          end
 
           @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
           @parameters_key.freeze
