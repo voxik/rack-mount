@@ -65,7 +65,7 @@ module ActionController
 
       def draw
         yield Mapper.new(self)
-        @set.add_route(NotFound, :path_info => /^.*$/)
+        @set.add_route(NotFound)
         install_helpers
         @set.freeze
       end
