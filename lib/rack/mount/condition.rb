@@ -23,8 +23,8 @@ module Rack
           @pattern = Regexp.compile("^#{@pattern}$")
         end
 
-        @keys[method] = Utils.extract_static_regexp(@pattern)
-        @pattern = RegexpWithNamedGroups.new(@pattern)
+        @keys[method] = Utils.extract_static_regexp(@pattern).freeze
+        @pattern = RegexpWithNamedGroups.new(@pattern).freeze
       end
 
       def anchored?
@@ -33,13 +33,6 @@ module Rack
 
       def inspect
         to_regexp.inspect
-      end
-
-      def freeze
-        @pattern.freeze
-        @keys.freeze
-
-        super
       end
     end
 
@@ -54,13 +47,14 @@ module Rack
       def initialize(method, pattern, separators)
         super(method, pattern)
 
-        @separators = separators
+        @separators = separators.freeze
         @separator_pattern = Regexp.union(*@separators).freeze
 
         @keys = {}
         generate_keys(@pattern).each_with_index do |value, index|
           @keys[[method, index]] = value
         end
+        @keys.freeze
       end
 
       def split(value)

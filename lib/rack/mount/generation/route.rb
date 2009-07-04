@@ -10,6 +10,7 @@ module Rack
 
           def initialize(name, requirement)
             @name, @requirement = name.to_sym, bound_expression(requirement)
+            freeze
           end
 
           def ==(obj)
@@ -28,7 +29,7 @@ module Rack
             def bound_expression(regexp)
               source, options = regexp.source, regexp.options
               source = "^#{source}$"
-              Regexp.compile(source, options)
+              Regexp.compile(source, options).freeze
             end
         end
 
@@ -60,7 +61,7 @@ module Rack
               @required_defaults.delete(s.name)
             end
           }
-          @required_defaults
+          @required_defaults.freeze
         end
 
         def generate(params = {}, recall = {})
@@ -115,14 +116,14 @@ module Rack
                 part = part.gsub('\\/', '/')
                 static = Utils.extract_static_regexp(part)
                 if static.is_a?(String)
-                  s << static
+                  s << static.freeze
                 else
                   raise ArgumentError, "failed to parse #{part.inspect}"
                 end
               end
             end
 
-            s
+            s.freeze
           end
 
           def generate_from_segments(segments, params, merged, defaults, optional = false)

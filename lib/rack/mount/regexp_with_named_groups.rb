@@ -22,7 +22,7 @@ module Rack
 
           if @names
             @named_captures = {}
-            @names.each_with_index { |n, i| @named_captures[n] = [i+1] if n }
+            @names.each_with_index { |n, i| @named_captures[n] = [i+1].freeze if n }
           end
 
           (@named_captures ||= {}).freeze
