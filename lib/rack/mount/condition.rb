@@ -40,7 +40,7 @@ module Rack
       def self.apply(value, separator_pattern)
         keys = value.split(separator_pattern)
         keys.shift if keys[0] == Const::EMPTY_STRING
-        keys << Const::EOS_KEY
+        keys << Const::NULL
         keys
       end
 
@@ -74,8 +74,8 @@ module Rack
               append_to_segments!(segments, previous)
               previous = nil
 
-              if part == Const::EOS_KEY
-                segments << Const::EOS_KEY
+              if part == Const::NULL
+                segments << Const::NULL
                 raise ArgumentError
               end
 

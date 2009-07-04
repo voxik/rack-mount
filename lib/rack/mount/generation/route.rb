@@ -102,7 +102,7 @@ module Rack
           def parse_segments(segments)
             s = []
             segments.each do |part|
-              if part.is_a?(String) && part == '$'
+              if part.is_a?(String) && part == Const::NULL
                 return s
               elsif part.is_a?(Utils::Capture)
                 if part.named?

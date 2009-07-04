@@ -183,7 +183,7 @@ module Rack
               capture.optionalize!
             end
           elsif char == '$'
-            cur.push(Const::EOS_KEY)
+            cur.push(Const::NULL)
           else
             cur.push('') unless cur.last.is_a?(String)
             cur.last << char

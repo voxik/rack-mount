@@ -12,7 +12,7 @@ module Rack
         REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
       end
 
-      EOS_KEY = '$'.freeze
+      NULL = "\0".freeze
 
       CONTENT_TYPE    = 'Content-Type'.freeze
       DELETE          = 'PUT'.freeze

@@ -36,6 +36,7 @@ end
 
 class SplitConditionTest < Test::Unit::TestCase
   SplitCondition = Rack::Mount::SplitCondition
+  EOS = Rack::Mount::Const::NULL
 
   def test_condition_with_path
     condition = SplitCondition.new(:path_info, '/foo/bar', %w( / ))
@@ -43,9 +44,9 @@ class SplitConditionTest < Test::Unit::TestCase
     assert_equal({
       [:path_info, 0] => 'foo',
       [:path_info, 1] => 'bar',
-      [:path_info, 2] => '$'
+      [:path_info, 2] => EOS
      }, condition.keys)
-    assert_equal ['foo', 'bar', '$'],
+    assert_equal ['foo', 'bar', EOS],
       condition.split('/foo/bar')
   end
 
@@ -56,9 +57,9 @@ class SplitConditionTest < Test::Unit::TestCase
       [:host, 0] => '37s',
       [:host, 1] => 'backpackit',
       [:host, 2] => 'com',
-      [:host, 3] => '$'
+      [:host, 3] => EOS
     }, condition.keys)
-    assert_equal ['37s', 'backpackit', 'com', '$'],
+    assert_equal ['37s', 'backpackit', 'com', EOS],
       condition.split('37s.backpackit.com')
   end
 
@@ -68,9 +69,9 @@ class SplitConditionTest < Test::Unit::TestCase
     assert_equal({
       [:path_info, 0] => 'foo',
       # [:path_info, 1] => /[0-9]+/,
-      # [:path_info, 2] => '$'
+      # [:path_info, 2] => EOS
      }, condition.keys)
-    assert_equal ['foo', '123', '$'],
+    assert_equal ['foo', '123', EOS],
       condition.split('/foo/123')
   end
 
@@ -80,7 +81,7 @@ class SplitConditionTest < Test::Unit::TestCase
     assert_equal({
       [:path_info, 0] => 'foo'
      }, condition.keys)
-    assert_equal ['foo', 'bar.xml', '$'],
+    assert_equal ['foo', 'bar.xml', EOS],
       condition.split('/foo/bar.xml')
   end
 end
