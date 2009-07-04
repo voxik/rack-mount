@@ -33,6 +33,14 @@ class RouteSetTest < Test::Unit::TestCase
     assert_raise(ArgumentError) { set.add_route(EchoApp, :foo => '/bar') }
   end
 
+  def test_marshaling
+    set = Rack::Mount::RouteSet.new
+    set.add_route(EchoApp)
+
+    data = Marshal.dump(set)
+    assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
+  end
+
   def test_worst_case
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
