@@ -1,3 +1,6 @@
+require 'rack/mount/utils'
+require 'uri'
+
 module Rack
   module Mount
     module Generation

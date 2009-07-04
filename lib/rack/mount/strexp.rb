@@ -1,3 +1,5 @@
+require 'strscan'
+
 module Rack
   module Mount
     class Strexp < Regexp

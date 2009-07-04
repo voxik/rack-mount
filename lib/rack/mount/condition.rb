@@ -1,3 +1,7 @@
+require 'rack/mount/regexp_with_named_groups'
+require 'rack/mount/utils'
+require 'strscan'
+
 module Rack
   module Mount
     class Condition #:nodoc:

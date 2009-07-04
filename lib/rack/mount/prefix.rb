@@ -1,3 +1,5 @@
+require 'rack/mount/utils'
+
 module Rack
   module Mount
     class Prefix

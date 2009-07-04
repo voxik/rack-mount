@@ -1,3 +1,8 @@
+require 'rack/mount/mixover'
+require 'rack/mount/multimap'
+require 'rack/mount/route'
+require 'rack/mount/utils'
+
 module Rack
   module Mount
     class RouteSet

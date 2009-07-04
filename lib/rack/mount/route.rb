@@ -1,3 +1,7 @@
+require 'rack/mount/condition'
+require 'rack/mount/mixover'
+require 'rack/mount/utils'
+
 module Rack
   module Mount
     # Route is an internal class used to wrap a single route attributes.

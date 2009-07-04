@@ -1,3 +1,5 @@
+require 'rack/mount/meta_method'
+
 module Rack
   module Mount
     module Recognition

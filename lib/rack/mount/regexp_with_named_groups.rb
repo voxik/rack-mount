@@ -1,3 +1,5 @@
+require 'rack/mount/utils'
+
 module Rack
   module Mount
     unless Const::SUPPORTS_NAMED_CAPTURES

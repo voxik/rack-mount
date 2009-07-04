@@ -1,3 +1,5 @@
+require 'rack/mount/prefix'
+
 module Rack
   module Mount
     module Recognition

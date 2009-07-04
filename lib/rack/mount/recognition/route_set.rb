@@ -1,3 +1,6 @@
+require 'rack/mount/condition'
+require 'rack/mount/utils'
+
 module Rack
   module Mount
     module Recognition

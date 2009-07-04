@@ -16,9 +16,6 @@ module Rack #:nodoc:
     autoload :RoutingError, 'rack/mount/exceptions'
     autoload :SplitCondition, 'rack/mount/condition'
     autoload :Strexp, 'rack/mount/strexp'
-    autoload :StringScanner, 'rack/mount/strscan'
     autoload :Utils, 'rack/mount/utils'
   end
 end
-
-autoload :URI, 'uri'

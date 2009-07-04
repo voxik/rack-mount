@@ -1,3 +1,6 @@
+require 'rack/mount/regexp_with_named_groups'
+require 'strscan'
+
 module Rack
   module Mount
     # Private utility methods used throughout Rack::Mount.
