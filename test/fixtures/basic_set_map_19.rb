@@ -15,6 +15,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/geocode2/(?<postalcode>\d{5}(-\d{4})?)$} }, { :controller => 'geocode', :action => 'show' }, :geocode2)
 
   set.add_route(EchoApp, { :path_info => '/login', :request_method => 'GET' }, { :controller => 'sessions', :action => 'new' }, :login)
+  set.add_route(EchoApp, { :path_info => '/old_login', :request_method => 'GET' }, { :controller => 'sessions', :action => 'new', :legacy => true })
   set.add_route(EchoApp, { :path_info => '/login', :request_method => 'POST' }, { :controller => 'sessions', :action => 'create' })
   set.add_route(EchoApp, { :path_info => '/logout', :request_method => 'DELETE' }, { :controller => 'sessions', :action => 'destroy' }, :logout)
 

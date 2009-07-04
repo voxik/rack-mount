@@ -21,6 +21,7 @@ module BasicGenerationTests
 
   def test_url_for_with_hash
     assert_equal '/login', @app.url_for(:controller => 'sessions', :action => 'new')
+    assert_equal '/old_login', @app.url_for(:controller => 'sessions', :action => 'new', :legacy => true)
     assert_equal '/logout', @app.url_for(:controller => 'sessions', :action => 'destroy')
 
     assert_equal '/global/show', @app.url_for(:controller => 'global', :action => 'show')

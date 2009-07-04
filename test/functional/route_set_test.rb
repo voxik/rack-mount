@@ -46,7 +46,7 @@ class RouteSetTest < Test::Unit::TestCase
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
     assert_equal 8, @app.instance_variable_get('@recognition_graph').height
-    assert_equal 13, @app.instance_variable_get('@generation_graph').height
+    assert_equal 15, @app.instance_variable_get('@generation_graph').height
   end
 
   private
