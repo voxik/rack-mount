@@ -14,11 +14,7 @@ module Rack
 
       # Initialize a new RouteSet without optimizations
       def self.new_without_optimizations(*args, &block)
-        @included_modules ||= []
-        @included_modules.delete(Recognition::CodeGeneration)
-        new(*args, &block)
-      ensure
-        @included_modules.push(Recognition::CodeGeneration)
+        new_without_module(Recognition::CodeGeneration, *args, &block)
       end
 
       # Basic RouteSet initializer.
