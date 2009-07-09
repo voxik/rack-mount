@@ -107,7 +107,7 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
     assert_equal '/people/1?legacy=true', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :legacy => 'true')
-    assert_equal '/legacy/people', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
+    assert_equal '/people?legacy=true', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
 
     assert_equal '/ws/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1', :ws => true)
     assert_equal '/ws/posts', @routes.generate(:controller => 'posts', :action => 'index', :ws => true)
