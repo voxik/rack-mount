@@ -33,6 +33,18 @@ class RouteSetTest < Test::Unit::TestCase
     assert_raise(ArgumentError) { set.add_route(EchoApp, :foo => '/bar') }
   end
 
+  def test_dupping
+    dupped = @app.dup
+    assert_equal (class << @app; included_modules; end),
+      (class << dupped; included_modules; end)
+  end
+
+  def test_cloning
+    cloned = @app.clone
+    assert_equal (class << @app; included_modules; end),
+      (class << cloned; included_modules; end)
+  end
+
   def test_marshaling
     set = Rack::Mount::RouteSet.new
     set.add_route(EchoApp)

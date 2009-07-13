@@ -5,12 +5,22 @@ module Rack
     # metaclass. This allows mixins to be stacked ontop of the instance
     # methods.
     module Mixover
+      module InstanceMethods
+        def dup
+          obj = super
+          included_modules = (class << self; included_modules; end) - (class << obj; included_modules; end)
+          included_modules.reverse.each { |mod| obj.extend(mod) }
+          obj
+        end
+      end
+
       def include(*mod)
         (@included_modules ||= []).push(*mod)
       end
 
       def new(*args, &block)
         obj = allocate
+        obj.extend(InstanceMethods)
         @included_modules.each { |mod| obj.extend(mod) }
         obj.send(:initialize, *args, &block)
         obj
