@@ -43,6 +43,34 @@ def track_new_objects
   new_objects
 end
 
+def profile_memory_usage
+  unless GC.respond_to?(:enable_stats)
+    abort 'Use REE so you can profile memory and object allocation'
+  end
+
+  GC.enable_stats
+
+  yield # warmup
+
+  GC.start
+  before = GC.allocated_size
+  before_rss = `ps -o rss= -p #{Process.pid}`.to_i
+  before_live_objects = ObjectSpace.live_objects
+
+  elapsed = Benchmark.realtime { yield }
+
+  GC.start
+  after_live_objects = ObjectSpace.live_objects
+  after_rss = `ps -o rss= -p #{Process.pid}`.to_i
+  after = GC.allocated_size
+  usage = (after - before) / 1024.0
+
+  puts "%10.2f KB %10d obj %8.1f ms  %d KB RSS" %
+    [usage, after_live_objects - before_live_objects, elapsed * 1000, after_rss - before_rss]
+
+  nil
+end
+
 begin
   gem 'ruby-prof'
   require 'ruby-prof'
