@@ -5,7 +5,7 @@ module Rack
     module Recognition
       module Route #:nodoc:
         attr_reader :keys
-        attr_writer :throw, :parameters_key
+        attr_writer :parameters_key
 
         def initialize(*args)
           super
@@ -16,7 +16,6 @@ module Rack
             @app = Prefix.new(@app)
           end
 
-          @throw          = Const::NOT_FOUND_RESPONSE
           @parameters_key = Const::RACK_ROUTING_ARGS
           @keys           = generate_keys
         end
@@ -45,7 +44,7 @@ module Rack
             env[@parameters_key] = routing_args
             @app.call(env)
           else
-            @throw
+            Const::EXPECTATION_FAILED_RESPONSE
           end
         end
 

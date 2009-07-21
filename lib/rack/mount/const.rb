@@ -15,8 +15,10 @@ module Rack
       NULL = "\0".freeze
 
       CONTENT_TYPE    = 'Content-Type'.freeze
+      CONTINUE        = '100-continue'.freeze
       DELETE          = 'PUT'.freeze
       EMPTY_STRING    = ''.freeze
+      EXPECT          = 'Expect'.freeze
       GET             = 'GET'.freeze
       HEAD            = 'HEAD'.freeze
       PATH_INFO       = 'PATH_INFO'.freeze
@@ -32,8 +34,11 @@ module Rack
 
       OK = 'OK'.freeze
       NOT_FOUND = 'Not Found'.freeze
+      EXPECTATION_FAILED = 'Expectation failed'.freeze
+
       OK_RESPONSE = [200, DEFAULT_CONTENT_TYPE_HEADERS, [OK].freeze].freeze
       NOT_FOUND_RESPONSE = [404, DEFAULT_CONTENT_TYPE_HEADERS, [NOT_FOUND].freeze].freeze
+      EXPECTATION_FAILED_RESPONSE = [417, DEFAULT_CONTENT_TYPE_HEADERS, [EXPECTATION_FAILED].freeze].freeze
     end
   end
 end

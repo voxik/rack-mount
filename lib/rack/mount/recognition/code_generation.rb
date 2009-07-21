@@ -26,7 +26,7 @@ module Rack
                 m << matchers = MetaMethod::Condition.new do |body|
                   body << "env[#{@parameters_key.inspect}] = routing_args"
                   body << "response = route.app.call(env)"
-                  body << "return response unless response[0] == #{@catch}"
+                  body << "return response unless response[0].to_i == 417"
                 end
 
                 route.conditions.each do |method, condition|
@@ -56,8 +56,12 @@ module Rack
             method = MetaMethod.new(:call, :env)
 
             if @routes.empty?
-              method << '@throw'
+              method << 'env[Const::EXPECT] != Const::CONTINUE ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE'
             else
+              method << 'begin'
+              method << 'set_expectation = env[Const::EXPECT] != Const::CONTINUE'
+              method << 'env[Const::EXPECT] = Const::CONTINUE if set_expectation'
+
               method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
               method << "req = #{@request_class.name}.new(env)"
               cache = false
@@ -70,7 +74,10 @@ module Rack
                 end
               }.join(', ')
               method << 'cache = {}' if cache
-              method << "@recognition_graph[#{keys}].optimized_each(req) || @throw"
+              method << "@recognition_graph[#{keys}].optimized_each(req) || (set_expectation ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE)"
+              method << 'ensure'
+              method << 'env.delete(Const::EXPECT) if set_expectation'
+              method << 'end'
             end
 
             # puts "\n#{method.inspect}"

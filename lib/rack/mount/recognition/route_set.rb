@@ -5,24 +5,8 @@ module Rack
   module Mount
     module Recognition
       module RouteSet
-        DEFAULT_CATCH_STATUS = 404
-
         # Adds recognition related concerns to RouteSet.new.
-        #
-        # Addition options include:
-        #
-        # <tt>:catch</tt>:: A "magic" status code that signals a non-match.
-        #                   Defaults to 404.
         def initialize(options = {})
-          if @catch = options.delete(:catch)
-            @throw = Const::NOT_FOUND_RESPONSE.dup
-            @throw[0] = @catch
-            @throw.freeze
-          else
-            @catch = DEFAULT_CATCH_STATUS
-            @throw = Const::NOT_FOUND_RESPONSE
-          end
-
           @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
           @parameters_key.freeze
 
@@ -32,7 +16,6 @@ module Rack
         # Adds recognition aspects to RouteSet#add_route.
         def add_route(*args)
           route = super
-          route.throw = @throw
           route.parameters_key = @parameters_key
           route
         end
@@ -45,6 +28,9 @@ module Rack
         # finalized.
         def call(env)
           raise 'route set not finalized' unless frozen?
+
+          set_expectation = env[Const::EXPECT] != Const::CONTINUE
+          env[Const::EXPECT] = Const::CONTINUE if set_expectation
 
           env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
 
@@ -59,9 +45,11 @@ module Rack
           }
           @recognition_graph[*keys].each do |route|
             result = route.call(req)
-            return result unless result[0] == @catch
+            return result unless result[0].to_i == 417
           end
-          @throw
+          set_expectation ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE
+        ensure
+          env.delete(Const::EXPECT) if set_expectation
         end
 
         # Adds the recognition aspect to RouteSet#freeze. Recognition keys

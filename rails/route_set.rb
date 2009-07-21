@@ -75,7 +75,7 @@ module ActionController
         named_routes.clear
         @combined_regexp = nil
         @routes_by_controller = nil
-        @set = ::Rack::Mount::RouteSet.new(:catch => -1, :parameters_key => PARAMETERS_KEY)
+        @set = ::Rack::Mount::RouteSet.new(:parameters_key => PARAMETERS_KEY)
       end
 
       def add_route(path, options = {})
