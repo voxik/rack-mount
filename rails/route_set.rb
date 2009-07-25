@@ -85,7 +85,7 @@ module ActionController
           method = conditions.delete(:method).to_s.upcase
         end
 
-        name = options.delete(:name)
+        name = options.delete(:_name)
 
         requirements = options.delete(:requirements) || {}
         defaults = {}
@@ -119,7 +119,7 @@ module ActionController
       end
 
       def add_named_route(name, path, options = {})
-        options[:name] = name
+        options[:_name] = name
         named_routes[name.to_sym] = add_route(path, options)
       end
 
