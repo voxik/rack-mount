@@ -124,11 +124,8 @@ module RecognitionTests
       assert_success
       assert_equal({ :controller => 'method', :action => 'index' }, routing_args)
 
-      # put '/method'
-      # assert_not_found
-
-      # delete '/method'
-      # assert_not_found
+      put '/method'
+      assert_not_found
     end
   end
 end
