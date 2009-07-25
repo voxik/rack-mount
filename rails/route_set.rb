@@ -8,7 +8,7 @@ module ActionController
       if defined? ActionDispatch
         PARAMETERS_KEY = 'action_dispatch.request.path_parameters'
       else
-        PARAMETERS_KEY = 'rack.routing_args'
+        PARAMETERS_KEY = 'action_controller.request.path_parameters'
       end
 
       class Dispatcher
