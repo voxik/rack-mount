@@ -46,16 +46,19 @@ module RouteSetTests
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users/1/edit', :method => :post) }
 
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
+    assert_equal({:controller => 'people', :action => 'index', :format => 'xml'}, @routes.recognize_path('/people.xml', :method => :get))
     assert_equal({:controller => 'people', :action => 'create'}, @routes.recognize_path('/people', :method => :post))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people', :method => :put) }
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people', :method => :delete) }
     assert_equal({:controller => 'people', :action => 'new'}, @routes.recognize_path('/people/new', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/new', :method => :post) }
     assert_equal({:controller => 'people', :action => 'show', :id => '1'}, @routes.recognize_path('/people/1', :method => :get))
+    assert_equal({:controller => 'people', :action => 'show', :id => '1', :format => 'xml'}, @routes.recognize_path('/people/1.xml', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1', :method => :post) }
     assert_equal({:controller => 'people', :action => 'update', :id => '1'}, @routes.recognize_path('/people/1', :method => :put))
     assert_equal({:controller => 'people', :action => 'destroy', :id => '1'}, @routes.recognize_path('/people/1', :method => :delete))
     assert_equal({:controller => 'people', :action => 'edit', :id => '1'}, @routes.recognize_path('/people/1/edit', :method => :get))
+    assert_equal({:controller => 'people', :action => 'edit', :id => '1', :format => 'xml'}, @routes.recognize_path('/people/1/edit.xml', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
 
     assert_equal({:controller => 'posts', :action => 'show', :id => '1', :ws => true}, @routes.recognize_path('/ws/posts/show/1', :method => :get))
@@ -94,6 +97,7 @@ module RouteSetTests
 
     assert_equal '/people', @routes.generate(:use_route => 'people')
     assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
+    assert_equal '/people.xml', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index', :format => 'xml')
     assert_equal '/people', @routes.generate({:use_route => 'people', :controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'index'})
     assert_equal '/people', @routes.generate(:controller => 'people')
     assert_equal '/people', @routes.generate(:controller => 'people', :action => 'index')
@@ -103,10 +107,12 @@ module RouteSetTests
     assert_equal '/people/new', @routes.generate(:controller => 'people', :action => 'new')
     assert_equal '/people/1', @routes.generate(:use_route => 'person', :id => '1')
     assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => '1')
+    assert_equal '/people/1.xml', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :format => 'xml')
     assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => 1)
     assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => Model.new('1'))
     assert_equal '/people/1', @routes.generate({:action => 'show', :id => '1'}, {:controller => 'people', :action => 'index'})
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
+    assert_equal '/people/1/edit.xml', @routes.generate(:controller => 'people', :action => 'edit', :id => '1', :format => 'xml')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
     assert_equal '/people/1?legacy=true', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :legacy => 'true')
     assert_equal '/people?legacy=true', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
