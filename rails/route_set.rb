@@ -198,6 +198,8 @@ module ActionController
 
             if optional && !(segment =~ /^:\w+$/) && !(segment =~ /^:\w+\(\.:format\)$/)
               optional = false
+            elsif optional && segment =~ /^:\w+$/ && segment != ":action" && segment != ":id"
+              optional = false
             end
 
             if optional && index < length - 1

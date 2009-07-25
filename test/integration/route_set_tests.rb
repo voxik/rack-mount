@@ -11,6 +11,8 @@ module RouteSetTests
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
+    map.project 'projects/:project_id', :controller => 'project'
+
     map.connect 'ws/:controller/:action/:id', :ws => true
     map.connect 'account/:action', :controller => 'account', :action => 'subscription'
     map.connect 'pages/:page_id/:controller/:action/:id'
@@ -19,7 +21,7 @@ module RouteSetTests
   }
 
   def setup
-    ActionController::Routing.use_controllers! ['posts', 'notes']
+    ActionController::Routing.use_controllers! ['posts', 'notes', 'project']
     @routes = ActionController::Routing::RouteSet.new
     @routes.draw(&Mapping)
     assert_loaded!
@@ -108,6 +110,13 @@ module RouteSetTests
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
     assert_equal '/people/1?legacy=true', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :legacy => 'true')
     assert_equal '/people?legacy=true', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
+
+    assert_equal '/project', @routes.generate({:controller => 'project', :action => 'index'})
+    assert_equal '/projects/1', @routes.generate({:controller => 'project', :action => 'index', :project_id => '1'})
+    assert_equal '/projects/1', @routes.generate({:controller => 'project', :action => 'index'}, {:project_id => '1'})
+    assert_raise(ActionController::RoutingError) { @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index'}) }
+    assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index', :project_id => '1'})
+    assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index'}, {:project_id => '1'})
 
     assert_equal '/ws/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1', :ws => true)
     assert_equal '/ws/posts', @routes.generate(:controller => 'posts', :action => 'index', :ws => true)
