@@ -282,12 +282,12 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     end
 
     def test_leading_static_segment
-      re = eval('/^\/ruby19\/(?<action>[a-z]+)\/(?<id>[0-9]+)$/')
+      re = eval('%r{^/ruby19/(?<action>[a-z]+)/(?<id>[0-9]+)$}')
 
       assert_equal ['ruby19'], extract_static_segments(re)
       assert_equal ['/ruby19/', DynamicSegment.new(:action, %r{[a-z]+}), '/', DynamicSegment.new(:id, %r{[0-9]+})], build_generation_segments(re)
-      assert_equal ['\\/ruby19\\/', Capture.new('[a-z]+', :name => 'action'),
-        '\\/', Capture.new('[0-9]+', :name => 'id'), EOS
+      assert_equal ['/ruby19/', Capture.new('[a-z]+', :name => 'action'),
+        '/', Capture.new('[0-9]+', :name => 'id'), EOS
       ], extract_regexp_parts(re)
     end
   end

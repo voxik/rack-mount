@@ -65,7 +65,13 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_capture
     condition = SplitCondition.new(:path_info, %r{^/foo/(?:<id>[0-9]+)$}, %w( / ))
-    assert_equal %r{^/foo/([0-9]+)$}, condition.to_regexp
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal %r{^/foo/(?:<id>[0-9]+)$}, condition.to_regexp
+    else
+      assert_equal %r{^/foo/([0-9]+)$}, condition.to_regexp
+    end
+
     assert_equal({
       [:path_info, 0] => 'foo',
       # [:path_info, 1] => /[0-9]+/,
@@ -77,7 +83,13 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_optional_capture
     condition = SplitCondition.new(:path_info, %r{^/foo/bar(\.(?:<format>[a-z]+))?$}, %w( / ))
-    assert_equal %r{^/foo/bar(\.([a-z]+))?$}, condition.to_regexp
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal %r{^/foo/bar(\.(?:<format>[a-z]+))?$}, condition.to_regexp
+    else
+      assert_equal %r{^/foo/bar(\.([a-z]+))?$}, condition.to_regexp
+    end
+
     assert_equal({
       [:path_info, 0] => 'foo'
      }, condition.keys)
