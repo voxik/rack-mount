@@ -167,12 +167,8 @@ module ActionController
         method = (environment[:method] || "GET").to_s.upcase
         env = Rack::MockRequest.env_for(path, {:method => method})
         env['action_controller.recognize'] = true
-        if result = call(env)
-          status, headers, body = result
-          body
-        else
-          raise ActionController::RoutingError
-        end
+        status, headers, body = call(env)
+        body
       end
 
       def call(env)
