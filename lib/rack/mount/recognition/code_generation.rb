@@ -66,7 +66,7 @@ module Rack
               keys = recognition_keys.map { |key|
                 if key.is_a?(Array)
                   cache = true
-                  "(cache[:#{key.first}] ||= SplitCondition.apply(req.#{key.first}, %r{/}))[#{key.last}]"
+                  "(cache[:#{key.first}] ||= SplitCondition.apply(req.#{key.first}, %r{/|\\.}))[#{key.last}]"
                 else
                   "req.#{key}"
                 end

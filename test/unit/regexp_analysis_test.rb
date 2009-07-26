@@ -130,7 +130,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/([^/.?]+)/bar(\.([^/.?]+))?$}, re
     end
 
-    assert_equal [%r{^[^/.?]+$}], extract_static_segments(re)
+    assert_equal [%r{^[^/.?]+$}, 'bar'], extract_static_segments(re)
     assert_equal ['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
       '/bar', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
     assert_equal ['/', Capture.new('[^/.?]+', :name => 'foo'), '/bar',
@@ -147,7 +147,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/people(\.([^/.?]+))?$}, re
     end
 
-    assert_equal [], extract_static_segments(re)
+    assert_equal ['people'], extract_static_segments(re)
     assert_equal ['/people', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
     assert_equal ['/people', Capture.new('\\.',
       Capture.new('[^/.?]+', :name => 'format'),
@@ -240,7 +240,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re
     end
 
-    assert_equal ['foo', %r{^[^/.?]+$}, '.', %r{^[^/.?]+$}, EOS], extract_static_segments(re)
+    assert_equal ['foo', %r{^[^/.?]+$}, %r{^[^/.?]+$}, EOS], extract_static_segments(re)
     assert_equal ['/foo/', DynamicSegment.new(:id, %r{[^/.?]+}), '.', DynamicSegment.new(:format, %r{[^/.?]+})], build_generation_segments(re)
     assert_equal ['/foo/', Capture.new('[^/.?]+', :name => 'id'),
       '\\.', Capture.new('[^/.?]+', :name => 'format'), EOS

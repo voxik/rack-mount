@@ -57,7 +57,7 @@ module Rack
               if pattern.is_a?(String)
                 pattern = Utils.normalize_path(pattern)
               end
-              @conditions[method] = SplitCondition.new(method, pattern, %w( / )).freeze
+              @conditions[method] = SplitCondition.new(method, pattern, %w( / . )).freeze
             else
               @conditions[method] = Condition.new(method, pattern).freeze
             end
