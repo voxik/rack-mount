@@ -5,19 +5,14 @@ module Rack
   module Mount
     module Recognition
       module RouteSet
+        attr_reader :parameters_key
+
         # Adds recognition related concerns to RouteSet.new.
         def initialize(options = {})
           @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
           @parameters_key.freeze
 
           super
-        end
-
-        # Adds recognition aspects to RouteSet#add_route.
-        def add_route(*args)
-          route = super
-          route.parameters_key = @parameters_key
-          route
         end
 
         # Rack compatible recognition and dispatching method. Routes are
