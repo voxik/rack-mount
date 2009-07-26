@@ -5,8 +5,13 @@ require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
 
+require 'lib/multimap_average'
+require 'lib/permutation'
+require 'lib/to_proc'
+
 autoload :ControllerConstants, 'lib/controller_constants'
 autoload :FrozenAssertions, 'lib/frozen_assertions'
+autoload :GraphReport, 'lib/graph_report'
 autoload :RequestDSL, 'lib/request_dsl'
 
 autoload :GenerationTests, 'functional/generation_tests'
