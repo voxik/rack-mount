@@ -80,4 +80,6 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(lambda { |env| Rack::Mount::Const::EXPECTATION_FAILED_RESPONSE }, { :path_info => %r{^/prefix} })
   set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
+
+  set.add_route(EchoApp, { :path_info => %r{^/(.*)/star$} }, { :controller => 'star' })
 end

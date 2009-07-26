@@ -115,6 +115,20 @@ module RecognitionTests
       assert_not_found
     end
 
+    def test_unnamed_capture
+      get '/death/star'
+      assert_success
+      assert_equal({ :controller => 'star' }, routing_args)
+
+      get '/new/death/star'
+      assert_success
+      assert_equal({ :controller => 'star' }, routing_args)
+
+      get '/death.wsdl/star'
+      assert_success
+      assert_equal({ :controller => 'star' }, routing_args)
+    end
+
     def test_method_regexp
       get '/method'
       assert_success
