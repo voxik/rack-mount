@@ -119,8 +119,7 @@ class SplitConditionTest < Test::Unit::TestCase
     end
 
     assert_equal({
-      # TODO: Really need to get this optimization to work
-      # [:path_info, 0] => 'foo'
+      [:path_info, 0] => 'foo'
      }, condition.keys)
     assert_equal ['foo', EOS],
       condition.split('/foo')
@@ -138,8 +137,7 @@ class SplitConditionTest < Test::Unit::TestCase
     end
 
     assert_equal({
-      # TODO: Really need to get this optimization to work
-      # [:path_info, 0] => 'foo'
+      [:path_info, 0] => 'foo'
      }, condition.keys)
    assert_equal ['foo', EOS],
      condition.split('/foo')

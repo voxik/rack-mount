@@ -69,7 +69,13 @@ module Rack
 
           begin
             Utils.extract_regexp_parts(regexp).each do |part|
-              raise ArgumentError if part.respond_to?(:optional?) && part.optional?
+              if part.respond_to?(:optional?) && part.optional?
+                if escaped_separators.include?(part.first)
+                  append_to_segments!(segments, previous)
+                end
+
+                raise ArgumentError
+              end
 
               append_to_segments!(segments, previous)
               previous = nil

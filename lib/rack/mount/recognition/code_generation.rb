@@ -12,8 +12,6 @@ module Rack
         private
           def optimize_call!
             recognition_graph.containers_with_default.each do |list|
-              break unless list.any?
-
               m = MetaMethod.new(:optimized_each, :req)
               m << 'env = req.env'
 
