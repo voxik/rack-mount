@@ -1,3 +1,0 @@
-[submodule "vendor/rack-router"]
-	path = vendor/rack-router
-	url = git://github.com/josh/rack-router.git
