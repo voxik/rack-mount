@@ -52,7 +52,7 @@ module Rack
 
         @keys = {}
         generate_keys(@pattern).each_with_index do |value, index|
-          @keys[[method, index]] = value
+          @keys[[method, index, @separator_pattern]] = value
         end
         @keys.freeze
       end
