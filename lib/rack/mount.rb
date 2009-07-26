@@ -2,6 +2,7 @@ require 'rack'
 
 module Rack #:nodoc:
   module Mount #:nodoc:
+    autoload :Analyzer, 'rack/mount/analyzer'
     autoload :Condition, 'rack/mount/condition'
     autoload :Const, 'rack/mount/const'
     autoload :Generation, 'rack/mount/generation'

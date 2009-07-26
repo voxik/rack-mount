@@ -11,8 +11,16 @@ module Rack
         def initialize(options = {})
           @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
           @parameters_key.freeze
+          @recognition_key_analyzer = Analyzer.new
 
           super
+        end
+
+        # Adds recognition aspects to RouteSet#add_route.
+        def add_route(*args)
+          route = super
+          @recognition_key_analyzer << route.keys
+          route
         end
 
         # Rack compatible recognition and dispatching method. Routes are
@@ -73,7 +81,9 @@ module Rack
 
           def recognition_keys
             @recognition_keys ||= begin
-              Utils.analysis_keys(@routes.map { |r| r.keys })
+              report = @recognition_key_analyzer.report
+              @recognition_key_analyzer = nil
+              report
             end
           end
       end

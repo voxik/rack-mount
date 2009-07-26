@@ -7,6 +7,8 @@ module Rack
         # Adds generation related concerns to RouteSet.new.
         def initialize(*args)
           @named_routes = {}
+          @generation_key_analyzer = Analyzer.new
+
           super
         end
 
@@ -14,6 +16,7 @@ module Rack
         def add_route(*args)
           route = super
           @named_routes[route.name] = route if route.name
+          @generation_key_analyzer << route.generation_keys
           route
         end
 
@@ -85,6 +88,7 @@ module Rack
         # are determined and an optimized generation graph is constructed.
         def freeze
           @named_routes.freeze
+
           generation_keys.freeze
           generation_graph.freeze
 
@@ -106,7 +110,9 @@ module Rack
 
           def generation_keys
             @generation_keys ||= begin
-              Utils.analysis_keys(@routes.map { |r| r.generation_keys })
+              report = @generation_key_analyzer.report
+              @generation_key_analyzer = nil
+              report
             end
           end
       end

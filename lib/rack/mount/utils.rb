@@ -195,28 +195,6 @@ module Rack
         result
       end
       module_function :extract_regexp_parts
-
-      def analysis_keys(possible_key_set)
-        keys = {}
-        possible_key_set.each do |possible_keys|
-          possible_keys.each do |key, value|
-            keys[key] ||= 0
-            keys[key] += 1
-          end
-        end
-        if keys.values.size > 0
-          avg_size = keys.values.inject(0) { |sum, n| sum += n } / keys.values.size
-        else
-          avg_size = 0
-        end
-
-        keys = keys.sort_by { |e| e[1] }
-        keys.reverse!
-        keys = keys.select { |e| e[1] >= avg_size }
-        keys.map! { |e| e[0] }
-        keys
-      end
-      module_function :analysis_keys
     end
   end
 end
