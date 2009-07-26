@@ -5,13 +5,13 @@ class ConditionTest < Test::Unit::TestCase
 
   def test_condition_with_string_pattern
     condition = Condition.new(:request_method, 'GET')
-    assert_equal %r{^GET$}, condition.to_regexp
+    assert_equal %r{\AGET\Z}, condition.to_regexp
     assert_equal({ :request_method => 'GET' }, condition.keys)
   end
 
   def test_condition_with_string_pattern_should_escape_pattern
     condition = Condition.new(:host, '37s.backpackit.com')
-    assert_equal %r{^37s\.backpackit\.com$}, condition.to_regexp
+    assert_equal %r{\A37s\.backpackit\.com\Z}, condition.to_regexp
     assert_equal({ :host => '37s.backpackit.com' }, condition.keys)
   end
 
@@ -40,7 +40,7 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_slash
     condition = SplitCondition.new(:path_info, '/foo/bar', %w( / ))
-    assert_equal %r{^/foo/bar$}, condition.to_regexp
+    assert_equal %r{\A/foo/bar\Z}, condition.to_regexp
     assert_equal({
       [:path_info, 0] => 'foo',
       [:path_info, 1] => 'bar',
@@ -52,7 +52,7 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_slash_and_dot
     condition = SplitCondition.new(:path_info, '/foo/bar', %w( / . ))
-    assert_equal %r{^/foo/bar$}, condition.to_regexp
+    assert_equal %r{\A/foo/bar\Z}, condition.to_regexp
     assert_equal({
       [:path_info, 0] => 'foo',
       [:path_info, 1] => 'bar',
@@ -64,7 +64,7 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_host
     condition = SplitCondition.new(:host, '37s.backpackit.com', %w( . ))
-    assert_equal %r{^37s\.backpackit\.com$}, condition.to_regexp
+    assert_equal %r{\A37s\.backpackit\.com\Z}, condition.to_regexp
     assert_equal({
       [:host, 0] => '37s',
       [:host, 1] => 'backpackit',
@@ -86,7 +86,7 @@ class SplitConditionTest < Test::Unit::TestCase
 
     assert_equal({
       [:path_info, 0] => 'foo',
-      [:path_info, 1] => /^[0-9]+$/,
+      [:path_info, 1] => /\A[0-9]+\Z/,
       [:path_info, 2] => EOS
      }, condition.keys)
     assert_equal ['foo', '123', EOS],

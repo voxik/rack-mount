@@ -6,22 +6,22 @@ module Rack
       # Parses segmented string expression and converts it into a Regexp
       #
       #   Strexp.compile('foo')
-      #     # => %r{^foo$}
+      #     # => %r{\Afoo\Z}
       #
       #   Strexp.compile('foo/:bar', {}, ['/'])
-      #     # => %r{^foo/(?<bar>[^/]+)$}
+      #     # => %r{\Afoo/(?<bar>[^/]+)\Z}
       #
       #   Strexp.compile(':foo.example.com')
-      #     # => %r{^(?<foo>.+)\.example\.com$}
+      #     # => %r{\A(?<foo>.+)\.example\.com\Z}
       #
       #   Strexp.compile('foo/:bar', {:bar => /[a-z]+/}, ['/'])
-      #     # => %r{^foo/(?<bar>[a-z]+)$}
+      #     # => %r{\Afoo/(?<bar>[a-z]+)\Z}
       #
       #   Strexp.compile('foo(.:extension)')
-      #     # => %r{^foo(\.(?<extension>.+))?$}
+      #     # => %r{\Afoo(\.(?<extension>.+))?\Z}
       #
       #   Strexp.compile('src/*files')
-      #     # => %r{^src/(?<files>.+)$}
+      #     # => %r{\Asrc/(?<files>.+)\Z}
       def initialize(str, requirements = {}, separators = [])
         return super(str) if str.is_a?(Regexp)
 
@@ -32,7 +32,7 @@ module Rack
         parse_dynamic_segments!(re, requirements)
         parse_optional_segments!(re)
 
-        super("^#{re}$")
+        super("\\A#{re}\\Z")
       end
 
       private
@@ -50,7 +50,7 @@ module Rack
           re, pos, scanner = '', 0, StringScanner.new(str)
           while scanner.scan_until(/(:|\\\*)([a-zA-Z_]\w*)/)
             pre, pos = scanner.pre_match[pos..-1], scanner.pos
-            if pre =~ /(.*)\\\\$/
+            if pre =~ /(.*)\\\\\Z/
               re << $1 + scanner.matched
             else
               name = scanner[2].to_sym
@@ -67,7 +67,7 @@ module Rack
           re, pos, scanner = '', 0, StringScanner.new(str)
           while scanner.scan_until(/\\\(|\\\)/)
             pre, pos = scanner.pre_match[pos..-1], scanner.pos
-            if pre =~ /(.*)\\\\$/
+            if pre =~ /(.*)\\\\\Z/
               re << $1 + scanner.matched
             elsif scanner.matched == '\\('
               re << pre + '('

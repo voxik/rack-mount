@@ -20,7 +20,7 @@ module Rack
 
         if @pattern.is_a?(String)
           @pattern = Regexp.escape(@pattern)
-          @pattern = Regexp.compile("^#{@pattern}$")
+          @pattern = Regexp.compile("\\A#{@pattern}\\Z")
         end
 
         @keys[method] = Utils.extract_static_regexp(@pattern).freeze
@@ -111,7 +111,7 @@ module Rack
         def append_to_segments!(segments, s)
           if s && s != Const::EMPTY_STRING
             @separators.each do |separator|
-              if Regexp.compile("^#{s}$") =~ separator
+              if Regexp.compile("\\A#{s}\\Z") =~ separator
                 raise ArgumentError
               end
             end

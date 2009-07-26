@@ -28,7 +28,7 @@ module Rack
           private
             def bound_expression(regexp)
               source, options = regexp.source, regexp.options
-              source = "^#{source}$"
+              source = "\\A#{source}\\Z"
               Regexp.compile(source, options).freeze
             end
         end

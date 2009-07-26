@@ -16,7 +16,7 @@ module Rack
       def normalize_path(path)
         path = "/#{path}"
         path.squeeze!(Const::SLASH)
-        path.sub!(%r'/+$', Const::EMPTY_STRING)
+        path.sub!(%r{/+\Z}, Const::EMPTY_STRING)
         path = Const::SLASH if path == Const::EMPTY_STRING
         path
       end
@@ -42,7 +42,7 @@ module Rack
       #   regexp_anchored?(/^foo/)  # => false
       #   regexp_anchored?(/foo$/)  # => false
       def regexp_anchored?(regexp)
-        regexp.source =~ /^\^.*\$$/ ? true : false
+        regexp.source =~ /\A(\\A|\^).*(\\Z|\$)\Z/ ? true : false
       end
       module_function :regexp_anchored?
 
@@ -55,15 +55,15 @@ module Rack
       #   extract_static_regexp(/^foo|bar$/)  # => /^foo|bar$/
       def extract_static_regexp(regexp)
         if regexp.is_a?(String)
-          regexp = Regexp.compile("^#{regexp}$")
+          regexp = Regexp.compile("\\A#{regexp}\\Z")
         end
 
         source = regexp.source
         if regexp_anchored?(regexp)
-          source.sub!(/^\^(.*)\$$/, '\1')
+          source.sub!(/^(\\A|\^)(.*)(\\Z|\$)$/, '\2')
           unescaped_source = source.gsub(/\\/, Const::EMPTY_STRING)
           if source == Regexp.escape(unescaped_source) &&
-              Regexp.compile("^(#{source})$") =~ unescaped_source
+              Regexp.compile("\\A(#{source})\\Z") =~ unescaped_source
             return unescaped_source
           end
         end
@@ -154,7 +154,7 @@ module Rack
         end
         source = regexp.source
 
-        source =~ /^\^/ ? source.gsub!(/^\^/, Const::EMPTY_STRING) :
+        source =~ /^(\\A|\^)/ ? source.gsub!(/^(\\A|\^)/, Const::EMPTY_STRING) :
           raise(ArgumentError, "#{source} needs to match the start of the string")
 
         scanner = StringScanner.new(source)
@@ -167,7 +167,10 @@ module Rack
 
           escaped = cur.last.is_a?(String) && cur.last[-1, 1] == '\\'
 
-          if escaped
+          if char == '\\' && scanner.peek(1) == 'Z'
+            scanner.pos += 1
+            cur.push(Const::NULL)
+          elsif escaped
             cur.push('') unless cur.last.is_a?(String)
             cur.last << char
           elsif char == '('

@@ -18,9 +18,12 @@ class UtilsTest < Test::Unit::TestCase
 
   def test_regexp_anchored
     assert_equal true, regexp_anchored?(/^foo$/)
+    assert_equal true, regexp_anchored?(/\Afoo\Z/)
     assert_equal false, regexp_anchored?(/foo/)
     assert_equal false, regexp_anchored?(/^foo/)
+    assert_equal false, regexp_anchored?(/\Afoo/)
     assert_equal false, regexp_anchored?(/foo$/)
+    assert_equal false, regexp_anchored?(/foo\Z/)
   end
 
   def test_extract_static_regexp
