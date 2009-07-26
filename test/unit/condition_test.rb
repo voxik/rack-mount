@@ -38,8 +38,20 @@ class SplitConditionTest < Test::Unit::TestCase
   SplitCondition = Rack::Mount::SplitCondition
   EOS = Rack::Mount::Const::NULL
 
-  def test_condition_with_path
+  def test_condition_with_path_with_slash
     condition = SplitCondition.new(:path_info, '/foo/bar', %w( / ))
+    assert_equal %r{^/foo/bar$}, condition.to_regexp
+    assert_equal({
+      [:path_info, 0] => 'foo',
+      [:path_info, 1] => 'bar',
+      [:path_info, 2] => EOS
+     }, condition.keys)
+    assert_equal ['foo', 'bar', EOS],
+      condition.split('/foo/bar')
+  end
+
+  def test_condition_with_path_with_slash_and_dot
+    condition = SplitCondition.new(:path_info, '/foo/bar', %w( / . ))
     assert_equal %r{^/foo/bar$}, condition.to_regexp
     assert_equal({
       [:path_info, 0] => 'foo',
@@ -74,6 +86,7 @@ class SplitConditionTest < Test::Unit::TestCase
 
     assert_equal({
       [:path_info, 0] => 'foo',
+      # TODO: Really need to get this optimization to work
       # [:path_info, 1] => /[0-9]+/,
       # [:path_info, 2] => EOS
      }, condition.keys)
@@ -95,5 +108,43 @@ class SplitConditionTest < Test::Unit::TestCase
      }, condition.keys)
     assert_equal ['foo', 'bar.xml', EOS],
       condition.split('/foo/bar.xml')
+  end
+
+  def test_condition_with_path_with_seperators_inside_optional_captures
+    condition = SplitCondition.new(:path_info, %r{^/foo(/(?:<action>[a-z]+))?$}, %w( / ))
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal %r{^/foo(/(?:<action>[a-z]+))?$}, condition.to_regexp
+    else
+      assert_equal %r{^/foo(/([a-z]+))?$}, condition.to_regexp
+    end
+
+    assert_equal({
+      # TODO: Really need to get this optimization to work
+      # [:path_info, 0] => 'foo'
+     }, condition.keys)
+    assert_equal ['foo', EOS],
+      condition.split('/foo')
+    assert_equal ['foo', 'bar', EOS],
+      condition.split('/foo/bar')
+  end
+
+  def test_condition_with_path_with_optional_capture_with_slash_and_dot
+    condition = SplitCondition.new(:path_info, %r{^/foo(\.(?:<format>[a-z]+))?$}, %w( / . ))
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal %r{^/foo(\.(?:<format>[a-z]+))?$}, condition.to_regexp
+    else
+      assert_equal %r{^/foo(\.([a-z]+))?$}, condition.to_regexp
+    end
+
+    assert_equal({
+      # TODO: Really need to get this optimization to work
+      # [:path_info, 0] => 'foo'
+     }, condition.keys)
+   assert_equal ['foo', EOS],
+     condition.split('/foo')
+    assert_equal ['foo', 'xml', EOS],
+      condition.split('/foo.xml')
   end
 end
