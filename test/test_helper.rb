@@ -5,7 +5,6 @@ require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
 
-require 'lib/multimap_average'
 require 'lib/permutation'
 require 'lib/to_proc'
 
