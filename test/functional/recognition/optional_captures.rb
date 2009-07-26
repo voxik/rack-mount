@@ -29,5 +29,11 @@ module RecognitionTests
       assert_success
       assert_equal({ :params_with_defaults => true, :controller => 'foo' }, routing_args)
     end
+
+    def test_escaped_optional_capture
+      get '/escaped/(foo)'
+      assert_success
+      assert_equal({ :controller => 'escaped/foo' }, routing_args)
+    end
   end
 end
