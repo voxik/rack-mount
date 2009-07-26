@@ -118,7 +118,7 @@ module Rack
         end
 
         def ==(obj)
-          @name == obj.name && @optional == obj.optional && super
+          obj.is_a?(Capture) && @name == obj.name && @optional == obj.optional && super
         end
 
         def optionalize!

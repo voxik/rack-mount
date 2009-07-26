@@ -48,7 +48,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, re
     end
 
-    assert_equal ['foo'], extract_static_segments(re)
+    assert_equal ['foo', %r{^[^/.?]+$}, %r{^[^/.?]+$}, EOS], extract_static_segments(re)
     assert_equal ['/foo/', DynamicSegment.new(:action, %r{[^/.?]+}), '/', DynamicSegment.new(:id, %r{[^/.?]+})], build_generation_segments(re)
     assert_equal [
       '/foo/', Capture.new('[^/.?]+', :name => 'action'),
@@ -66,7 +66,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/foo/(bar|baz)/([a-z0-9]+)$}, re
     end
 
-    assert_equal ['foo'], extract_static_segments(re)
+    assert_equal ['foo', %r{^bar|baz$}, %r{^[a-z0-9]+$}, EOS], extract_static_segments(re)
     assert_equal ['/foo/', DynamicSegment.new(:action, %r{bar|baz}), '/', DynamicSegment.new(:id, %r{[a-z0-9]+})], build_generation_segments(re)
     assert_equal [
       '/foo/', Capture.new('bar|baz', :name => 'action'),
@@ -82,7 +82,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     else
       assert_equal %r{^/msg/get/(\d+(?:,\d+)*)$}, re
     end
-    assert_equal ['msg', 'get'], extract_static_segments(re)
+    assert_equal ['msg', 'get', %r{^\d+(?:,\d+)*$}, EOS], extract_static_segments(re)
     assert_equal ['/msg/get/',
       DynamicSegment.new(:id, %r{\d+(?:,\d+)*})
     ], build_generation_segments(re)
@@ -130,7 +130,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/([^/.?]+)/bar(\.([^/.?]+))?$}, re
     end
 
-    assert_equal [], extract_static_segments(re)
+    assert_equal [%r{^[^/.?]+$}], extract_static_segments(re)
     assert_equal ['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
       '/bar', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
     assert_equal ['/', Capture.new('[^/.?]+', :name => 'foo'), '/bar',
@@ -163,7 +163,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, re
     end
 
-    assert_equal ['people'], extract_static_segments(re)
+    assert_equal ['people', %r{^[^/.?]+$}], extract_static_segments(re)
     assert_equal ['/people/', DynamicSegment.new(:id, %r{[^/.?]+}), ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], build_generation_segments(re)
     assert_equal ['/people/', Capture.new('[^/.?]+', :name => 'id'), ['\\.', Capture.new('[^/.?]+', :name => 'format')], EOS], extract_regexp_parts(re)
   end
@@ -177,7 +177,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/([^/.?]+)(/([^/.?]+))?(/([^/.?]+))?$}, re
     end
 
-    assert_equal [], extract_static_segments(re)
+    assert_equal [%r{^[^/.?]+$}], extract_static_segments(re)
     assert_equal ['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
       ['/', DynamicSegment.new(:bar, %r{[^/.?]+})],
       ['/', DynamicSegment.new(:baz, %r{[^/.?]+})]
@@ -197,7 +197,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/([^/.?]+)(/([^/.?]+)(/([^/.?]+)(\.([^/.?]+))?)?)?$}, re
     end
 
-    assert_equal [], extract_static_segments(re)
+    assert_equal [%r{^[^/.?]+$}], extract_static_segments(re)
     assert_equal ['/', DynamicSegment.new(:controller, %r{[^/.?]+}), ['/', DynamicSegment.new(:action, %r{[^/.?]+}), ['/', DynamicSegment.new(:id, %r{[^/.?]+}), ['.', DynamicSegment.new(:format, %r{[^/.?]+})]]]], build_generation_segments(re)
     assert_equal ['/', Capture.new('[^/.?]+', :name => 'controller'),
       Capture.new('/', Capture.new('[^/.?]+', :name => 'action'),
@@ -211,7 +211,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
   def test_regexp_simple_requirements
     re = %r{^/foo/(bar|baz)/([a-z0-9]+)$}
 
-    assert_equal ['foo'], extract_static_segments(re)
+    assert_equal ['foo', %r{^bar|baz$}, %r{^[a-z0-9]+$}, EOS], extract_static_segments(re)
     assert_equal [], build_generation_segments(re)
     assert_equal ['/foo/', Capture.new('bar|baz'), '/',
       Capture.new('[a-z0-9]+'), EOS], extract_regexp_parts(re)
@@ -225,7 +225,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       re = Rack::Mount::RegexpWithNamedGroups.new(%r{^/regexp/bar/(?:<action>[a-z]+)/(?:<id>[0-9]+)$})
     end
 
-    assert_equal ['regexp', 'bar'], extract_static_segments(re)
+    assert_equal ['regexp', 'bar', /^[a-z]+$/, /^[0-9]+$/, EOS], extract_static_segments(re)
     assert_equal ['/regexp/bar/', DynamicSegment.new(:action, /[a-z]+/), '/', DynamicSegment.new(:id, /[0-9]+/)], build_generation_segments(re)
     assert_equal ['/regexp/bar/', Capture.new('[a-z]+', :name => 'action'),
       '/', Capture.new('[0-9]+', :name => 'id'), EOS], extract_regexp_parts(re)
@@ -240,7 +240,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
       assert_equal %r{^/foo/([^/.?]+)\.([^/.?]+)$}, re
     end
 
-    assert_equal ['foo'], extract_static_segments(re)
+    assert_equal ['foo', %r{^[^/.?]+$}, '.', %r{^[^/.?]+$}, EOS], extract_static_segments(re)
     assert_equal ['/foo/', DynamicSegment.new(:id, %r{[^/.?]+}), '.', DynamicSegment.new(:format, %r{[^/.?]+})], build_generation_segments(re)
     assert_equal ['/foo/', Capture.new('[^/.?]+', :name => 'id'),
       '\\.', Capture.new('[^/.?]+', :name => 'format'), EOS
@@ -273,7 +273,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     def test_named_regexp_groups
       re = eval('%r{^/(?<controller>[a-z0-9]+)/(?<action>[a-z0-9]+)/(?<id>[0-9]+)$}')
 
-      assert_equal [], extract_static_segments(re)
+      assert_equal [%r{^[a-z0-9]+$}, %r{^[a-z0-9]+$}, %r{^[0-9]+$}, EOS], extract_static_segments(re)
       assert_equal ['/', DynamicSegment.new(:controller, %r{[a-z0-9]+}), '/', DynamicSegment.new(:action, %r{[a-z0-9]+}), '/', DynamicSegment.new(:id, %r{[0-9]+})], build_generation_segments(re)
       assert_equal ['/', Capture.new('[a-z0-9]+', :name => 'controller'),
         '/', Capture.new('[a-z0-9]+', :name => 'action'),
@@ -284,7 +284,7 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     def test_leading_static_segment
       re = eval('%r{^/ruby19/(?<action>[a-z]+)/(?<id>[0-9]+)$}')
 
-      assert_equal ['ruby19'], extract_static_segments(re)
+      assert_equal ['ruby19', %r{^[a-z]+$}, %r{^[0-9]+$}, EOS], extract_static_segments(re)
       assert_equal ['/ruby19/', DynamicSegment.new(:action, %r{[a-z]+}), '/', DynamicSegment.new(:id, %r{[0-9]+})], build_generation_segments(re)
       assert_equal ['/ruby19/', Capture.new('[a-z]+', :name => 'action'),
         '/', Capture.new('[0-9]+', :name => 'id'), EOS

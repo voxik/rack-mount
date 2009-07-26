@@ -69,7 +69,7 @@ module Rack
 
           begin
             Utils.extract_regexp_parts(regexp).each do |part|
-              raise ArgumentError if part.is_a?(Utils::Capture)
+              raise ArgumentError if part.respond_to?(:optional?) && part.optional?
 
               append_to_segments!(segments, previous)
               previous = nil
@@ -79,12 +79,17 @@ module Rack
                 raise ArgumentError
               end
 
-              scanner = StringScanner.new(part)
-              while s = scanner.scan_until(separators_regexp)
-                s = s[0...-scanner.matched_size]
-                append_to_segments!(segments, s)
+              if part.is_a?(Utils::Capture)
+                source = part.map { |p| p.to_s }.join
+                append_to_segments!(segments, source)
+              else
+                scanner = StringScanner.new(part)
+                while s = scanner.scan_until(separators_regexp)
+                  s = s[0...-scanner.matched_size]
+                  append_to_segments!(segments, s)
+                end
+                previous = scanner.rest
               end
-              previous = scanner.rest
             end
 
             append_to_segments!(segments, previous)
@@ -106,7 +111,7 @@ module Rack
             end
 
             static = Utils.extract_static_regexp(s)
-            segments << (static.is_a?(String) ? static : nil)
+            segments << (static.is_a?(String) ? static : static)
           end
         end
     end
