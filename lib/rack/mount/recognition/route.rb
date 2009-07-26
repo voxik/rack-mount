@@ -31,6 +31,7 @@ module Rack
                   routing_args[k] = v
                 end
               }
+              # TODO: Don't explict check for :path_info condition
               if condition.method == :path_info && !condition.anchored?
                 env[Prefix::KEY] = m.to_s
               end
