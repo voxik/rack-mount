@@ -91,9 +91,13 @@ module ActionController
         defaults = {}
         options.each do |k, v|
           if v.is_a?(Regexp)
-            requirements[k.to_sym] = options.delete(k)
+            if value = options.delete(k)
+              requirements[k.to_sym] = value
+            end
           else
-            defaults[k.to_sym] = options.delete(k)
+            if value = options.delete(k)
+              defaults[k.to_sym] = value
+            end
           end
         end
 
