@@ -43,7 +43,7 @@ module Rack
           @required_defaults = {}
 
           @conditions.each do |method, condition|
-            @segments[method] = segments(@conditions[method].to_regexp)
+            @segments[method] = @conditions[method].segments
 
             @required_params[method] = @segments[method].find_all { |s|
               s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
@@ -96,41 +96,6 @@ module Rack
         end
 
         private
-          # Segment data structure used for generations
-          # => ['/people', ['.', :format]]
-          def segments(regexp)
-            parse_segments(Utils.extract_regexp_parts(regexp))
-          rescue ArgumentError
-            []
-          end
-
-          def parse_segments(segments)
-            s = []
-            segments.each do |part|
-              if part.is_a?(String) && part == Const::NULL
-                return s
-              elsif part.is_a?(Utils::Capture)
-                if part.named?
-                  source = part.map { |p| p.to_s }.join
-                  requirement = Regexp.compile(source)
-                  s << DynamicSegment.new(part.name, requirement)
-                else
-                  s << parse_segments(part)
-                end
-              else
-                part = part.gsub('\\/', '/')
-                static = Utils.extract_static_regexp(part)
-                if static.is_a?(String)
-                  s << static.freeze
-                else
-                  raise ArgumentError, "failed to parse #{part.inspect}"
-                end
-              end
-            end
-
-            s.freeze
-          end
-
           def generate_from_segments(segments, params, merged, defaults, optional = false)
             if optional
               return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }

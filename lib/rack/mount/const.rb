@@ -12,6 +12,9 @@ module Rack
         REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
       end
 
+      EMPTY_ARRAY = [].freeze
+      EMPTY_HASH = {}.freeze
+
       NULL = "\0".freeze
 
       CONTENT_TYPE    = 'Content-Type'.freeze

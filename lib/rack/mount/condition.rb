@@ -5,7 +5,7 @@ require 'strscan'
 module Rack
   module Mount
     class Condition #:nodoc:
-      include Recognition::Condition
+      include Generation::Condition, Recognition::Condition
 
       attr_reader :method, :pattern
       alias_method :to_regexp, :pattern
