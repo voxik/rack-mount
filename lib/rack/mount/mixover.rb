@@ -3,8 +3,8 @@ module Rack::Mount
   # being chained as a superclass, they are mixed into the objects
   # metaclass. This allows mixins to be stacked ontop of the instance
   # methods.
-  module Mixover
-    module InstanceMethods
+  module Mixover #:nodoc:
+    module InstanceMethods #:nodoc:
       def dup
         obj = super
         included_modules = (class << self; included_modules; end) - (class << obj; included_modules; end)

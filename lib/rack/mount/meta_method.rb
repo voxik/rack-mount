@@ -1,6 +1,6 @@
 module Rack::Mount
-  class MetaMethod
-    class Block < Array
+  class MetaMethod #:nodoc:
+    class Block < Array #:nodoc:
       def initialize(*parts)
         replace(parts)
         yield(self) if block_given?
@@ -27,7 +27,7 @@ module Rack::Mount
       end
     end
 
-    class Condition
+    class Condition #:nodoc:
       attr_accessor :body, :else
 
       def initialize(*conditions)

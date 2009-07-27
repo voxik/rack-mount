@@ -1,7 +1,7 @@
 require 'rack/mount/utils'
 
 module Rack::Mount
-  class Prefix
+  class Prefix #:nodoc:
     KEY = 'rack.mount.prefix'.freeze
 
     def initialize(app, prefix = nil)

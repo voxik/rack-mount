@@ -141,7 +141,7 @@ module Rack::Mount
       end
     end
 
-    def extract_regexp_parts(regexp)
+    def extract_regexp_parts(regexp) #:nodoc:
       unless regexp.is_a?(RegexpWithNamedGroups)
         regexp = RegexpWithNamedGroups.new(regexp)
       end

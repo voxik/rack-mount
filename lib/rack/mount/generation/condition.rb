@@ -1,6 +1,6 @@
 module Rack::Mount
   module Generation
-    module Condition
+    module Condition #:nodoc:
       class DynamicSegment #:nodoc:
         attr_reader :name, :requirement
 
@@ -34,7 +34,7 @@ module Rack::Mount
       end
 
       # Segment data structure used for generations
-      # => ['/people', ['.', :format]]
+      #   #=> ['/people', ['.', :format]]
       def segments
         @segments ||= parse_segments(Utils.extract_regexp_parts(to_regexp))
       rescue ArgumentError
