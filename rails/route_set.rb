@@ -156,7 +156,7 @@ module ActionController
         recall[:action] ||= 'index' if merged[:controller]
         recall[:action] = options.delete(:action) if options[:action] == 'index'
 
-        path = @set.url_for(named_route, options, recall)
+        path = @set.url(named_route, options, recall)
         if path && method == :generate_extras
           uri = URI(path)
           extras = uri.query ?

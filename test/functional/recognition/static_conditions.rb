@@ -101,9 +101,6 @@ module RecognitionTests
       get '/host', 'HTTP_HOST' => 'josh.backpackit.com'
       assert_success
       assert_equal({ :controller => 'account', :account => 'josh' }, routing_args)
-
-      get '/host', 'HTTP_HOST' => 'nil.backpackit.com'
-      assert_not_found
     end
 
     # set.add_route(EchoApp, { :path_info => '/slashes/trailing/' }, { :controller => 'slash', :action => 'trailing' })

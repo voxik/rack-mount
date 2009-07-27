@@ -12,7 +12,7 @@ The API is extremely minimal and only 3 methods are exposed as the public API.
 
 <tt>Rack::Mount::RouteSet#add_route</tt>:: builder method for adding routes to the set
 <tt>Rack::Mount::RouteSet#call</tt>:: Rack compatible recognition and dispatching method
-<tt>Rack::Mount::RouteSet#url_for</tt>:: generates path from identifiers or significant keys
+<tt>Rack::Mount::RouteSet#url</tt>:: generates path from identifiers or significant keys
 
 === Example
 

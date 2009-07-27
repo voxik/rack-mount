@@ -23,16 +23,20 @@ module Rack
         # Generates path from identifiers or significant keys.
         #
         # To generate a url by named route, pass the name in as a +Symbol+.
-        #   url_for(:dashboard) # => "/dashboard"
+        #   url(:dashboard) # => "/dashboard"
         #
         # Additional parameters can be passed in as a hash
-        #   url_for(:people, :id => "1") # => "/people/1"
+        #   url(:people, :id => "1") # => "/people/1"
         #
         # If no name route is given, it will fall back to a slower
         # generation search.
-        #   url_for(:controller => "people", :action => "show", :id => "1")
+        #   url(:controller => "people", :action => "show", :id => "1")
         #     # => "/people/1"
-        def url_for(*args)
+        def url(*args)
+          generate(:path_info, *args)
+        end
+
+        def generate(method, *args) #:nodoc:
           case args.length
           when 3
             named_route, params, recall = args
@@ -62,7 +66,7 @@ module Rack
           if named_route
             if route = @named_routes[named_route.to_sym]
               recall = route.defaults.merge(recall)
-              route.generate(params, recall)
+              route.generate(method, params, recall)
             else
               raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
             end
@@ -75,7 +79,7 @@ module Rack
               end
             }
             @generation_graph[*keys].each do |r|
-              if url = r.generate(params, recall)
+              if url = r.generate(method, params, recall)
                 return url
               end
             end

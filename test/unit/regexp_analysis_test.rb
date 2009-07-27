@@ -310,6 +310,6 @@ class RegexpAnalysisTest < Test::Unit::TestCase
     def build_generation_segments(re)
       set = Rack::Mount::RouteSet.new
       route = Rack::Mount::Route.new(set, EchoApp, { :path_info => re }, {}, nil)
-      route.instance_variable_get('@segments')
+      route.instance_variable_get('@segments')[:path_info]
     end
 end

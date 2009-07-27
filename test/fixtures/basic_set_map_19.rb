@@ -61,8 +61,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => '/ssl', :scheme => 'http' }, { :controller => 'ssl', :action => 'nonssl' })
   set.add_route(EchoApp, { :path_info => '/ssl', :scheme => 'https' }, { :controller => 'ssl', :action => 'ssl' })
   set.add_route(EchoApp, { :path_info => '/method', :request_method => /get|post/i }, { :controller => 'method', :action => 'index' })
-  set.add_route(EchoApp, { :path_info => '/host', :host => '37s.backpackit.com' }, { :controller => 'account', :account => '37s' })
-  set.add_route(EchoApp, { :path_info => '/host', :host => 'josh.backpackit.com' }, { :controller => 'account', :account => 'josh' })
+  set.add_route(EchoApp, { :path_info => '/host', :host => %r{^(?<account>[0-9a-z]+)\.backpackit\.com$} }, { :controller => 'account' })
 
   set.add_route(EchoApp, { :path_info => %r{^/optional/index(\.(?<format>[a-z]+))?$} }, { :controller => 'optional', :action => 'index' })
 

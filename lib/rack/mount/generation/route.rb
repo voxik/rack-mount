@@ -38,41 +38,46 @@ module Rack
         def initialize(*args)
           super
 
-          # TODO: Don't explict check for :path_info condition
-          @segments = @conditions.has_key?(:path_info) ?
-            segments(@conditions[:path_info].to_regexp).freeze :
-            []
+          @segments = Hash.new([])
+          @required_params = {}
+          @required_defaults = {}
 
-          # TODO: Way too may types of requirement hashes,
-          # need to consolidate
-          @required_params = @segments.find_all { |s|
-            s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
-          }.map { |s| s.name }.freeze
+          @conditions.each do |method, condition|
+            @segments[method] = segments(@conditions[method].to_regexp)
+
+            @required_params[method] = @segments[method].find_all { |s|
+              s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
+            }.map { |s| s.name }.freeze
+
+            @required_defaults[method] = @defaults.dup
+            @segments[method].flatten.each { |s|
+              if s.is_a?(DynamicSegment)
+                @required_defaults[method].delete(s.name)
+              end
+            }
+            @required_defaults[method].freeze
+          end
+
           @generation_keys = @defaults.dup
-          @segments.flatten.each { |s|
-            if s.is_a?(DynamicSegment) && @defaults.include?(s.name)
-              @generation_keys.delete(s.name)
-            end
+          @segments.each { |condition|
+            condition.flatten.each { |s|
+              if s.is_a?(DynamicSegment) && @defaults.include?(s.name)
+                @generation_keys.delete(s.name)
+              end
+            }
           }
           @generation_keys.freeze
-          @required_defaults = @defaults.dup
-          @segments.flatten.each { |s|
-            if s.is_a?(DynamicSegment)
-              @required_defaults.delete(s.name)
-            end
-          }
-          @required_defaults.freeze
         end
 
-        def generate(params = {}, recall = {})
+        def generate(method, params = {}, recall = {})
           params = (params || {}).dup
           merged = recall.merge(params)
 
-          return nil if @segments.empty?
-          return nil unless @required_params.all? { |p| merged.include?(p) }
-          return nil unless @required_defaults.all? { |k, v| merged[k] == v }
+          return nil if @segments[method].empty?
+          return nil unless @required_params[method].all? { |p| merged.include?(p) }
+          return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
 
-          unless path = generate_from_segments(@segments, params, merged, @defaults)
+          unless path = generate_from_segments(@segments[method], params, merged, @defaults)
             return
           end
 

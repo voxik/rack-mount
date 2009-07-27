@@ -55,8 +55,13 @@ module Rack
         raise NotImplementedError
       end
 
-      # See <tt>Generation::RouteSet#url_for</tt>
-      def url_for(*args)
+      # See <tt>Generation::RouteSet#url</tt>
+      def url(*args)
+        raise NotImplementedError
+      end
+
+      # See <tt>Generation::RouteSet#generate</tt>
+      def generate(*args)
         raise NotImplementedError
       end
 
@@ -66,7 +71,7 @@ module Rack
       end
 
       # Finalizes the set and builds optimized data structures. You *must*
-      # freeze the set before you can use <tt>call</tt> and <tt>url_for</tt>.
+      # freeze the set before you can use <tt>call</tt> and <tt>url</tt>.
       # So remember to call freeze after you are done adding routes.
       def freeze
         @routes.each { |route| route.freeze }
