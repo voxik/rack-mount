@@ -33,7 +33,7 @@ module Rack
         #   url(:controller => "people", :action => "show", :id => "1")
         #     # => "/people/1"
         def url(*args)
-          generate(:path_info, *args)
+          generate(:__url__, *args)
         end
 
         def generate(method, *args) #:nodoc:

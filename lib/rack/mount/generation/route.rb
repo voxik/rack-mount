@@ -31,16 +31,11 @@ module Rack
           @generation_keys.freeze
         end
 
-        def generate(method, params = {}, recall = {})
+        def url(params = {}, recall = {})
           params = (params || {}).dup
           merged = recall.merge(params)
 
-          return nil unless @conditions[method]
-          return nil if @conditions[method].segments.empty?
-          return nil unless @required_params[method].all? { |p| merged.include?(p) }
-          return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
-
-          unless path = @conditions[method].generate(params, merged, @defaults)
+          unless part = generate_method(:path_info, params, merged, @defaults)
             return
           end
 
@@ -52,11 +47,31 @@ module Rack
 
           params.delete_if { |k, v| v.nil? }
           if params.any?
-            path << "?#{Rack::Utils.build_query(params)}"
+            part << "?#{Rack::Utils.build_query(params)}"
           end
 
-          path
+          part
         end
+
+        def generate(methods, params = {}, recall = {})
+          return url(params, recall) if methods == :__url__
+          params = (params || {}).dup
+          merged = recall.merge(params)
+          if methods.is_a?(Array)
+            methods.map { |m| generate_method(m, params, merged, @defaults) || (return nil) }
+          else
+            generate_method(methods, params, merged, @defaults)
+          end
+        end
+
+        private
+          def generate_method(method, params, merged, defaults)
+            return nil unless condition = @conditions[method]
+            return nil if condition.segments.empty?
+            return nil unless @required_params[method].all? { |p| merged.include?(p) }
+            return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
+            condition.generate(params, merged, defaults)
+          end
       end
     end
   end

@@ -46,6 +46,7 @@ module BasicGenerationTests
 
   def test_generate_host
     assert_equal 'josh.backpackit.com', @app.generate(:host, :controller => 'account', :account => 'josh')
+    assert_equal ['josh.backpackit.com', '/host'], @app.generate([:host, :path_info], :controller => 'account', :account => 'josh')
   end
 
   def test_url_with_query_string
