@@ -10,8 +10,18 @@ module Rack
           @segments = Const::EMPTY_ARRAY
         end
 
+        def required_keys
+          @required_keys ||= segments.find_all { |s| s.is_a?(Route::DynamicSegment) }.map { |s| s.name }
+        end
+
+        def requirements
+          @requirements ||= segments.flatten.find_all { |s| s.is_a?(Route::DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }
+        end
+
         def freeze
           segments
+          required_keys
+          requirements
           super
         end
 

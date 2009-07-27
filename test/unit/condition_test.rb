@@ -110,6 +110,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/foo/([0-9]+)$}, condition.to_regexp
     end
     assert_equal({:id => 0}, condition.named_captures)
+    assert_equal([:id], condition.required_keys)
+    assert_equal({:id => /\A[0-9]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'foo',
@@ -130,6 +132,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/([a-z]+)/bar(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:foo => 0, :format => 2}, condition.named_captures)
     end
+    assert_equal([:foo], condition.required_keys)
+    assert_equal({:foo => /\A[a-z]+\Z/, :format => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/|\.}] => %r{\A[a-z]+\Z},
@@ -150,6 +154,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/msg/get/(\d+(?:,\d+)*)$}, condition.to_regexp
     end
     assert_equal({:id => 0}, condition.named_captures)
+    assert_equal([:id], condition.required_keys)
+    assert_equal({:id => /\A\d+(?:,\d+)*\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'msg',
@@ -170,6 +176,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/foo/([a-z]+)/([a-z]+)$}, condition.to_regexp
     end
     assert_equal({:action => 0, :id => 1}, condition.named_captures)
+    assert_equal([:action, :id], condition.required_keys)
+    assert_equal({:action => %r{\A[a-z]+\Z}, :id => %r{\A[a-z]+\Z}}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'foo',
@@ -194,6 +202,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/foo/bar(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:format => 1}, condition.named_captures)
     end
+    assert_equal([], condition.required_keys)
+    assert_equal({:format => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'foo'
@@ -212,6 +222,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/([a-z]+)(/([a-z]+))?(/([a-z]+))?$}, condition.to_regexp
       assert_equal({:foo => 0, :bar => 2, :baz => 4}, condition.named_captures)
     end
+    assert_equal([:foo], condition.required_keys)
+    assert_equal({:foo => /\A[a-z]+\Z/, :bar => /\A[a-z]+\Z/, :baz => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => %r{\A[a-z]+\Z}
@@ -235,6 +247,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/people/([a-z]+)(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:id => 0, :format => 2}, condition.named_captures)
     end
+    assert_equal([:id], condition.required_keys)
+    assert_equal({:id => /\A[a-z]+\Z/, :format => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/|\.}] => 'people',
@@ -296,6 +310,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/foo(/([a-z]+))?$}, condition.to_regexp
       assert_equal({:action => 1}, condition.named_captures)
     end
+    assert_equal([], condition.required_keys)
+    assert_equal({:action => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'foo'
@@ -315,6 +331,8 @@ class SplitConditionTest < Test::Unit::TestCase
       assert_equal %r{^/foo(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:format => 1}, condition.named_captures)
     end
+    assert_equal([], condition.required_keys)
+    assert_equal({:format => /\A[a-z]+\Z/}, condition.requirements)
 
     assert_equal({
       [:path_info, 0, %r{/|\.}] => 'foo'

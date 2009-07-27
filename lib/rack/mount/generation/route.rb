@@ -21,6 +21,10 @@ module Rack
             @requirement =~ str
           end
 
+          def to_hash
+            { @name => @requirement }
+          end
+
           def inspect
             "/(?<#{@name}>#{@requirement.source})/"
           end
@@ -38,34 +42,24 @@ module Rack
         def initialize(*args)
           super
 
-          @segments = Hash.new([])
           @required_params = {}
           @required_defaults = {}
+          @generation_keys = @defaults.dup
 
           @conditions.each do |method, condition|
-            @segments[method] = @conditions[method].segments
-
-            @required_params[method] = @segments[method].find_all { |s|
-              s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
-            }.map { |s| s.name }.freeze
-
+            @required_params[method] = @conditions[method].required_keys.reject { |s| @defaults.include?(s) }.freeze
             @required_defaults[method] = @defaults.dup
-            @segments[method].flatten.each { |s|
-              if s.is_a?(DynamicSegment)
-                @required_defaults[method].delete(s.name)
-              end
+
+            condition.requirements.keys.each { |name|
+              @required_defaults[method].delete(name)
+              @generation_keys.delete(name) if @defaults.include?(name)
             }
+
             @required_defaults[method].freeze
           end
 
-          @generation_keys = @defaults.dup
-          @segments.each { |condition|
-            condition.flatten.each { |s|
-              if s.is_a?(DynamicSegment) && @defaults.include?(s.name)
-                @generation_keys.delete(s.name)
-              end
-            }
-          }
+          @required_params.freeze
+          @required_defaults.freeze
           @generation_keys.freeze
         end
 
@@ -73,11 +67,12 @@ module Rack
           params = (params || {}).dup
           merged = recall.merge(params)
 
-          return nil if @segments[method].empty?
+          return nil unless @conditions[method]
+          return nil if @conditions[method].segments.empty?
           return nil unless @required_params[method].all? { |p| merged.include?(p) }
           return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
 
-          unless path = generate_from_segments(@segments[method], params, merged, @defaults)
+          unless path = generate_from_segments(@conditions[method].segments, params, merged, @defaults)
             return
           end
 
