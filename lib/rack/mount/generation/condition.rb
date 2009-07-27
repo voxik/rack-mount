@@ -2,6 +2,38 @@ module Rack
   module Mount
     module Generation
       module Condition
+        class DynamicSegment #:nodoc:
+          attr_reader :name, :requirement
+
+          def initialize(name, requirement)
+            @name, @requirement = name.to_sym, bound_expression(requirement)
+            freeze
+          end
+
+          def ==(obj)
+            @name == obj.name && @requirement == obj.requirement
+          end
+
+          def =~(str)
+            @requirement =~ str
+          end
+
+          def to_hash
+            { @name => @requirement }
+          end
+
+          def inspect
+            "/(?<#{@name}>#{@requirement.source})/"
+          end
+
+          private
+            def bound_expression(regexp)
+              source, options = regexp.source, regexp.options
+              source = "\\A#{source}\\Z"
+              Regexp.compile(source, options).freeze
+            end
+        end
+
         # Segment data structure used for generations
         # => ['/people', ['.', :format]]
         def segments
@@ -11,11 +43,15 @@ module Rack
         end
 
         def required_keys
-          @required_keys ||= segments.find_all { |s| s.is_a?(Route::DynamicSegment) }.map { |s| s.name }
+          @required_keys ||= segments.find_all { |s| s.is_a?(DynamicSegment) }.map { |s| s.name }
         end
 
         def requirements
-          @requirements ||= segments.flatten.find_all { |s| s.is_a?(Route::DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }
+          @requirements ||= segments.flatten.find_all { |s| s.is_a?(DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }
+        end
+
+        def generate(params, merged, defaults)
+          generate_from_segments(segments, params, merged, defaults)
         end
 
         def freeze
@@ -35,7 +71,7 @@ module Rack
                 if part.named?
                   source = part.map { |p| p.to_s }.join
                   requirement = Regexp.compile(source)
-                  s << Route::DynamicSegment.new(part.name, requirement)
+                  s << DynamicSegment.new(part.name, requirement)
                 else
                   s << parse_segments(part)
                 end
@@ -51,6 +87,42 @@ module Rack
             end
 
             s.freeze
+          end
+
+          def generate_from_segments(segments, params, merged, defaults, optional = false)
+            if optional
+              return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
+              return Const::EMPTY_STRING unless segments.flatten.any? { |s|
+                params[s.name] if s.is_a?(DynamicSegment)
+              }
+              return Const::EMPTY_STRING if segments.any? { |segment|
+                if segment.is_a?(DynamicSegment)
+                  value = params[segment.name] || defaults[segment.name]
+                  value.nil? || segment !~ value.to_s || params[segment.name] == defaults[segment.name]
+                end
+              }
+            end
+
+            generated = segments.map do |segment|
+              case segment
+              when String
+                segment
+              when DynamicSegment
+                value = merged[segment.name] || defaults[segment.name]
+                if value && segment =~ value.to_s
+                  URI.escape(value.to_s)
+                else
+                  return
+                end
+              when Array
+                generate_from_segments(segment, params, merged, defaults, true) || Const::EMPTY_STRING
+              end
+            end
+
+            # Delete any used items from the params
+            segments.each { |s| params.delete(s.name) if s.is_a?(DynamicSegment) }
+
+            generated.join
           end
       end
     end

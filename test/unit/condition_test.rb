@@ -41,7 +41,7 @@ end
 
 class SplitConditionTest < Test::Unit::TestCase
   SplitCondition = Rack::Mount::SplitCondition
-  DynamicSegment = Rack::Mount::Generation::Route::DynamicSegment
+  DynamicSegment = Rack::Mount::Generation::Condition::DynamicSegment
   EOS = Rack::Mount::Const::NULL
 
   def test_condition_with_root_path
