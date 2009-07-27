@@ -91,6 +91,16 @@ class SplitConditionTest < Test::Unit::TestCase
     assert_equal(['37s.backpackit.com'], condition.segments)
   end
 
+  def test_condition_with_unanchored_path
+    condition = SplitCondition.new(:path_info, %r{^/prefix}, %w( / . ))
+    assert_equal %r{^/prefix}, condition.to_regexp
+    assert_equal({
+      [:path_info, 0, %r{/|\.}] => 'prefix'
+    }, condition.keys)
+    assert_equal ['prefix', 'foo', EOS], condition.split('/prefix/foo')
+    assert_equal(['/prefix'], condition.segments)
+  end
+
   def test_condition_with_path_with_capture
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       condition = SplitCondition.new(:path_info, eval('%r{^/foo/(?<id>[0-9]+)$}'), %w( / ))
@@ -112,23 +122,23 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_leading_capture
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      condition = SplitCondition.new(:path_info, eval('%r{^/(?<foo>[^/.?]+)/bar(\.(?<format>[^/.?]+))?$}'), %w( / . ))
-      assert_equal eval('%r{^/(?<foo>[^/.?]+)/bar(\.(?<format>[^/.?]+))?$}'), condition.to_regexp
+      condition = SplitCondition.new(:path_info, eval('%r{^/(?<foo>[a-z]+)/bar(\.(?<format>[a-z]+))?$}'), %w( / . ))
+      assert_equal eval('%r{^/(?<foo>[a-z]+)/bar(\.(?<format>[a-z]+))?$}'), condition.to_regexp
       assert_equal({:foo => 0, :format => 1}, condition.named_captures)
     else
-      condition = SplitCondition.new(:path_info, %r{^/(?:<foo>[^/.?]+)/bar(\.(?:<format>[^/.?]+))?$}, %w( / . ))
-      assert_equal %r{^/([^/.?]+)/bar(\.([^/.?]+))?$}, condition.to_regexp
+      condition = SplitCondition.new(:path_info, %r{^/(?:<foo>[a-z]+)/bar(\.(?:<format>[a-z]+))?$}, %w( / . ))
+      assert_equal %r{^/([a-z]+)/bar(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:foo => 0, :format => 2}, condition.named_captures)
     end
 
     assert_equal({
-      [:path_info, 0, %r{/|\.}] => %r{\A[^/.?]+\Z},
+      [:path_info, 0, %r{/|\.}] => %r{\A[a-z]+\Z},
       [:path_info, 1, %r{/|\.}] => 'bar'
     }, condition.keys)
     assert_equal ['fu', 'bar', 'xml', EOS], condition.split('/fu/bar.xml')
     assert_equal ['fu', 'bar', EOS], condition.split('/fu/bar')
-    assert_equal(['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
-      '/bar', ['.', DynamicSegment.new(:format, %r{[^/.?]+})]], condition.segments)
+    assert_equal(['/', DynamicSegment.new(:foo, %r{[a-z]+}),
+      '/bar', ['.', DynamicSegment.new(:format, %r{[a-z]+})]], condition.segments)
   end
 
   def test_condition_with_capture_inside_requirement
@@ -153,24 +163,24 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_multiple_captures
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      condition = SplitCondition.new(:path_info, eval('%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}'), %w( / ))
-      assert_equal eval('%r{^/foo/(?<action>[^/.?]+)/(?<id>[^/.?]+)$}'), condition.to_regexp
+      condition = SplitCondition.new(:path_info, eval('%r{^/foo/(?<action>[a-z]+)/(?<id>[a-z]+)$}'), %w( / ))
+      assert_equal eval('%r{^/foo/(?<action>[a-z]+)/(?<id>[a-z]+)$}'), condition.to_regexp
     else
-      condition = SplitCondition.new(:path_info, %r{^/foo/(?:<action>[^/.?]+)/(?:<id>[^/.?]+)$}, %w( / ))
-      assert_equal %r{^/foo/([^/.?]+)/([^/.?]+)$}, condition.to_regexp
+      condition = SplitCondition.new(:path_info, %r{^/foo/(?:<action>[a-z]+)/(?:<id>[a-z]+)$}, %w( / ))
+      assert_equal %r{^/foo/([a-z]+)/([a-z]+)$}, condition.to_regexp
     end
     assert_equal({:action => 0, :id => 1}, condition.named_captures)
 
     assert_equal({
       [:path_info, 0, %r{/}] => 'foo',
-      [:path_info, 1, %r{/}] => %r{\A[^/.?]+\Z},
-      [:path_info, 2, %r{/}] => %r{\A[^/.?]+\Z},
+      [:path_info, 1, %r{/}] => %r{\A[a-z]+\Z},
+      [:path_info, 2, %r{/}] => %r{\A[a-z]+\Z},
       [:path_info, 3, %r{/}] => EOS
     }, condition.keys)
     assert_equal ['foo', 'bar', '1', EOS], condition.split('/foo/bar/1')
     assert_equal(['/foo/',
-      DynamicSegment.new(:action, %r{[^/.?]+}), '/',
-      DynamicSegment.new(:id, %r{[^/.?]+})],
+      DynamicSegment.new(:action, %r{[a-z]+}), '/',
+      DynamicSegment.new(:id, %r{[a-z]+})],
     condition.segments)
   end
 
@@ -194,47 +204,71 @@ class SplitConditionTest < Test::Unit::TestCase
 
   def test_condition_with_path_with_multiple_optional_captures
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      condition = SplitCondition.new(:path_info, eval('%r{^/(?<foo>[^/.?]+)(/(?<bar>[^/.?]+))?(/(?<baz>[^/.?]+))?$}'), %w( / ))
-      assert_equal eval('%r{^/(?<foo>[^/.?]+)(/(?<bar>[^/.?]+))?(/(?<baz>[^/.?]+))?$}'), condition.to_regexp
+      condition = SplitCondition.new(:path_info, eval('%r{^/(?<foo>[a-z]+)(/(?<bar>[a-z]+))?(/(?<baz>[a-z]+))?$}'), %w( / ))
+      assert_equal eval('%r{^/(?<foo>[a-z]+)(/(?<bar>[a-z]+))?(/(?<baz>[a-z]+))?$}'), condition.to_regexp
       assert_equal({:foo => 0, :bar => 1, :baz => 2}, condition.named_captures)
     else
-      condition = SplitCondition.new(:path_info, %r{^/(?:<foo>[^/.?]+)(/(?:<bar>[^/.?]+))?(/(?:<baz>[^/.?]+))?$}, %w( / ))
-      assert_equal %r{^/([^/.?]+)(/([^/.?]+))?(/([^/.?]+))?$}, condition.to_regexp
+      condition = SplitCondition.new(:path_info, %r{^/(?:<foo>[a-z]+)(/(?:<bar>[a-z]+))?(/(?:<baz>[a-z]+))?$}, %w( / ))
+      assert_equal %r{^/([a-z]+)(/([a-z]+))?(/([a-z]+))?$}, condition.to_regexp
       assert_equal({:foo => 0, :bar => 2, :baz => 4}, condition.named_captures)
     end
 
     assert_equal({
-      [:path_info, 0, %r{/}] => %r{\A[^/.?]+\Z}
+      [:path_info, 0, %r{/}] => %r{\A[a-z]+\Z}
     }, condition.keys)
     assert_equal ['foo', 'bar', 'baz', EOS], condition.split('/foo/bar/baz')
     assert_equal ['foo', 'bar', EOS], condition.split('/foo/bar')
     assert_equal ['foo', EOS], condition.split('/foo')
-    assert_equal(['/', DynamicSegment.new(:foo, %r{[^/.?]+}),
-      ['/', DynamicSegment.new(:bar, %r{[^/.?]+})],
-      ['/', DynamicSegment.new(:baz, %r{[^/.?]+})]
+    assert_equal(['/', DynamicSegment.new(:foo, %r{[a-z]+}),
+      ['/', DynamicSegment.new(:bar, %r{[a-z]+})],
+      ['/', DynamicSegment.new(:baz, %r{[a-z]+})]
     ], condition.segments)
   end
 
   def test_condition_with_path_with_capture_followed_by_an_optional_capture
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-      condition = SplitCondition.new(:path_info, eval('%r{^/people/(?<id>[^/.?]+)(\.(?<format>[^/.?]+))?$}'), %w( / . ))
-      assert_equal eval('%r{^/people/(?<id>[^/.?]+)(\.(?<format>[^/.?]+))?$}'), condition.to_regexp
+      condition = SplitCondition.new(:path_info, eval('%r{^/people/(?<id>[a-z]+)(\.(?<format>[a-z]+))?$}'), %w( / . ))
+      assert_equal eval('%r{^/people/(?<id>[a-z]+)(\.(?<format>[a-z]+))?$}'), condition.to_regexp
       assert_equal({:id => 0, :format => 1}, condition.named_captures)
     else
-      condition = SplitCondition.new(:path_info, %r{^/people/(?:<id>[^/.?]+)(\.(?:<format>[^/.?]+))?$}, %w( / . ))
-      assert_equal %r{^/people/([^/.?]+)(\.([^/.?]+))?$}, condition.to_regexp
+      condition = SplitCondition.new(:path_info, %r{^/people/(?:<id>[a-z]+)(\.(?:<format>[a-z]+))?$}, %w( / . ))
+      assert_equal %r{^/people/([a-z]+)(\.([a-z]+))?$}, condition.to_regexp
       assert_equal({:id => 0, :format => 2}, condition.named_captures)
     end
 
     assert_equal({
       [:path_info, 0, %r{/|\.}] => 'people',
-      [:path_info, 1, %r{/|\.}] => %r{\A[^/.?]+\Z}
+      [:path_info, 1, %r{/|\.}] => %r{\A[a-z]+\Z}
     }, condition.keys)
     assert_equal ['people', '1', 'xml', EOS], condition.split('/people/1.xml')
     assert_equal ['people', '1', EOS], condition.split('/people/1')
     assert_equal(['/people/',
-      DynamicSegment.new(:id, %r{[^/.?]+}),
-      ['.', DynamicSegment.new(:format, %r{[^/.?]+})]],
+      DynamicSegment.new(:id, %r{[a-z]+}),
+      ['.', DynamicSegment.new(:format, %r{[a-z]+})]],
+    condition.segments)
+  end
+
+  def test_condition_with_path_with_period_seperator
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      condition = SplitCondition.new(:path_info, eval('%r{^/foo/(?<id>[0-9]+)\.(?<format>[a-z]+)$}'), %w( / . ))
+      assert_equal eval('%r{^/foo/(?<id>[0-9]+)\.(?<format>[a-z]+)$}'), condition.to_regexp
+      assert_equal({:id => 0, :format => 1}, condition.named_captures)
+    else
+      condition = SplitCondition.new(:path_info, %r{^/foo/(?:<id>[0-9]+)\.(?:<format>[a-z]+)$}, %w( / . ))
+      assert_equal %r{^/foo/([0-9]+)\.([a-z]+)$}, condition.to_regexp
+      assert_equal({:id => 0, :format => 1}, condition.named_captures)
+    end
+
+    assert_equal({
+      [:path_info, 0, %r{/|\.}] => 'foo',
+      [:path_info, 1, %r{/|\.}] => %r{\A[0-9]+\Z},
+      [:path_info, 2, %r{/|\.}] => %r{\A[a-z]+\Z},
+      [:path_info, 3, %r{/|\.}] => EOS
+    }, condition.keys)
+    assert_equal ['foo', '1', 'xml', EOS], condition.split('/foo/1.xml')
+    assert_equal(['/foo/',
+      DynamicSegment.new(:id, %r{[0-9]+}), '.',
+      DynamicSegment.new(:format, %r{[a-z]+})],
     condition.segments)
   end
 
