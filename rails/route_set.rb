@@ -63,6 +63,7 @@ module ActionController
           end
       end
 
+      undef :draw
       def draw
         yield Mapper.new(self)
         @set.add_route(NotFound)
@@ -70,6 +71,7 @@ module ActionController
         @set.freeze
       end
 
+      undef :clear!
       def clear!
         routes.clear
         named_routes.clear
@@ -78,8 +80,9 @@ module ActionController
         @set = ::Rack::Mount::RouteSet.new(:parameters_key => PARAMETERS_KEY)
       end
 
+      undef :add_route
       def add_route(path, options = {})
-        clear! unless @set
+        clear! unless defined? @set
 
         if conditions = options.delete(:conditions)
           method = conditions.delete(:method).to_s.upcase
@@ -122,11 +125,13 @@ module ActionController
         route
       end
 
+      undef :add_named_route
       def add_named_route(name, path, options = {})
         options[:_name] = name
         named_routes[name.to_sym] = add_route(path, options)
       end
 
+      undef :generate
       def generate(options, recall = {}, method = :generate)
         named_route = options.delete(:use_route)
 
@@ -167,6 +172,7 @@ module ActionController
         raise RoutingError, "No route matches #{options.inspect}"
       end
 
+      undef :recognize_path
       def recognize_path(path, environment = {})
         method = (environment[:method] || "GET").to_s.upcase
         env = Rack::MockRequest.env_for(path, {:method => method})
@@ -175,6 +181,7 @@ module ActionController
         body
       end
 
+      undef :call
       def call(env)
         @set.call(env)
       end

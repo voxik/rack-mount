@@ -35,14 +35,14 @@ class RouteSetTest < Test::Unit::TestCase
 
   def test_dupping
     dupped = @app.dup
-    assert_equal (class << @app; included_modules; end),
-      (class << dupped; included_modules; end)
+    assert_equal((class << @app; included_modules; end),
+      (class << dupped; included_modules; end))
   end
 
   def test_cloning
     cloned = @app.clone
-    assert_equal (class << @app; included_modules; end),
-      (class << cloned; included_modules; end)
+    assert_equal((class << @app; included_modules; end),
+      (class << cloned; included_modules; end))
   end
 
   def test_marshaling
@@ -72,4 +72,4 @@ class RouteSetTest < Test::Unit::TestCase
     def set_included_modules
       class << @app; included_modules; end
     end
-end
+end unless defined? RouteSetTest
