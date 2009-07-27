@@ -1,5 +1,5 @@
 module Rack::Mount
-  module Const #:nodoc:
+  module Const
     RACK_ROUTING_ARGS = 'rack.routing_args'.freeze
 
     begin
