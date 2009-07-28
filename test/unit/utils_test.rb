@@ -52,5 +52,8 @@ class UtilsTest < Test::Unit::TestCase
     assert_equal({'.' => 1}, analyze_capture_boundaries([%r{^([a-z+]).37signals.com$}]))
     assert_equal({'o' => 1, '.' => 1}, analyze_capture_boundaries([%r{^/foo(\.([a-z]+))?$}]))
     assert_equal({'-' => 2}, analyze_capture_boundaries([%r{^foo-([a-z+])-bar$}]))
+
+    assert_equal({}, analyze_capture_boundaries([:controller]))
+    assert_equal({}, analyze_capture_boundaries(['GET', 'POST', 'PUT', 'DELETE']))
   end
 end

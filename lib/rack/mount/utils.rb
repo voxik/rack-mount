@@ -226,6 +226,8 @@ module Rack::Mount
         return boundaries
       end
 
+      return boundaries unless regexp.is_a?(Regexp)
+
       parts = extract_regexp_parts(regexp)
       parts.each_with_index do |part, index|
         break if part == Const::NULL
