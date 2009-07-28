@@ -4,9 +4,10 @@ require 'strscan'
 
 module Rack::Mount
   class Condition #:nodoc:
-    include Generation::Condition, Recognition::Condition
+    include Generation::Condition
 
     attr_reader :method, :pattern
+    attr_reader :named_captures
     alias_method :to_regexp, :pattern
 
     def initialize(method, pattern)
@@ -21,6 +22,11 @@ module Rack::Mount
       end
 
       @pattern = RegexpWithNamedGroups.new(@pattern).freeze
+
+      @named_captures = @pattern.named_captures.inject({}) { |named_captures, (k, v)|
+        named_captures[k.to_sym] = v.last - 1
+        named_captures
+      }.freeze
     end
 
     def anchored?
