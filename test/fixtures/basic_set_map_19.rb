@@ -51,12 +51,12 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path_info => %r{^/feed/(?<kind>[a-z]+)$} }, { :controller => 'feed', :kind => 'rss' }, :feed)
 
-  set.add_route(EchoApp, { :path_info => 'foo' }, { :controller => 'foo', :action => 'index' })
-  set.add_route(EchoApp, { :path_info => 'foo/bar' }, { :controller => 'foo_bar', :action => 'index' })
-  set.add_route(EchoApp, { :path_info => '/baz' }, { :controller => 'baz', :action => 'index' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo') }, { :controller => 'foo', :action => 'index' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo/bar') }, { :controller => 'foo_bar', :action => 'index' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('/baz') }, { :controller => 'baz', :action => 'index' })
 
-  set.add_route(EchoApp, { :path_info => '/slashes/trailing/' }, { :controller => 'slash', :action => 'trailing' })
-  set.add_route(EchoApp, { :path_info => '//slashes/repeated' }, { :controller => 'slash', :action => 'repeated' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('/slashes/trailing/') }, { :controller => 'slash', :action => 'trailing' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('//slashes/repeated') }, { :controller => 'slash', :action => 'repeated' })
 
   set.add_route(EchoApp, { :path_info => '/ssl', :scheme => 'http' }, { :controller => 'ssl', :action => 'nonssl' })
   set.add_route(EchoApp, { :path_info => '/ssl', :scheme => 'https' }, { :controller => 'ssl', :action => 'ssl' })
