@@ -205,49 +205,5 @@ module Rack::Mount
       result
     end
     module_function :extract_regexp_parts
-
-    class Histogram < Hash
-      attr_reader :count
-
-      def initialize
-        @count = 0
-        super(0)
-      end
-
-      def <<(value)
-        @count += 1
-        self[value] += 1 if value
-      end
-    end
-
-    def analyze_capture_boundaries(regexp, boundaries = Histogram.new) #:nodoc:
-      if regexp.is_a?(Array)
-        regexp.each { |r| analyze_capture_boundaries(r, boundaries) }
-        return boundaries
-      end
-
-      return boundaries unless regexp.is_a?(Regexp)
-
-      parts = extract_regexp_parts(regexp)
-      parts.each_with_index do |part, index|
-        break if part == Const::NULL
-
-        if index > 0
-          previous = parts[index-1]
-          previous = extract_static_regexp(previous.last_part) if previous.is_a?(Capture)
-          boundaries << previous[-1..-1] if previous.is_a?(String)
-        end
-
-        if index < parts.length
-          following = parts[index+1]
-          following = extract_static_regexp(following.first_part) if following.is_a?(Capture)
-          if following.is_a?(String) && following != Const::NULL
-            boundaries << following[0..0] == '\\' ? following[1..1] : following[0..0]
-          end
-        end
-      end
-      boundaries
-    end
-    module_function :analyze_capture_boundaries
   end
 end

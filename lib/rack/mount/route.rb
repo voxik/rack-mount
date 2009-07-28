@@ -51,12 +51,7 @@ module Rack::Mount
         end
 
         if method && pattern
-          # TODO: Don't explict check for :path_info condition
-          if method == :path_info
-            @conditions[method] = SplitCondition.new(method, pattern, %w( / . )).freeze
-          else
-            @conditions[method] = Condition.new(method, pattern).freeze
-          end
+          @conditions[method] = Condition.new(method, pattern).freeze
         end
       end
 

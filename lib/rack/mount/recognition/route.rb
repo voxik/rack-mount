@@ -3,8 +3,6 @@ require 'rack/mount/prefix'
 module Rack::Mount
   module Recognition
     module Route #:nodoc:
-      attr_reader :keys
-
       def initialize(*args)
         super
 
@@ -13,8 +11,6 @@ module Rack::Mount
             !@conditions[:path_info].anchored?
           @app = Prefix.new(@app)
         end
-
-        @keys = generate_keys
       end
 
       def call(req)
@@ -45,16 +41,6 @@ module Rack::Mount
           Const::EXPECTATION_FAILED_RESPONSE
         end
       end
-
-      private
-        def generate_keys
-          @set.valid_conditions.inject({}) do |keys, method|
-            if @conditions.has_key?(method)
-              keys.merge!(@conditions[method].keys)
-            end
-            keys
-          end
-        end
     end
   end
 end

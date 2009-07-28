@@ -94,6 +94,7 @@ module Rack::Mount
 
         generation_keys.freeze
         generation_graph.freeze
+        @generation_key_analyzer = nil
 
         super
       end
@@ -101,22 +102,18 @@ module Rack::Mount
       private
         def generation_graph
           @generation_graph ||= begin
-            build_nested_route_set(generation_keys) { |r, k|
-              if k = r.generation_keys[k]
+            build_nested_route_set(generation_keys) { |k, i|
+              if k = @generation_key_analyzer.possible_keys[i][k]
                 k.to_s
               else
                 nil
               end
-              }
+            }
           end
         end
 
         def generation_keys
-          @generation_keys ||= begin
-            report = @generation_key_analyzer.report
-            @generation_key_analyzer = nil
-            report
-          end
+          @generation_keys ||= @generation_key_analyzer.report
         end
     end
   end

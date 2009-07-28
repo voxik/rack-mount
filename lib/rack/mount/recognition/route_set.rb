@@ -18,7 +18,10 @@ module Rack::Mount
       # Adds recognition aspects to RouteSet#add_route.
       def add_route(*args)
         route = super
-        @recognition_key_analyzer << route.keys
+        @recognition_key_analyzer << route.conditions.inject({}) { |conditions, (method, condition)|
+          conditions[method] = condition.to_regexp
+          conditions
+        }
         route
       end
 
@@ -59,6 +62,7 @@ module Rack::Mount
       def freeze
         recognition_keys.freeze
         recognition_graph.freeze
+        @recognition_key_analyzer = nil
 
         super
       end
@@ -74,16 +78,14 @@ module Rack::Mount
       private
         def recognition_graph
           @recognition_graph ||= begin
-            build_nested_route_set(recognition_keys) { |r, k| r.keys[k] }
+            build_nested_route_set(recognition_keys) { |k, i|
+              @recognition_key_analyzer.possible_keys[i][k]
+            }
           end
         end
 
         def recognition_keys
-          @recognition_keys ||= begin
-            report = @recognition_key_analyzer.report
-            @recognition_key_analyzer = nil
-            report
-          end
+          @recognition_keys ||= @recognition_key_analyzer.report
         end
     end
   end

@@ -53,6 +53,26 @@ class AnalyzerTest < Test::Unit::TestCase
     )
   end
 
+  # def test_analysis_boundaries
+  #   assert_equal(['/', 's'], Rack::Mount::Analyzer.new(
+  #     {:method => 'GET', :path => %r{^/people/([0-9]+)$}},
+  #     {:method => 'GET', :path => %r{^/messages(/([0-9]+))$}},
+  #     {:method => 'POST', :path => %r{^/comments$} }
+  #   ).separators)
+  # 
+  #   assert_equal(['e', '.'], Rack::Mount::Analyzer.new(
+  #     {:method => 'GET', :path => %r{^/people(\.([a-z]+))?$}}
+  #   ).separators)
+  # 
+  #   assert_equal(['.'], Rack::Mount::Analyzer.new(
+  #     {:host => %r{^([a-z+]).37signals.com$}}
+  #   ).separators)
+  # 
+  #   assert_equal(['-'], Rack::Mount::Analyzer.new(
+  #     {:foo => %r{^foo-([a-z+])-bar$}}
+  #   ).separators)
+  # end
+
   private
     def assert_report(quality, *keys)
       actual = Rack::Mount::Analyzer.new(*keys).report
