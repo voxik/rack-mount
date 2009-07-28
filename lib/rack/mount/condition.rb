@@ -37,13 +37,4 @@ module Rack::Mount
       to_regexp.inspect
     end
   end
-
-  class SplitCondition < Condition #:nodoc:
-    def self.apply(value, separator_pattern)
-      keys = value.split(separator_pattern)
-      keys.shift if keys[0] == Const::EMPTY_STRING
-      keys << Const::NULL
-      keys
-    end
-  end
 end

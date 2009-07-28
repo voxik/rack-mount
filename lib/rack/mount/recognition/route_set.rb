@@ -43,7 +43,7 @@ module Rack::Mount
         req = @request_class.new(env)
         keys = @recognition_keys.map { |key|
           if key.is_a?(Array)
-            (cache[key[0]] ||= SplitCondition.apply(req.send(key[0]), key[2]))[key[1]]
+            (cache[key[0]] ||= Analyzer.split(req.send(key[0]), key[2]))[key[1]]
           else
             req.send(key)
           end

@@ -13,7 +13,6 @@ module Rack #:nodoc:
     autoload :Route, 'rack/mount/route'
     autoload :RouteSet, 'rack/mount/route_set'
     autoload :RoutingError, 'rack/mount/exceptions'
-    autoload :SplitCondition, 'rack/mount/condition'
     autoload :Strexp, 'rack/mount/strexp'
     autoload :Utils, 'rack/mount/utils'
 

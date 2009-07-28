@@ -1,5 +1,12 @@
 module Rack::Mount
   class Analyzer #:nodoc:
+    def self.split(value, separator_pattern)
+      keys = value.split(separator_pattern)
+      keys.shift if keys[0] == Const::EMPTY_STRING
+      keys << Const::NULL
+      keys
+    end
+
     def initialize(*keys)
       # Hard code separators for now
       @separators = %w( / . )
