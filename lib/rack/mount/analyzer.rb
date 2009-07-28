@@ -8,47 +8,64 @@ module Rack::Mount
     end
 
     def initialize(*keys)
-      # Hard code separators for now
-      @separators = %w( / . )
-      @separator_pattern = Regexp.union(*@separators).freeze
-
       clear
       keys.each { |key| self << key }
     end
 
     def clear
-      @possible_keys = []
+      @raw_keys = []
       self
     end
 
-    attr_reader :possible_keys
-
     def <<(key)
       raise ArgumentError unless key.is_a?(Hash)
-
-      @possible_keys << key.inject({}) { |requirements, (method, requirement)|
-        raise ArgumentError unless method.is_a?(Symbol)
-
-        if requirement.is_a?(Regexp) && method == :path_info
-          generate_split_keys(requirement, @separators).each_with_index do |value, index|
-            requirements[[method, index, @separator_pattern]] = value
-          end
-        elsif requirement.is_a?(Regexp)
-          requirements[method] = Utils.extract_static_regexp(requirement)
-        else
-          requirements[method] = requirement
-        end
-
-        requirements
-      }
-
+      @raw_keys << key
       nil
     end
 
+    def separators
+      return @separators if @separators
+
+      boundaries = Histogram.new
+      @raw_keys.each { |keys| keys.each_pair { |_, value| analyze_capture_boundaries(value, boundaries) } }
+      separators = boundaries.sort_by { |e| e[1] }
+      separators.reverse!
+      separators = separators.select { |e| e[1] >= boundaries.count / boundaries.size }
+      separators.map! { |e| e[0] }
+      separators
+    end
+
+    def possible_keys
+      return @possible_keys if @possible_keys
+
+      separators = self.separators
+      separator_pattern = Regexp.union(*separators).freeze
+
+      @raw_keys.map do |key|
+        key.inject({}) { |requirements, (method, requirement)|
+          raise ArgumentError unless method.is_a?(Symbol)
+
+          if requirement.is_a?(Regexp) && method == :path_info
+            generate_split_keys(requirement, separators).each_with_index do |value, index|
+              requirements[[method, index, separator_pattern]] = value
+            end
+          elsif requirement.is_a?(Regexp)
+            requirements[method] = Utils.extract_static_regexp(requirement)
+          else
+            requirements[method] = requirement
+          end
+
+          requirements
+        }
+      end
+    end
+
     def report
+      return @report if @report
+
       key_frequency = Histogram.new
 
-      @possible_keys.each { |keys| keys.each_pair { |key, _| key_frequency << key } }
+      possible_keys.each { |keys| keys.each_pair { |key, _| key_frequency << key } }
 
       return [] if key_frequency.count <= 1
 
@@ -59,14 +76,12 @@ module Rack::Mount
       keys
     end
 
-    def separators
-      boundaries = Histogram.new
-      @possible_keys.each { |keys| keys.each_pair { |_, value| analyze_capture_boundaries(value, boundaries) } }
-      separators = boundaries.sort_by { |e| e[1] }
-      separators.reverse!
-      separators = separators.select { |e| e[1] >= boundaries.count / boundaries.size }
-      separators.map! { |e| e[0] }
-      separators
+    def freeze
+      @separators = self.separators
+      @possible_keys = self.possible_keys
+      @report = self.report
+
+      super
     end
 
     private

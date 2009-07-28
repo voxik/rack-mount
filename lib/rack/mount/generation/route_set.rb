@@ -91,9 +91,11 @@ module Rack::Mount
       # are determined and an optimized generation graph is constructed.
       def freeze
         @named_routes.freeze
+        @generation_key_analyzer.freeze
 
         generation_keys.freeze
         generation_graph.freeze
+
         @generation_key_analyzer = nil
 
         super
@@ -102,7 +104,7 @@ module Rack::Mount
       private
         def generation_graph
           @generation_graph ||= begin
-            build_nested_route_set(generation_keys) { |k, i|
+            build_nested_route_set(@generation_keys) { |k, i|
               if k = @generation_key_analyzer.possible_keys[i][k]
                 k.to_s
               else
