@@ -135,6 +135,17 @@ module Rack::Mount
         source
       end
 
+      def first_char
+        char = first[0..0]
+        char = first[1..1] if char == '\\'
+        char.is_a?(self.class) ? char.first_char : char
+      end
+
+      def last_char
+        char = last[-1..-1]
+        char.is_a?(self.class) ? char.last_char : char
+      end
+
       def freeze
         each { |e| e.freeze }
         super
@@ -197,5 +208,39 @@ module Rack::Mount
       result
     end
     module_function :extract_regexp_parts
+
+    def analyze_capture_boundaries(regexps) #:nodoc:
+      boundaries = Hash.new(0)
+      regexps.each do |regexp|
+        last = peek = nil
+        extract_regexp_parts(regexp).each do |part|
+          break if part == Const::NULL
+
+          if peek
+            char = part.is_a?(Capture) ? part.first_char : part[0..0]
+            boundaries[char] += 1
+            peek = nil
+          end
+
+          if part.is_a?(Capture)
+            peek = true
+          end
+
+          if part.is_a?(Capture) && part.optional?
+            char = part.first_char
+            boundaries[char] += 1
+          end
+
+          if last && part.is_a?(Capture)
+            char = last.is_a?(Capture) ? last.last_char : last[-1..-1]
+            boundaries[char] += 1
+          end
+
+          last = part
+        end
+      end
+      boundaries
+    end
+    module_function :analyze_capture_boundaries
   end
 end

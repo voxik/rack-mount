@@ -45,4 +45,12 @@ class UtilsTest < Test::Unit::TestCase
       assert_equal [/([a-z]+)([a-z]+)/, [nil, 'foo']], extract_named_captures(/([a-z]+)(?:<foo>[a-z]+)/)
     end
   end
+
+  def test_analyze_capture_boundaries
+    assert_equal({'/' => 1}, analyze_capture_boundaries([%r{^/foo/([a-z+])$}]))
+    assert_equal({'o' => 1, '/' => 1}, analyze_capture_boundaries([%r{^/foo(/bar)?$}]))
+    assert_equal({'.' => 1}, analyze_capture_boundaries([%r{^([a-z+]).37signals.com$}]))
+    assert_equal({'o' => 1, '.' => 1}, analyze_capture_boundaries([%r{^/foo(\.([a-z]+))?$}]))
+    assert_equal({'-' => 2}, analyze_capture_boundaries([%r{^foo-([a-z+])-bar$}]))
+  end
 end
