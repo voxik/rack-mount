@@ -48,7 +48,7 @@ module Rack::Mount
     def report
       key_frequency = Histogram.new
 
-      @possible_keys.each { |key| key.each_pair { |key, value| key_frequency << key } }
+      @possible_keys.each { |keys| keys.each_pair { |key, _| key_frequency << key } }
 
       return [] if key_frequency.count <= 1
 
@@ -59,15 +59,15 @@ module Rack::Mount
       keys
     end
 
-    # def separators
-    #   boundaries = Histogram.new
-    #   @possible_keys.each { |keys| keys.each_pair { |key, value| analyze_capture_boundaries(value, boundaries) } }
-    #   separators = boundaries.sort_by { |e| e[1] }
-    #   separators.reverse!
-    #   separators = separators.select { |e| e[1] >= boundaries.count / boundaries.size }
-    #   separators.map! { |e| e[0] }
-    #   separators
-    # end
+    def separators
+      boundaries = Histogram.new
+      @possible_keys.each { |keys| keys.each_pair { |_, value| analyze_capture_boundaries(value, boundaries) } }
+      separators = boundaries.sort_by { |e| e[1] }
+      separators.reverse!
+      separators = separators.select { |e| e[1] >= boundaries.count / boundaries.size }
+      separators.map! { |e| e[0] }
+      separators
+    end
 
     private
       class Histogram < Hash #:nodoc:
@@ -92,19 +92,19 @@ module Rack::Mount
 
         return boundaries unless regexp.is_a?(Regexp)
 
-        parts = extract_regexp_parts(regexp) rescue []
+        parts = Utils.extract_regexp_parts(regexp) rescue []
         parts.each_with_index do |part, index|
           break if part == Const::NULL
 
           if index > 0
             previous = parts[index-1]
-            previous = Utils.extract_static_regexp(previous.last_part) if previous.is_a?(Capture)
+            previous = Utils.extract_static_regexp(previous.last_part) if previous.is_a?(Utils::Capture)
             boundaries << previous[-1..-1] if previous.is_a?(String)
           end
 
           if index < parts.length
             following = parts[index+1]
-            following = extract_static_regexp(following.first_part) if following.is_a?(Capture)
+            following = Utils.extract_static_regexp(following.first_part) if following.is_a?(Utils::Capture)
             if following.is_a?(String) && following != Const::NULL
               boundaries << following[0..0] == '\\' ? following[1..1] : following[0..0]
             end
