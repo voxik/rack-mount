@@ -50,9 +50,7 @@ module Rack::Mount
             @set.valid_conditions.inspect
         end
 
-        if method && pattern
-          @conditions[method] = Condition.new(method, pattern).freeze
-        end
+        @conditions[method] = Condition.new(method, pattern) if method && pattern
       end
 
       @conditions.freeze

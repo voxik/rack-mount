@@ -27,6 +27,8 @@ module Rack::Mount
         named_captures[k.to_sym] = v.last - 1
         named_captures
       }.freeze
+
+      freeze
     end
 
     def anchored?
