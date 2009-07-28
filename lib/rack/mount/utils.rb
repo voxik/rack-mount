@@ -135,15 +135,12 @@ module Rack::Mount
         source
       end
 
-      def first_char
-        char = first[0..0]
-        char = first[1..1] if char == '\\'
-        char.is_a?(self.class) ? char.first_char : char
+      def first_part
+        first.is_a?(Capture) ? first.first_part : first
       end
 
-      def last_char
-        char = last[-1..-1]
-        char.is_a?(self.class) ? char.last_char : char
+      def last_part
+        last.is_a?(Capture) ? last.last_part : last
       end
 
       def freeze
@@ -209,34 +206,42 @@ module Rack::Mount
     end
     module_function :extract_regexp_parts
 
-    def analyze_capture_boundaries(regexps) #:nodoc:
-      boundaries = Hash.new(0)
-      regexps.each do |regexp|
-        last = peek = nil
-        extract_regexp_parts(regexp).each do |part|
-          break if part == Const::NULL
+    class Histogram < Hash
+      attr_reader :count
 
-          if peek
-            char = part.is_a?(Capture) ? part.first_char : part[0..0]
-            boundaries[char] += 1
-            peek = nil
+      def initialize
+        @count = 0
+        super(0)
+      end
+
+      def <<(value)
+        @count += 1
+        self[value] += 1 if value
+      end
+    end
+
+    def analyze_capture_boundaries(regexp, boundaries = Histogram.new) #:nodoc:
+      if regexp.is_a?(Array)
+        regexp.each { |r| analyze_capture_boundaries(r, boundaries) }
+        return boundaries
+      end
+
+      parts = extract_regexp_parts(regexp)
+      parts.each_with_index do |part, index|
+        break if part == Const::NULL
+
+        if index > 0
+          previous = parts[index-1]
+          previous = extract_static_regexp(previous.last_part) if previous.is_a?(Capture)
+          boundaries << previous[-1..-1] if previous.is_a?(String)
+        end
+
+        if index < parts.length
+          following = parts[index+1]
+          following = extract_static_regexp(following.first_part) if following.is_a?(Capture)
+          if following.is_a?(String) && following != Const::NULL
+            boundaries << following[0..0] == '\\' ? following[1..1] : following[0..0]
           end
-
-          if part.is_a?(Capture)
-            peek = true
-          end
-
-          if part.is_a?(Capture) && part.optional?
-            char = part.first_char
-            boundaries[char] += 1
-          end
-
-          if last && part.is_a?(Capture)
-            char = last.is_a?(Capture) ? last.last_char : last[-1..-1]
-            boundaries[char] += 1
-          end
-
-          last = part
         end
       end
       boundaries
