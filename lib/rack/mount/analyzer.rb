@@ -14,25 +14,21 @@ module Rack::Mount
 
     def clear
       @raw_keys = []
+      @boundaries = Histogram.new
+      @key_frequency = Histogram.new
       self
     end
 
     def <<(key)
       raise ArgumentError unless key.is_a?(Hash)
       @raw_keys << key
+      key.each_pair { |_, value| analyze_capture_boundaries(value, @boundaries) }
       nil
     end
 
     def separators
       return @separators if @separators
-
-      boundaries = Histogram.new
-      @raw_keys.each { |keys| keys.each_pair { |_, value| analyze_capture_boundaries(value, boundaries) } }
-      separators = boundaries.sort_by { |e| e[1] }
-      separators.reverse!
-      separators = separators.select { |e| e[1] >= boundaries.count / boundaries.size }
-      separators.map! { |e| e[0] }
-      separators
+      @boundaries.select_upper
     end
 
     def possible_keys
@@ -63,17 +59,11 @@ module Rack::Mount
     def report
       return @report if @report
 
-      key_frequency = Histogram.new
+      possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
 
-      possible_keys.each { |keys| keys.each_pair { |key, _| key_frequency << key } }
+      return [] if @key_frequency.count <= 1
 
-      return [] if key_frequency.count <= 1
-
-      keys = key_frequency.sort_by { |e| e[1] }
-      keys.reverse!
-      keys = keys.select { |e| e[1] >= key_frequency.count / key_frequency.size }
-      keys.map! { |e| e[0] }
-      keys
+      @key_frequency.select_upper
     end
 
     def freeze
@@ -97,17 +87,20 @@ module Rack::Mount
           @count += 1
           self[value] += 1 if value
         end
+
+        def select_upper
+          values = sort_by { |_, value| value }
+          values.reverse!
+          values = values.select { |_, value| value >= count / size }
+          values.map! { |key, _| key }
+          values
+        end
       end
 
-      def analyze_capture_boundaries(regexp, boundaries = Histogram.new) #:nodoc:
-        if regexp.is_a?(Array)
-          regexp.each { |r| analyze_capture_boundaries(r, boundaries) }
-          return boundaries
-        end
-
+      def analyze_capture_boundaries(regexp, boundaries) #:nodoc:
         return boundaries unless regexp.is_a?(Regexp)
 
-        parts = Utils.extract_regexp_parts(regexp) rescue []
+        parts = extract_regexp_parts(regexp) rescue []
         parts.each_with_index do |part, index|
           break if part == Const::NULL
 
@@ -128,13 +121,13 @@ module Rack::Mount
         boundaries
       end
 
-      def generate_split_keys(regexp, separators)
+      def generate_split_keys(regexp, separators) #:nodoc:
         escaped_separators = separators.map { |s| Regexp.escape(s) }
         separators_regexp = Regexp.union(*escaped_separators)
         segments, previous = [], nil
 
         begin
-          Utils.extract_regexp_parts(regexp).each do |part|
+          extract_regexp_parts(regexp).each do |part|
             if part.respond_to?(:optional?) && part.optional?
               if escaped_separators.include?(part.first)
                 append_to_segments!(segments, previous, separators)
@@ -185,6 +178,10 @@ module Rack::Mount
           static = Utils.extract_static_regexp(s)
           segments << (static.is_a?(String) ? static : static)
         end
+      end
+
+      def extract_regexp_parts(regexp) #:nodoc:
+        (@parts ||= {})[regexp] ||= Utils.extract_regexp_parts(regexp)
       end
   end
 end

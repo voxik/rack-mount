@@ -202,7 +202,7 @@ module Rack::Mount
 
       result = stack.pop
       result.each { |e| e.freeze }
-      result
+      result.freeze
     end
     module_function :extract_regexp_parts
   end
