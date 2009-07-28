@@ -91,7 +91,6 @@ module Rack::Mount
       # are determined and an optimized generation graph is constructed.
       def freeze
         @named_routes.freeze
-        @generation_key_analyzer.freeze
 
         generation_keys.freeze
         generation_graph.freeze

@@ -60,8 +60,6 @@ module Rack::Mount
       # Adds the recognition aspect to RouteSet#freeze. Recognition keys
       # are determined and an optimized recognition graph is constructed.
       def freeze
-        @recognition_key_analyzer.freeze
-
         recognition_keys.freeze
         recognition_graph.freeze
 

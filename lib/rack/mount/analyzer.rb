@@ -27,51 +27,41 @@ module Rack::Mount
     end
 
     def separators
-      return @separators if @separators
-      @boundaries.select_upper
+      @separators ||= @boundaries.select_upper
+    end
+
+    def separator_pattern
+      @separator_pattern ||= Regexp.union(*separators).freeze
     end
 
     def possible_keys
-      return @possible_keys if @possible_keys
+      @possible_keys ||= begin
+        @raw_keys.map do |key|
+          key.inject({}) { |requirements, (method, requirement)|
+            raise ArgumentError unless method.is_a?(Symbol)
 
-      separators = self.separators
-      separator_pattern = Regexp.union(*separators).freeze
-
-      @raw_keys.map do |key|
-        key.inject({}) { |requirements, (method, requirement)|
-          raise ArgumentError unless method.is_a?(Symbol)
-
-          if requirement.is_a?(Regexp) && method == :path_info
-            generate_split_keys(requirement, separators).each_with_index do |value, index|
-              requirements[[method, index, separator_pattern]] = value
+            if requirement.is_a?(Regexp) && method == :path_info
+              generate_split_keys(requirement, separators).each_with_index do |value, index|
+                requirements[[method, index, separator_pattern]] = value
+              end
+            elsif requirement.is_a?(Regexp)
+              requirements[method] = Utils.extract_static_regexp(requirement)
+            else
+              requirements[method] = requirement
             end
-          elsif requirement.is_a?(Regexp)
-            requirements[method] = Utils.extract_static_regexp(requirement)
-          else
-            requirements[method] = requirement
-          end
 
-          requirements
-        }
+            requirements
+          }
+        end
       end
     end
 
     def report
-      return @report if @report
-
-      possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
-
-      return [] if @key_frequency.count <= 1
-
-      @key_frequency.select_upper
-    end
-
-    def freeze
-      @separators = self.separators
-      @possible_keys = self.possible_keys
-      @report = self.report
-
-      super
+      @report ||= begin
+        possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
+        return [] if @key_frequency.count <= 1
+        @key_frequency.select_upper
+      end
     end
 
     private
