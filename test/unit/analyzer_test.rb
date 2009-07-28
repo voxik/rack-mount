@@ -55,22 +55,22 @@ class AnalyzerTest < Test::Unit::TestCase
 
   def test_analysis_boundaries
     assert_equal(['/', 's'], Rack::Mount::Analyzer.new(
-      {:method => 'GET', :path => %r{^/people/([0-9]+)$}},
-      {:method => 'GET', :path => %r{^/messages(/([0-9]+))$}},
-      {:method => 'POST', :path => %r{^/comments$} }
-    ).separators)
+      {:path => %r{^/people/([0-9]+)$}},
+      {:path => %r{^/messages(/([0-9]+))$}},
+      {:path => %r{^/comments$} }
+    ).separators(:path))
 
     assert_equal(['e', '.'], Rack::Mount::Analyzer.new(
-      {:method => 'GET', :path => %r{^/people(\.([a-z]+))?$}}
-    ).separators)
+      {:path => %r{^/people(\.([a-z]+))?$}}
+    ).separators(:path))
 
     assert_equal(['.'], Rack::Mount::Analyzer.new(
       {:host => %r{^([a-z+]).37signals.com$}}
-    ).separators)
+    ).separators(:host))
 
     assert_equal(['-'], Rack::Mount::Analyzer.new(
       {:foo => %r{^foo-([a-z+])-bar$}}
-    ).separators)
+    ).separators(:foo))
   end
 
   private

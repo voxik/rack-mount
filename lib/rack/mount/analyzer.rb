@@ -14,7 +14,7 @@ module Rack::Mount
 
     def clear
       @raw_keys = []
-      @boundaries = Histogram.new
+      @boundaries = {}
       @key_frequency = Histogram.new
       self
     end
@@ -22,16 +22,14 @@ module Rack::Mount
     def <<(key)
       raise ArgumentError unless key.is_a?(Hash)
       @raw_keys << key
-      key.each_pair { |_, value| analyze_capture_boundaries(value, @boundaries) }
+      key.each_pair do |k, v|
+        analyze_capture_boundaries(v, @boundaries[k] ||= Histogram.new)
+      end
       nil
     end
 
-    def separators
-      @separators ||= @boundaries.select_upper
-    end
-
-    def separator_pattern
-      @separator_pattern ||= Regexp.union(*separators).freeze
+    def separators(key)
+      @boundaries[key].select_upper
     end
 
     def possible_keys
@@ -39,10 +37,11 @@ module Rack::Mount
         @raw_keys.map do |key|
           key.inject({}) { |requirements, (method, requirement)|
             raise ArgumentError unless method.is_a?(Symbol)
+            separators = separators(method)
 
-            if requirement.is_a?(Regexp) && method == :path_info
+            if requirement.is_a?(Regexp) && separators.any?
               generate_split_keys(requirement, separators).each_with_index do |value, index|
-                requirements[[method, index, separator_pattern]] = value
+                requirements[[method, index, Regexp.union(*separators).freeze]] = value
               end
             elsif requirement.is_a?(Regexp)
               requirements[method] = Utils.extract_static_regexp(requirement)
