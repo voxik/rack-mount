@@ -14,10 +14,10 @@ module Rack::Mount
         @generation_keys = @defaults.dup
 
         @conditions.each do |method, condition|
-          @required_params[method] = @conditions[method].required_keys.reject { |s| @defaults.include?(s) }.freeze
+          @required_params[method] = @conditions[method].segments.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.map { |s| s.name }.reject { |s| @defaults.include?(s) }.freeze
           @required_defaults[method] = @defaults.dup
 
-          condition.requirements.keys.each { |name|
+          condition.segments.flatten.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
             @required_defaults[method].delete(name)
             @generation_keys.delete(name) if @defaults.include?(name)
           }
