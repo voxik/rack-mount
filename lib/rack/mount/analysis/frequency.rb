@@ -2,7 +2,6 @@ module Rack::Mount
   module Analysis
     class Frequency #:nodoc:
       extend Mixover
-      include Splitting
 
       def initialize(*keys)
         clear

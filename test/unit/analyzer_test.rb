@@ -54,21 +54,21 @@ class AnalyzerTest < Test::Unit::TestCase
   end
 
   def test_analysis_boundaries
-    assert_equal(['/', 's'], Rack::Mount::Analysis::Frequency.new(
+    assert_equal(['/', 's'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
       {:path => %r{^/people/([0-9]+)$}},
       {:path => %r{^/messages(/([0-9]+))$}},
       {:path => %r{^/comments$} }
     ).separators(:path))
 
-    assert_equal(['e', '.'], Rack::Mount::Analysis::Frequency.new(
+    assert_equal(['e', '.'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
       {:path => %r{^/people(\.([a-z]+))?$}}
     ).separators(:path))
 
-    assert_equal(['.'], Rack::Mount::Analysis::Frequency.new(
+    assert_equal(['.'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
       {:host => %r{^([a-z+]).37signals.com$}}
     ).separators(:host))
 
-    assert_equal(['-'], Rack::Mount::Analysis::Frequency.new(
+    assert_equal(['-'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
       {:foo => %r{^foo-([a-z+])-bar$}}
     ).separators(:foo))
   end

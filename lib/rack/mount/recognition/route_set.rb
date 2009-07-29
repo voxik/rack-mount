@@ -10,7 +10,7 @@ module Rack::Mount
       def initialize(options = {})
         @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
         @parameters_key.freeze
-        @recognition_key_analyzer = Analysis::Frequency.new
+        @recognition_key_analyzer = Analysis::Frequency.new_with_module(Analysis::Splitting)
 
         super
       end

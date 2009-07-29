@@ -21,14 +21,14 @@ module Rack::Mount
     def new(*args, &block) #:nodoc:
       obj = allocate
       obj.extend(InstanceMethods)
-      @included_modules.each { |mod| obj.extend(mod) }
+      (@included_modules ||= []).each { |mod| obj.extend(mod) }
       obj.send(:initialize, *args, &block)
       obj
     end
 
     # Create a new class without an included module.
     def new_without_module(mod, *args, &block)
-      old_included_modules = @included_modules.dup
+      old_included_modules = (@included_modules ||= []).dup
       @included_modules.delete(mod)
       new(*args, &block)
     ensure
@@ -37,7 +37,7 @@ module Rack::Mount
 
     # Create a new class temporarily with a module.
     def new_with_module(mod, *args, &block)
-      old_included_modules = @included_modules.dup
+      old_included_modules = (@included_modules ||= []).dup
       include(mod)
       new(*args, &block)
     ensure
