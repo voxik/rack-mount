@@ -3,6 +3,10 @@ require 'strscan'
 
 module Rack::Mount
   # Private utility methods used throughout Rack::Mount.
+  #--
+  # This module is a trash can. Try to move these functions into
+  # more appropriate contexts.
+  #++
   module Utils
     # Normalizes URI path.
     #
