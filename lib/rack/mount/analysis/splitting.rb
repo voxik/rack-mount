@@ -5,13 +5,21 @@ module Rack::Mount
         def initialize(method, index, separators)
           replace([method, index, separators])
         end
-      end
 
-      def self.split(value, separator_pattern)
-        keys = value.split(separator_pattern)
-        keys.shift if keys[0] == Const::EMPTY_STRING
-        keys << Const::NULL
-        keys
+        def self.split(value, separator_pattern)
+          keys = value.split(separator_pattern)
+          keys.shift if keys[0] == Const::EMPTY_STRING
+          keys << Const::NULL
+          keys
+        end
+
+        def call(cache, obj)
+          (cache[self[0]] ||= self.class.split(obj.send(self[0]), self[2]))[self[1]]
+        end
+
+        def call_source(cache, obj)
+          "(#{cache}[:#{self[0]}] ||= Analysis::Splitting::Key.split(#{obj}.#{self[0]}, #{self[2].inspect}))[#{self[1]}]"
+        end
       end
 
       def clear

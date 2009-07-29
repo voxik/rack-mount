@@ -25,7 +25,6 @@ module Rack::Mount
         @possible_keys ||= begin
           @raw_keys.map do |key|
             key.inject({}) { |requirements, (method, requirement)|
-              raise ArgumentError unless method.is_a?(Symbol)
               process_key(requirements, method, requirement)
               requirements
             }

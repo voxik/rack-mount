@@ -65,7 +65,7 @@ module Rack::Mount
             keys = recognition_keys.map { |key|
               if key.is_a?(Array)
                 cache = true
-                "(cache[:#{key[0]}] ||= Analysis::Splitting.split(req.#{key[0]}, #{key[2].inspect}))[#{key[1]}]"
+                key.call_source(:cache, :req)
               else
                 "req.#{key}"
               end
