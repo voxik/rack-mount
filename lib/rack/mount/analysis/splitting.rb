@@ -59,13 +59,17 @@ module Rack::Mount
 
             if index > 0
               previous = parts[index-1]
-              previous = Utils.extract_static_regexp(previous.last_part) if previous.is_a?(Utils::Capture)
+              if previous.is_a?(Utils::Capture)
+                previous = Utils.extract_static_regexp(previous.last_part) rescue nil
+              end
               boundaries << previous[-1..-1] if previous.is_a?(String)
             end
 
             if index < parts.length
               following = parts[index+1]
-              following = Utils.extract_static_regexp(following.first_part) if following.is_a?(Utils::Capture)
+              if following.is_a?(Utils::Capture)
+                following = Utils.extract_static_regexp(following.first_part) rescue nil
+              end
               if following.is_a?(String) && following != Const::NULL
                 boundaries << following[0..0] == '\\' ? following[1..1] : following[0..0]
               end
