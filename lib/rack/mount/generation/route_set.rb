@@ -6,7 +6,7 @@ module Rack::Mount
       # Adds generation related concerns to RouteSet.new.
       def initialize(*args)
         @named_routes = {}
-        @generation_key_analyzer = Analyzer.new
+        @generation_key_analyzer = Analysis::Frequency.new
 
         super
       end

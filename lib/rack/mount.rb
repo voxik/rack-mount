@@ -2,7 +2,6 @@ require 'rack'
 
 module Rack #:nodoc:
   module Mount #:nodoc:
-    autoload :Analyzer, 'rack/mount/analyzer'
     autoload :Condition, 'rack/mount/condition'
     autoload :Const, 'rack/mount/const'
     autoload :MetaMethod, 'rack/mount/meta_method'
@@ -15,6 +14,12 @@ module Rack #:nodoc:
     autoload :RoutingError, 'rack/mount/exceptions'
     autoload :Strexp, 'rack/mount/strexp'
     autoload :Utils, 'rack/mount/utils'
+
+    module Analysis #:nodoc:
+      autoload :Frequency, 'rack/mount/analysis/frequency'
+      autoload :Histogram, 'rack/mount/analysis/histogram'
+      autoload :Splitting, 'rack/mount/analysis/splitting'
+    end
 
     module Generation #:nodoc:
       autoload :Condition, 'rack/mount/generation/condition'
