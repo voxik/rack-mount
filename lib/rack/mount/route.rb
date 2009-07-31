@@ -44,7 +44,6 @@ module Rack::Mount
         raise ArgumentError, 'conditions must be a Hash'
       end
       @conditions = {}
-      @generatable_conditions = {}
 
       conditions.each do |method, pattern|
         next unless method && pattern
@@ -55,13 +54,12 @@ module Rack::Mount
         end
 
         pattern = Regexp.compile("\\A#{Regexp.escape(pattern)}\\Z") if pattern.is_a?(String)
-        pattern = RegexpWithNamedGroups.new(pattern).freeze
-        @conditions[method] = pattern
-        @generatable_conditions[method] = GeneratableRegexp.compile(pattern).freeze
+        pattern = RegexpWithNamedGroups.new(pattern)
+        pattern.extend(GeneratableRegexp::InstanceMethods)
+        @conditions[method] = pattern.freeze
       end
 
       @conditions.freeze
-      @generatable_conditions.freeze
     end
 
     def inspect #:nodoc:
