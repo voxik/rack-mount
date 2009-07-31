@@ -51,6 +51,14 @@ module Rack::Mount
         end
       end
 
+      def captures
+        segments.flatten.find_all { |s| s.is_a?(DynamicSegment) }
+      end
+
+      def required_captures
+        segments.find_all { |s| s.is_a?(DynamicSegment) }
+      end
+
       private
         def parse_segments(segments)
           s = []
