@@ -14,10 +14,10 @@ module Rack::Mount
         @generation_keys = @defaults.dup
 
         @conditions.each do |method, condition|
-          @required_params[method] = @conditions[method].segments.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.map { |s| s.name }.reject { |s| @defaults.include?(s) }.freeze
+          @required_params[method] = @generatable_conditions[method].segments.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.map { |s| s.name }.reject { |s| @defaults.include?(s) }.freeze
           @required_defaults[method] = @defaults.dup
 
-          condition.segments.flatten.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
+          @generatable_conditions[method].segments.flatten.find_all { |s| s.is_a?(GeneratableRegexp::DynamicSegment) }.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
             @required_defaults[method].delete(name)
             @generation_keys.delete(name) if @defaults.include?(name)
           }
@@ -65,11 +65,11 @@ module Rack::Mount
 
       private
         def generate_method(method, params, merged, defaults)
-          return nil unless condition = @conditions[method]
-          return nil if condition.segments.empty?
+          return nil unless @conditions[method]
+          return nil if @generatable_conditions[method].segments.empty?
           return nil unless @required_params[method].all? { |p| merged.include?(p) }
           return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
-          condition.generate(params, merged, defaults)
+          @generatable_conditions[method].generate(params, merged, defaults)
         end
     end
   end

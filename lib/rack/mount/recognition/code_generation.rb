@@ -16,7 +16,7 @@ module Rack::Mount
 
             list.each_with_index { |route, i|
               path_info_unanchored = route.conditions[:path_info] &&
-                !route.conditions[:path_info].anchored?
+                !Utils.regexp_anchored?(route.conditions[:path_info])
               m << "route = self[#{i}]"
               m << 'routing_args = route.defaults.dup'
 
@@ -29,13 +29,13 @@ module Rack::Mount
               route.conditions.each do |method, condition|
                 matchers << MetaMethod::Block.new do |matcher|
                   matcher << c = MetaMethod::Condition.new("m = req.#{method}.match(#{condition.inspect})") do |b|
-                    b << "matches = m.captures" if condition.named_captures.any?
-                    condition.named_captures.each do |k, i|
+                    b << "matches = m.captures" if route.named_captures[method].any?
+                    route.named_captures[method].each do |k, i|
                       b << MetaMethod::Condition.new("p = matches[#{i}]") do |c2|
                         c2 << "routing_args[#{k.inspect}] = p"
                       end
                     end
-                    if condition.method == :path_info && !condition.anchored?
+                    if method == :path_info && !Utils.regexp_anchored?(condition)
                       b << "env[Prefix::KEY] = m.to_s"
                     end
                     b << "true"

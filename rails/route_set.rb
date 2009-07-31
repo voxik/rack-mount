@@ -53,7 +53,7 @@ module ActionController
 
       module RouteExtensions
         def segment_keys
-          conditions[:path_info].to_regexp.names.compact.map(&:to_sym)
+          conditions[:path_info].names.compact.map(&:to_sym)
         end
       end
 

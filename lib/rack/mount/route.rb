@@ -1,5 +1,6 @@
-require 'rack/mount/condition'
+require 'rack/mount/generatable_regexp'
 require 'rack/mount/mixover'
+require 'rack/mount/regexp_with_named_groups'
 require 'rack/mount/utils'
 
 module Rack::Mount
@@ -43,17 +44,24 @@ module Rack::Mount
         raise ArgumentError, 'conditions must be a Hash'
       end
       @conditions = {}
+      @generatable_conditions = {}
 
       conditions.each do |method, pattern|
+        next unless method && pattern
+
         unless @set.valid_conditions.include?(method)
           raise ArgumentError, 'conditions may only include ' +
             @set.valid_conditions.inspect
         end
 
-        @conditions[method] = Condition.new(method, pattern) if method && pattern
+        pattern = Regexp.compile("\\A#{Regexp.escape(pattern)}\\Z") if pattern.is_a?(String)
+        pattern = RegexpWithNamedGroups.new(pattern).freeze
+        @conditions[method] = pattern
+        @generatable_conditions[method] = GeneratableRegexp.compile(pattern).freeze
       end
 
       @conditions.freeze
+      @generatable_conditions.freeze
     end
 
     def inspect #:nodoc:

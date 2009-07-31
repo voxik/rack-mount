@@ -1,4 +1,3 @@
-require 'rack/mount/condition'
 require 'rack/mount/utils'
 
 module Rack::Mount
@@ -18,10 +17,7 @@ module Rack::Mount
       # Adds recognition aspects to RouteSet#add_route.
       def add_route(*args)
         route = super
-        @recognition_key_analyzer << route.conditions.inject({}) { |conditions, (method, condition)|
-          conditions[method] = condition.to_regexp
-          conditions
-        }
+        @recognition_key_analyzer << route.conditions
         route
       end
 

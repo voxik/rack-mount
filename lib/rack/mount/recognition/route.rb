@@ -3,14 +3,25 @@ require 'rack/mount/prefix'
 module Rack::Mount
   module Recognition
     module Route #:nodoc:
+      attr_reader :named_captures
+
       def initialize(*args)
         super
 
         # TODO: Don't explict check for :path_info condition
         if @conditions.has_key?(:path_info) &&
-            !@conditions[:path_info].anchored?
+            !Utils.regexp_anchored?(@conditions[:path_info])
           @app = Prefix.new(@app)
         end
+
+        @named_captures = {}
+        @conditions.map { |method, condition|
+          @named_captures[method] = condition.named_captures.inject({}) { |named_captures, (k, v)|
+            named_captures[k.to_sym] = v.last - 1
+            named_captures
+          }.freeze
+        }
+        @named_captures.freeze
       end
 
       def call(req)
@@ -19,15 +30,15 @@ module Rack::Mount
         routing_args = @defaults.dup
         if @conditions.all? { |method, condition|
           value = req.send(method)
-          if m = value.match(condition.to_regexp)
+          if m = value.match(condition)
             matches = m.captures
-            condition.named_captures.each { |k, i|
+            @named_captures[method].each { |k, i|
               if v = matches[i]
                 routing_args[k] = v
               end
             }
             # TODO: Don't explict check for :path_info condition
-            if condition.method == :path_info && !condition.anchored?
+            if method == :path_info && !Utils.regexp_anchored?(condition)
               env[Prefix::KEY] = m.to_s
             end
             true

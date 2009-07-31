@@ -2,7 +2,6 @@ require 'rack'
 
 module Rack #:nodoc:
   module Mount #:nodoc:
-    autoload :Condition, 'rack/mount/condition'
     autoload :Const, 'rack/mount/const'
     autoload :GeneratableRegexp, 'rack/mount/generatable_regexp'
     autoload :MetaMethod, 'rack/mount/meta_method'
@@ -23,14 +22,12 @@ module Rack #:nodoc:
     end
 
     module Generation #:nodoc:
-      autoload :Condition, 'rack/mount/generation/condition'
       autoload :Route, 'rack/mount/generation/route'
       autoload :RouteSet, 'rack/mount/generation/route_set'
     end
 
     module Recognition #:nodoc:
       autoload :CodeGeneration, 'rack/mount/recognition/code_generation'
-      autoload :Condition, 'rack/mount/recognition/condition'
       autoload :Route, 'rack/mount/recognition/route'
       autoload :RouteSet, 'rack/mount/recognition/route_set'
     end
