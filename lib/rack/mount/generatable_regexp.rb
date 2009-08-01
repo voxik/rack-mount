@@ -39,7 +39,11 @@ module Rack::Mount
         obj.segments
       end
 
-      def generate(params, merged, defaults)
+      def generatable?
+        segments.any?
+      end
+
+      def generate(params = {}, merged = {}, defaults = {})
         generate_from_segments(segments, params, merged, defaults)
       end
 
@@ -106,7 +110,7 @@ module Rack::Mount
             when String
               segment
             when DynamicSegment
-              value = merged[segment.name] || defaults[segment.name]
+              value = params[segment.name] || merged[segment.name] || defaults[segment.name]
               if value && segment =~ value.to_s
                 URI.escape(value.to_s)
               else
