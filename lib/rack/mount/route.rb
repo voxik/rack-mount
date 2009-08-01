@@ -1,5 +1,4 @@
 require 'rack/mount/generatable_regexp'
-require 'rack/mount/mixover'
 require 'rack/mount/regexp_with_named_groups'
 require 'rack/mount/utils'
 
