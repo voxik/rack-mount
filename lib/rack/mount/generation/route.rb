@@ -1,5 +1,4 @@
 require 'rack/mount/utils'
-require 'uri'
 
 module Rack::Mount
   module Generation

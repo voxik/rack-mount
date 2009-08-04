@@ -1,4 +1,5 @@
 require 'rack/mount/utils'
+require 'uri'
 
 module Rack::Mount
   class GeneratableRegexp < Regexp #:nodoc:
