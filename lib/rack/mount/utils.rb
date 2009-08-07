@@ -75,9 +75,9 @@ module Rack::Mount
     module_function :extract_static_regexp
 
     if Const::SUPPORTS_NAMED_CAPTURES
-      NAMED_CAPTURE_REGEXP = /\?<([^>]+)>/.freeze
+      NAMED_CAPTURE_REGEXP = /\?<([^>]+)>/
     else
-      NAMED_CAPTURE_REGEXP = /\?:<([^>]+)>/.freeze
+      NAMED_CAPTURE_REGEXP = /\?:<([^>]+)>/
     end
 
     # Strips shim named capture syntax and returns a clean Regexp and
@@ -146,11 +146,6 @@ module Rack::Mount
       def last_part
         last.is_a?(Capture) ? last.last_part : last
       end
-
-      def freeze
-        each { |e| e.freeze }
-        super
-      end
     end
 
     def extract_regexp_parts(regexp) #:nodoc:
@@ -204,9 +199,7 @@ module Rack::Mount
         end
       end
 
-      result = stack.pop
-      result.each { |e| e.freeze }
-      result.freeze
+      stack.pop
     end
     module_function :extract_regexp_parts
   end
