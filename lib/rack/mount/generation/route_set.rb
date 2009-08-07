@@ -93,7 +93,7 @@ module Rack::Mount
         @named_routes.freeze
 
         generation_keys.freeze
-        generation_graph.freeze
+        generation_graph
 
         @generation_key_analyzer = nil
 

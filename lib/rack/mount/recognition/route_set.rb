@@ -57,7 +57,7 @@ module Rack::Mount
       # are determined and an optimized recognition graph is constructed.
       def freeze
         recognition_keys.freeze
-        recognition_graph.freeze
+        recognition_graph
 
         @recognition_key_analyzer = nil
 
