@@ -15,7 +15,6 @@ class RouteSetTest < Test::Unit::TestCase
     assert_raise(RuntimeError) { set.call({}) }
 
     set.freeze
-    assert_frozen(set)
     assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 

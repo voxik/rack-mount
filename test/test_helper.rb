@@ -9,7 +9,6 @@ require 'lib/permutation'
 require 'lib/to_proc'
 
 autoload :ControllerConstants, 'lib/controller_constants'
-autoload :FrozenAssertions, 'lib/frozen_assertions'
 autoload :GraphReport, 'lib/graph_report'
 autoload :RequestDSL, 'lib/request_dsl'
 
@@ -21,7 +20,3 @@ module Account
 end
 
 Object.extend(ControllerConstants)
-
-class Test::Unit::TestCase
-  include FrozenAssertions
-end
