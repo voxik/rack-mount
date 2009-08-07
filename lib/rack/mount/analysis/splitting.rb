@@ -42,7 +42,7 @@ module Rack::Mount
         separators = separators(method)
         if requirement.is_a?(Regexp) && separators.any?
           generate_split_keys(requirement, separators).each_with_index do |value, index|
-            requirements[Key.new(method, index, Regexp.union(*separators).freeze)] = value
+            requirements[Key.new(method, index, Regexp.union(*separators))] = value
           end
         else
           super
@@ -121,7 +121,7 @@ module Rack::Mount
 
           Utils.pop_trailing_nils!(segments)
 
-          segments.freeze
+          segments
         end
 
         def append_to_segments!(segments, s, separators) #:nodoc:
