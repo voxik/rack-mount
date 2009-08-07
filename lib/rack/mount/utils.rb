@@ -100,6 +100,7 @@ module Rack::Mount
         end
       end
 
+      names = [] unless names.any?
       source.gsub!(NAMED_CAPTURE_REGEXP, Const::EMPTY_STRING)
       return Regexp.compile(source, options), names
     end

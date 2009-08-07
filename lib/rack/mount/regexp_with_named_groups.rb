@@ -24,26 +24,23 @@ module Rack::Mount
         end
       end
 
-      attr_reader :named_captures, :names
-
       # Wraps Regexp with named capture support.
       def initialize(regexp)
-        names = nil if names && !names.any?
         regexp, @names = Utils.extract_named_captures(regexp)
-
-        @names = nil unless @names.any?
-
-        if @names
-          @named_captures = {}
-          @names.each_with_index { |n, i|
-            @named_captures[n] = [i+1].freeze if n
-          }
-        end
-
-        (@named_captures ||= {}).freeze
-        (@names ||= []).freeze
-
+        @names.freeze
         super(regexp)
+      end
+
+      def names
+        @names.dup
+      end
+
+      def named_captures
+        named_captures = {}
+        names.each_with_index { |n, i|
+          named_captures[n] = [i+1] if n
+        }
+        named_captures
       end
     end
   else
