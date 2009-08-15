@@ -65,6 +65,7 @@ module ActionController
 
       undef :draw
       def draw
+        clear!
         yield Mapper.new(self)
         @set.add_route(NotFound)
         install_helpers
