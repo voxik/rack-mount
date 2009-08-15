@@ -36,6 +36,8 @@ module Rack::Mount
       end
 
       def generate(method, *args) #:nodoc:
+        raise 'route set not finalized' unless frozen?
+
         case args.length
         when 3
           named_route, params, recall = args

@@ -13,9 +13,11 @@ class RouteSetTest < Test::Unit::TestCase
   def test_ensure_routeset_needs_to_be_frozen
     set = Rack::Mount::RouteSet.new
     assert_raise(RuntimeError) { set.call({}) }
+    assert_raise(RuntimeError) { set.url(:foo) }
 
     set.freeze
     assert_nothing_raised(RuntimeError) { set.call({}) }
+    assert_raise(Rack::Mount::RoutingError) { set.url(:foo) }
   end
 
   def test_ensure_each_route_requires_a_valid_rack_app
