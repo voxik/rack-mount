@@ -118,8 +118,8 @@ module ActionController
           end
         end
 
-        # possible_names = Routing.possible_controllers.collect { |n| Regexp.escape(n) }
-        # requirements[:controller] ||= Regexp.union(*possible_names)
+        possible_names = Routing.possible_controllers.collect { |n| Regexp.escape(n) }
+        requirements[:controller] ||= Regexp.union(*possible_names)
 
         defaults[:action] ||= 'index' if defaults[:controller]
 
