@@ -127,6 +127,10 @@ module Rack::Mount
         def append_to_segments!(segments, s, separators) #:nodoc:
           if s && s != Const::EMPTY_STRING
             separators.each do |separator|
+              if s.gsub(/\[[^\]]+\]/, '').include?(separator)
+                raise ArgumentError
+              end
+
               if Regexp.compile("\\A#{s}\\Z") =~ separator
                 raise ArgumentError
               end

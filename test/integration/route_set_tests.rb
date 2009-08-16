@@ -21,7 +21,7 @@ module RouteSetTests
   }
 
   def setup
-    ActionController::Routing.use_controllers! ['posts', 'notes', 'project']
+    ActionController::Routing.use_controllers! ['admin/posts', 'posts', 'notes', 'project']
     @routes = ActionController::Routing::RouteSet.new
     @routes.draw(&Mapping)
     assert_loaded!
@@ -44,6 +44,9 @@ module RouteSetTests
     assert_equal({:controller => 'admin/users', :action => 'destroy', :id => '1'}, @routes.recognize_path('/admin/users/1', :method => :delete))
     assert_equal({:controller => 'admin/users', :action => 'edit', :id => '1'}, @routes.recognize_path('/admin/users/1/edit', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/admin/users/1/edit', :method => :post) }
+
+    assert_equal({:controller => 'admin/posts', :action => 'index'}, @routes.recognize_path('/admin/posts', :method => :get))
+    assert_equal({:controller => 'admin/posts', :action => 'new'}, @routes.recognize_path('/admin/posts/new', :method => :get))
 
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
     assert_equal({:controller => 'people', :action => 'index', :format => 'xml'}, @routes.recognize_path('/people.xml', :method => :get))
@@ -91,6 +94,9 @@ module RouteSetTests
     assert_equal '/admin/users', @routes.generate({:action => 'index'}, {:controller => 'admin/users'})
     assert_equal '/admin/users', @routes.generate({:controller => 'users', :action => 'index'}, {:controller => 'admin/accounts'})
     assert_equal '/people', @routes.generate({:controller => '/people', :action => 'index'}, {:controller => 'admin/accounts'})
+
+    assert_equal '/admin/posts', @routes.generate({:controller => 'admin/posts'})
+    assert_equal '/admin/posts/new', @routes.generate({:controller => 'admin/posts', :action => 'new'})
 
     # Passes on AC, but it doesn't seem correct
     # assert_equal '/admin/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'admin/accounts'})

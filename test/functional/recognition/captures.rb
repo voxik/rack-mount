@@ -91,6 +91,16 @@ module RecognitionTests
       assert_equal({ :controller => 'account/credit', :action => 'index' }, routing_args)
     end
 
+    def test_nested_route
+      get '/admin/users'
+      assert_success
+      assert_equal({ :controller => 'admin/users' }, routing_args)
+
+      get '/admin/groups'
+      assert_success
+      assert_equal({ :controller => 'admin/groups' }, routing_args)
+    end
+
     # add_route(EchoApp, { :path_info => %r{^/regexp/foos?/(?<action>bar|baz)/(?<id>[a-z0-9]+)$} }, { :controller => 'foo' })
     # add_route(EchoApp, { :path_info => %r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$} }, { :controller => 'foo' }, :complex_regexp)
     # add_route(EchoApp, { :path_info => %r{^/regexp/baz/[a-z]+/[0-9]+$} }, { :controller => 'foo' }, :complex_regexp_fail)
