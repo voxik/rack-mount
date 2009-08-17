@@ -81,23 +81,8 @@ module ActionController
         @set = ::Rack::Mount::RouteSet.new(:parameters_key => PARAMETERS_KEY)
       end
 
-      undef :load_routes!
-      def load_routes!
-        clear!
-        if configuration_files.any?
-          configuration_files.each { |config| load(config) }
-          @routes_last_modified = routes_changed_at
-        else
-          draw do |map|
-            map.connect ":controller/:action/:id"
-          end
-        end
-      end
-
       undef :add_route
       def add_route(path, options = {})
-        clear! unless defined? @set
-
         if conditions = options.delete(:conditions)
           method = conditions.delete(:method).to_s.upcase
         end
