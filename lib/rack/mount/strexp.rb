@@ -25,7 +25,7 @@ module Rack::Mount
       return super(str) if str.is_a?(Regexp)
 
       re = Regexp.escape(str)
-      requirements ||= {}
+      requirements = requirements ? requirements.dup : {}
 
       normalize_requirements!(requirements, separators)
       parse_dynamic_segments!(re, requirements)

@@ -7,6 +7,18 @@ class StrexpTest < Test::Unit::TestCase
     assert_equal %r{foo}, Strexp.compile(%r{foo})
   end
 
+  def test_does_mutate_args
+    str = 'foo/:bar'.freeze
+    requirements = { :bar  => /[a-z]+/.freeze }.freeze
+    separators = ['/'.freeze].freeze
+
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{\Afoo/(?<bar>[a-z]+)\Z}'), Strexp.compile(str, requirements, separators)
+    else
+      assert_equal %r{\Afoo/(?:<bar>[a-z]+)\Z}, Strexp.compile(str, requirements, separators)
+    end
+  end
+
   def test_static_string
     assert_equal %r{\Afoo\Z}, Strexp.compile('foo')
   end
