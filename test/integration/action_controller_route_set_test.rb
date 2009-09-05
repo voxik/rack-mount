@@ -2,18 +2,6 @@ unless RUBY_VERSION == '1.9.2'
   require 'test_helper'
   require 'integration/route_set_tests'
 
-  module ActionController
-    module Routing
-      class RouteSet
-        # TODO: Deprecate sorted behavior in Rails core
-        undef :routes_for_controller_and_action_and_keys
-        def routes_for_controller_and_action_and_keys(controller, action, keys)
-          routes.select { |route| route.matches_controller_and_action?(controller, action) }
-        end
-      end
-    end
-  end
-
   class ActionControllerRouteSetTest < Test::Unit::TestCase
     include RouteSetTests
 

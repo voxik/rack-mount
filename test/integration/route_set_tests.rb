@@ -1,5 +1,7 @@
 require 'action_controller'
 
+ActionController::Routing.generate_best_match = false
+
 module RouteSetTests
   Model = Struct.new(:to_param)
 
