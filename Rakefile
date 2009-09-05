@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'rake'
-require 'rake/testtask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
 
@@ -13,6 +10,7 @@ Thread.new {
 Rake::GemPackageTask.new($spec) do |package|
   package.gem_spec = $spec
 end
+
 
 begin
   require 'hanna/rdoctask'
@@ -44,6 +42,9 @@ namespace :rdoc do
   end
 end
 
+
+require 'rake/testtask'
+
 task :default => :test
 
 Rake::TestTask.new do |t|
@@ -51,6 +52,7 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['test/**/*_test.rb']
   t.verbose = true
 end
+
 
 namespace :vendor do
   task :update_multimap do
