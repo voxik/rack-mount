@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'rack/mount'
 require 'benchmark'
 require 'fixtures'
@@ -70,7 +69,6 @@ def profile_memory_usage
 end
 
 begin
-  gem 'ruby-prof'
   require 'ruby-prof'
 
   OUTPUT = File.join(File.dirname(__FILE__), '..', '..', 'tmp', 'performance')

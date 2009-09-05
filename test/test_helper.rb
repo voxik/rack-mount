@@ -1,4 +1,10 @@
-require 'rubygems'
+begin
+  require 'rack'
+rescue LoadError
+  warn "Loading rubygems"
+  require 'rubygems'
+end
+
 require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
