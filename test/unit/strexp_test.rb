@@ -68,6 +68,7 @@ class StrexpTest < Test::Unit::TestCase
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{\Afoo(\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')
     else
+      # assert_equal %r{\Afoo(?:\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
       assert_equal %r{\Afoo(\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
     end
   end
@@ -109,14 +110,17 @@ class StrexpTest < Test::Unit::TestCase
   end
 
   def test_optional_segment
+    # assert_equal %r{\A/foo(?:/bar)?\Z}, Strexp.compile('/foo(/bar)')
     assert_equal %r{\A/foo(/bar)?\Z}, Strexp.compile('/foo(/bar)')
   end
 
   def test_consecutive_optional_segments
+    # assert_equal %r{\A/foo(?:/bar)?(?:/baz)?\Z}, Strexp.compile('/foo(/bar)(/baz)')
     assert_equal %r{\A/foo(/bar)?(/baz)?\Z}, Strexp.compile('/foo(/bar)(/baz)')
   end
 
   def test_multiple_optional_segments
+    # assert_equal %r{\A(?:/foo)?(?:/bar)?(?:/baz)?\Z}, Strexp.compile('(/foo)(/bar)(/baz)')
     assert_equal %r{\A(/foo)?(/bar)?(/baz)?\Z}, Strexp.compile('(/foo)(/bar)(/baz)')
   end
 
@@ -125,6 +129,7 @@ class StrexpTest < Test::Unit::TestCase
   end
 
   def test_escapes_one_optional_segment_parenthesis
+    # assert_equal %r{\A/foo\((?:/bar)?\Z}, Strexp.compile('/foo\((/bar)')
     assert_equal %r{\A/foo\((/bar)?\Z}, Strexp.compile('/foo\((/bar)')
   end
 

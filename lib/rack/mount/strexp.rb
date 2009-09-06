@@ -69,6 +69,7 @@ module Rack::Mount
           if pre =~ /(.*)\\\\\Z/
             re << $1 + scanner.matched
           elsif scanner.matched == '\\('
+            # re << pre + '(?:'
             re << pre + '('
           elsif scanner.matched == '\\)'
             re << pre + ')?'
