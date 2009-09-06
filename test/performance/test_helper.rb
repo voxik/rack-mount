@@ -115,5 +115,5 @@ begin
       end
     end
   end
-rescue Gem::LoadError
+rescue LoadError
 end
