@@ -15,6 +15,9 @@ module RouteSetTests
 
     map.project 'projects/:project_id', :controller => 'project'
 
+    map.connect '', :controller => 'news', :format => nil
+    map.connect 'news.:format', :controller => 'news'
+
     map.connect 'ws/:controller/:action/:id', :ws => true
     map.connect 'account/:action', :controller => 'account', :action => 'subscription'
     map.connect 'pages/:page_id/:controller/:action/:id'
@@ -23,7 +26,7 @@ module RouteSetTests
   }
 
   def setup
-    ActionController::Routing.use_controllers! ['admin/posts', 'posts', 'notes', 'project']
+    ActionController::Routing.use_controllers! ['admin/posts', 'posts', 'news', 'notes', 'project']
     @routes = ActionController::Routing::RouteSet.new
     @routes.draw(&Mapping)
     assert_loaded!
@@ -85,7 +88,9 @@ module RouteSetTests
     assert_equal({:controller => 'posts', :action => 'show', :id => '1'}, @routes.recognize_path('/posts/show/1', :method => :get))
     assert_equal({:controller => 'posts', :action => 'create'}, @routes.recognize_path('/posts/create', :method => :post))
 
-    assert_raise(ActionController::RoutingError) { @routes.recognize_path('/', :method => :get) }
+    assert_equal({:controller => 'news', :action => 'index', :format => nil}, @routes.recognize_path('/', :method => :get))
+    assert_equal({:controller => 'news', :action => 'index', :format => 'rss'}, @routes.recognize_path('/news.rss', :method => :get))
+
     assert_raise(ActionController::RoutingError) { @routes.recognize_path('/none', :method => :get) }
   end
 
@@ -155,6 +160,10 @@ module RouteSetTests
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'posts', :action => 'index'})
     assert_equal '/posts/create', @routes.generate({:action => 'create'}, {:controller => 'posts'})
     assert_equal '/posts?foo=bar', @routes.generate(:controller => 'posts', :foo => 'bar')
+
+    assert_equal '/', @routes.generate(:controller => 'news', :action => 'index')
+    assert_equal '/', @routes.generate(:controller => 'news', :action => 'index', :format => nil)
+    assert_equal '/news.rss', @routes.generate(:controller => 'news', :action => 'index', :format => 'rss')
 
     assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }
   end
