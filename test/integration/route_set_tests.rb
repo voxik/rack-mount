@@ -100,9 +100,6 @@ module RouteSetTests
     assert_equal '/admin/posts', @routes.generate({:controller => 'admin/posts'})
     assert_equal '/admin/posts/new', @routes.generate({:controller => 'admin/posts', :action => 'new'})
 
-    # Passes on AC, but it doesn't seem correct
-    # assert_equal '/admin/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'admin/accounts'})
-
     assert_equal '/people', @routes.generate(:use_route => 'people')
     assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
     assert_equal '/people.xml', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index', :format => 'xml')
@@ -144,6 +141,12 @@ module RouteSetTests
     assert_equal '/pages/1/notes', @routes.generate(:page_id => '1', :controller => 'notes')
     assert_equal '/notes', @routes.generate(:page_id => nil, :controller => 'notes')
     assert_equal '/notes', @routes.generate(:controller => 'notes')
+    assert_equal '/notes/print', @routes.generate(:controller => 'notes', :action => 'print')
+    assert_equal '/notes/print', @routes.generate({}, {:controller => 'notes', :action => 'print'})
+    assert_equal '/notes/index/1', @routes.generate({}, {:controller => 'notes', :id => '1'})
+    assert_equal '/notes/show/1', @routes.generate({}, {:controller => 'notes', :action => 'show', :id => '1'})
+    assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'notes', :action => 'show', :id => '1'})
+    assert_equal '/notes/list', @routes.generate({:action => 'list'}, {:controller => 'notes', :action => 'show', :id => '1'})
 
     assert_equal '/posts/ping', @routes.generate(:controller => 'posts', :action => 'ping')
     assert_equal '/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1')

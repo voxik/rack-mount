@@ -42,6 +42,7 @@ module BasicGenerationTests
     assert_equal '/pages/1/users/show/2', @app.url(:page_id => '1', :controller => 'users', :action => 'show', :id => '2')
     assert_equal '/default/users/show/1', @app.url(:controller => 'users', :action => 'show', :id => '1')
     assert_equal '/default/users/show/1', @app.url({:action => 'show', :id => '1'}, {:controller => 'users'})
+    assert_equal '/default/users/show/1', @app.url({:controller => 'users', :id => '1'}, {:action => 'show'})
   end
 
   def test_generate_host

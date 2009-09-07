@@ -44,7 +44,8 @@ module Rack::Mount
         segments.any?
       end
 
-      def generate(params = {}, merged = {}, defaults = {})
+      def generate(params = {}, recall = {}, defaults = {})
+        merged = recall.merge(params)
         generate_from_segments(segments, params, merged, defaults)
       end
 
@@ -100,8 +101,8 @@ module Rack::Mount
             }
             return Const::EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
-                value = params[segment.name] || defaults[segment.name]
-                value.nil? || segment !~ value.to_s || params[segment.name] == defaults[segment.name]
+                value = merged[segment.name] || defaults[segment.name]
+                value.nil? || segment !~ value.to_s || merged[segment.name] == defaults[segment.name]
               end
             }
           end

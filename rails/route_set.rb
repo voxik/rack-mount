@@ -138,6 +138,26 @@ module ActionController
         expire_on = build_expiry(options, recall)
         options.each { |k, v| options[k] = v.to_param }
 
+        # TODO: This is a complete mess
+        not_expired = expire_on.inject([]) { |ary, (key, expired)|
+          ary << key if expired == false
+          ary
+        }
+        recover_others = false
+        if recall[:controller] && not_expired.delete(:controller)
+          options[:controller] ||= recall[:controller]
+          recover_others = true
+        end
+        if !expire_on[:action] && recall[:action] && (recover_others || not_expired.delete(:action))
+          options[:action] ||= recall[:action]
+          recover_others = true
+        end
+        if !expire_on[:action] && recover_others
+          not_expired.each do |key|
+            options[key] ||= recall[key]
+          end
+        end
+
         if options[:controller]
           options[:controller] = options[:controller].to_s
         end

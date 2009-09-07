@@ -28,10 +28,7 @@ module Rack::Mount
       end
 
       def url(params = {}, recall = {})
-        params = (params || {}).dup
-        merged = recall.merge(params)
-
-        unless part = generate_method(:path_info, params, merged, @defaults)
+        unless part = generate_method(:path_info, params, recall, @defaults)
           return
         end
 
@@ -51,22 +48,21 @@ module Rack::Mount
 
       def generate(methods, params = {}, recall = {})
         return url(params, recall) if methods == :__url__
-        params = (params || {}).dup
-        merged = recall.merge(params)
         if methods.is_a?(Array)
-          methods.map { |m| generate_method(m, params, merged, @defaults) || (return nil) }
+          methods.map { |m| generate_method(m, params, recall, @defaults) || (return nil) }
         else
-          generate_method(methods, params, merged, @defaults)
+          generate_method(methods, params, recall, @defaults)
         end
       end
 
       private
-        def generate_method(method, params, merged, defaults)
+        def generate_method(method, params, recall, defaults)
+          merged = recall.merge(params)
           return nil unless condition = @conditions[method]
           return nil if condition.segments.empty?
           return nil unless @required_params[method].all? { |p| merged.include?(p) }
           return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
-          condition.generate(params, merged, defaults)
+          condition.generate(params, recall, defaults)
         end
     end
   end
