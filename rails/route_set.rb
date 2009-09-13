@@ -142,11 +142,11 @@ module ActionController
           ary
         }
         recover_others = false
-        if recall[:controller] && not_expired.delete(:controller)
+        if recall[:controller] && options[:controller] != recall[:controller] && not_expired.delete(:controller)
           options[:controller] ||= recall[:controller]
           recover_others = true
         end
-        if !expire_on[:action] && recall[:action] && (recover_others || not_expired.delete(:action))
+        if !expire_on[:action] && recall[:action] && options[:action] != recall[:action] && (recover_others || not_expired.delete(:action))
           options[:action] ||= recall[:action]
           recover_others = true
         end
