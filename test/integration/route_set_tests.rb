@@ -10,6 +10,15 @@ module RouteSetTests
       admin.resources :users
     end
 
+    map.connect 'blog/:year/:month/:day',
+                :controller => 'posts',
+                :action => 'show_date',
+                :requirements => { :year => /(19|20)\d\d/,
+                                   :month => /[01]?\d/,
+                                   :day => /[0-3]?\d/},
+                :day => nil,
+                :month => nil
+
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
@@ -52,6 +61,11 @@ module RouteSetTests
 
     assert_equal({:controller => 'admin/posts', :action => 'index'}, @routes.recognize_path('/admin/posts', :method => :get))
     assert_equal({:controller => 'admin/posts', :action => 'new'}, @routes.recognize_path('/admin/posts/new', :method => :get))
+
+    # assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009'}, @routes.recognize_path('/blog/2009', :method => :get))
+    # assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009', :month => '01'}, @routes.recognize_path('/blog/2009/01', :method => :get))
+    # assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009', :month => '01', :day => '01'}, @routes.recognize_path('/blog/2009/01/01', :method => :get))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/blog/123456789', :method => :get) }
 
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
     assert_equal({:controller => 'people', :action => 'index', :format => 'xml'}, @routes.recognize_path('/people.xml', :method => :get))
@@ -104,6 +118,10 @@ module RouteSetTests
 
     assert_equal '/admin/posts', @routes.generate({:controller => 'admin/posts'})
     assert_equal '/admin/posts/new', @routes.generate({:controller => 'admin/posts', :action => 'new'})
+
+    # assert_equal '/blog/2009', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009)
+    # assert_equal '/blog/2009/1', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009, :month => 1)
+    assert_equal '/blog/2009/1/1', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009, :month => 1, :day => 1)
 
     assert_equal '/people', @routes.generate(:use_route => 'people')
     assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
