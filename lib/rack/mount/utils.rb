@@ -38,6 +38,26 @@ module Rack::Mount
     end
     module_function :pop_trailing_nils!
 
+    # Taken from Rack 1.1.x to build nested query strings
+    def build_nested_query(value, prefix = nil) #:nodoc:
+      case value
+      when Array
+        value.map { |v|
+          build_nested_query(v, Rack::Utils.escape("#{prefix}[]"))
+        }.join("&")
+      when Hash
+        value.map { |k, v|
+          build_nested_query(v, prefix ? Rack::Utils.escape("#{prefix}[#{k}]") : Rack::Utils.escape(k))
+        }.join("&")
+      when String
+        raise ArgumentError, "value must be a Hash" if prefix.nil?
+        "#{prefix}=#{Rack::Utils.escape(value)}"
+      else
+        prefix
+      end
+    end
+    module_function :build_nested_query
+
     # Determines whether the regexp must match the entire string.
     #
     #   regexp_anchored?(/^foo$/) # => true

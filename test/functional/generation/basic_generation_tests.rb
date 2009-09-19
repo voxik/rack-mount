@@ -56,6 +56,8 @@ module BasicGenerationTests
   def test_url_with_query_string
     assert_equal '/login?token=1', @app.url(:login, :token => '1')
     assert_equal '/login?token=1', @app.url(:controller => 'sessions', :action => 'new', :token => '1')
+    # Not sure if escaping []s is correct
+    assert_equal '/login?token%5B%5D=1&token%5B%5D=2', @app.url(:login, :token => ['1', '2'])
   end
 
   def test_uses_default_parameters_when_non_are_passed

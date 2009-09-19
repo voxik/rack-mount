@@ -40,7 +40,7 @@ module Rack::Mount
 
         params.delete_if { |k, v| v.nil? }
         if params.any?
-          part << "?#{Rack::Utils.build_query(params)}"
+          part << "?#{Utils.build_nested_query(params)}"
         end
 
         part

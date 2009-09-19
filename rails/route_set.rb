@@ -180,7 +180,7 @@ module ActionController
         if path && method == :generate_extras
           uri = URI(path)
           extras = uri.query ?
-            uri.query.split('&').map { |v| v.split('=').first.to_sym }.uniq :
+            Rack::Utils.parse_nested_query(uri.query).keys.map { |k| k.to_sym } :
             []
           [uri.path, extras]
         elsif path
