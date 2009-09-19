@@ -138,7 +138,6 @@ module ActionController
 
         options = options_as_params(options)
         expire_on = build_expiry(options, recall)
-        options.each { |k, v| options[k] = v.to_param }
 
         # TODO: This is a complete mess
         not_expired = expire_on.inject([]) { |ary, (key, expired)|

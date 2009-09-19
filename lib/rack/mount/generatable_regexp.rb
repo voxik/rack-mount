@@ -113,6 +113,7 @@ module Rack::Mount
               segment
             when DynamicSegment
               value = params[segment.name] || merged[segment.name] || defaults[segment.name]
+              value = value.to_param if value.respond_to?(:to_param)
               if value && segment =~ value.to_s
                 URI.escape(value.to_s)
               else
