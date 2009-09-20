@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-class StrexpTest < Test::Unit::TestCase
+class TestStrexp < Test::Unit::TestCase
   Strexp = Rack::Mount::Strexp
 
   def test_leaves_regexps_alone

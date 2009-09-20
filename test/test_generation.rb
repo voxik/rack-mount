@@ -1,4 +1,11 @@
-module BasicGenerationTests
+require 'abstract_unit'
+
+class TestGeneration < Test::Unit::TestCase
+  def setup
+    @app = BasicSet
+    assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+  end
+
   Person = Struct.new(:to_param)
 
   def test_url_with_named_route
@@ -63,5 +70,18 @@ module BasicGenerationTests
   def test_uses_default_parameters_when_non_are_passed
     assert_equal '/feed/atom', @app.url(:feed, :kind => 'atom')
     assert_equal '/feed/rss', @app.url(:feed)
+  end
+end
+
+class TestOptimizedGeneration < TestGeneration
+  def setup
+    @app = OptimizedBasicSet
+    assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+  end
+end
+
+class TestLinearGeneration < TestGeneration
+  def setup
+    @app = LinearBasicSet
   end
 end

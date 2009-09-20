@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-class GeneratableRegexpTest < Test::Unit::TestCase
+class TestGeneratableRegexp < Test::Unit::TestCase
   GeneratableRegexp = Rack::Mount::GeneratableRegexp
   DynamicSegment = GeneratableRegexp::DynamicSegment
 

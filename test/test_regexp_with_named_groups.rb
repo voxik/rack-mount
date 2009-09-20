@@ -1,7 +1,7 @@
 require 'abstract_unit'
 
 unless Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-  class RegexpWithNamedGroupsTest < Test::Unit::TestCase
+  class TestRegexpWithNamedGroups < Test::Unit::TestCase
     RegexpWithNamedGroups = Rack::Mount::RegexpWithNamedGroups
 
     def test_simple_regexp

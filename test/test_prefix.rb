@@ -1,8 +1,6 @@
 require 'abstract_unit'
 
-class PrefixTest < Test::Unit::TestCase
-  include RequestDSL
-
+class TestPrefix < Test::Unit::TestCase
   Prefix = Rack::Mount::Prefix
 
   def test_root

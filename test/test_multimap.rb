@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-class MultimapTest < Test::Unit::TestCase
+class TestMultimap < Test::Unit::TestCase
   def test_one_level
     set['/people'] = '/people'
     set['/people'] = '/people/1'

@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-class MetaMethodTest < Test::Unit::TestCase
+class TestMetaMethod < Test::Unit::TestCase
   MetaMethod = Rack::Mount::MetaMethod
   Block = Rack::Mount::MetaMethod::Block
   Condition = Rack::Mount::MetaMethod::Condition
@@ -44,7 +44,7 @@ class MetaMethodTest < Test::Unit::TestCase
   end
 end
 
-class MetaMethodBlockTest < Test::Unit::TestCase
+class TestMetaMethodBlock < Test::Unit::TestCase
   Block = Rack::Mount::MetaMethod::Block
 
   def test_empty_Block
@@ -76,7 +76,7 @@ class MetaMethodBlockTest < Test::Unit::TestCase
   end
 end
 
-class MetaMethodConditionTest < Test::Unit::TestCase
+class TestMetaMethodCondition < Test::Unit::TestCase
   Block = Rack::Mount::MetaMethod::Block
   Condition = Rack::Mount::MetaMethod::Condition
 

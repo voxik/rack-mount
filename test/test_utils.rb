@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-class UtilsTest < Test::Unit::TestCase
+class TestUtils < Test::Unit::TestCase
   include Rack::Mount::Utils
 
   def test_normalize_path

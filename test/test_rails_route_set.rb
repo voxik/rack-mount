@@ -1,8 +1,9 @@
+require 'abstract_unit'
 require 'action_controller'
 
 ActionController::Routing.generate_best_match = false
 
-module RouteSetTests
+module RailsRouteSetTests
   Model = Struct.new(:to_param)
 
   Mapping = lambda { |map|
@@ -236,4 +237,29 @@ module RouteSetTests
     rescue e
       assert true
     end
+end
+
+class TestActionControllerRouteSet < Test::Unit::TestCase
+  include RailsRouteSetTests
+
+  def assert_loaded!
+    if defined? ActionController::Routing::RouteSet::Dispatcher
+      flunk "ActionController tests are running on monkey patched RouteSet"
+    end
+  end
+end
+
+class TestRackMountRouteSet < Test::Unit::TestCase
+  include RailsRouteSetTests
+
+  def setup
+    require File.join(File.dirname(__FILE__), '..', 'rails', 'init')
+    super
+  end
+
+  def assert_loaded!
+    unless defined? ActionController::Routing::RouteSet::Dispatcher
+      flunk "Rack::Mount tests are running without the proper monkey patch"
+    end
+  end
 end

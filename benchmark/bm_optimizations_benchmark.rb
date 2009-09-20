@@ -1,4 +1,4 @@
-require 'performance/abstract_unit'
+require 'helper'
 
 TIMES = 10_000.to_i
 Env = EnvGenerator.env_for(TIMES, '/account/credit_card/1')

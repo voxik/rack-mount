@@ -1,10 +1,6 @@
 require 'abstract_unit'
 
-class RouteSetTest < Test::Unit::TestCase
-  include RequestDSL
-  include RecognitionTests
-  include GenerationTests
-
+class TestRouteSet < Test::Unit::TestCase
   def setup
     @app = BasicSet
     assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
@@ -68,9 +64,27 @@ class RouteSetTest < Test::Unit::TestCase
     assert_equal 3, @app.instance_variable_get('@recognition_graph').average_height.to_i
     assert_equal 7, @app.instance_variable_get('@generation_graph').average_height.to_i
   end
+end
 
-  private
-    def set_included_modules
-      class << @app; included_modules; end
-    end
-end unless defined? RouteSetTest
+class TestOptimizedRouteSet < TestRouteSet
+  def setup
+    @app = OptimizedBasicSet
+    assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+  end
+end
+
+class TestLinearRouteSet < TestRouteSet
+  def setup
+    @app = LinearBasicSet
+  end
+
+  def test_worst_case
+    assert_equal @app.length, @app.instance_variable_get('@recognition_graph').height
+    assert_equal @app.length, @app.instance_variable_get('@generation_graph').height
+  end
+
+  def test_average_case
+    assert_equal @app.length, @app.instance_variable_get('@recognition_graph').average_height.to_i
+    assert_equal @app.length, @app.instance_variable_get('@generation_graph').average_height.to_i
+  end
+end
