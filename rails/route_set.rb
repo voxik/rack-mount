@@ -121,7 +121,14 @@ module ActionController
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)
 
-        conditions = { :request_method => method, :path_info => path }
+        if method && !HTTP_METHODS.include?(method.downcase.to_sym)
+          raise ArgumentError
+        end
+
+        conditions = {}
+        conditions[:request_method] = method if method
+        conditions[:path_info] = path if path
+
         route = @set.add_route(app, conditions, defaults, name)
         route.extend(RouteExtensions)
         route
