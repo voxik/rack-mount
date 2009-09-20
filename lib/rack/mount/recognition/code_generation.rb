@@ -46,7 +46,7 @@ module Rack::Mount
 
           m << 'nil'
           # puts "\n#{m.inspect}"
-          container.instance_eval(m)
+          container.instance_eval(m, __FILE__, __LINE__)
         end
 
         def optimize_call!
@@ -80,7 +80,7 @@ module Rack::Mount
           end
 
           # puts "\n#{method.inspect}"
-          instance_eval(method)
+          instance_eval(method, __FILE__, __LINE__)
         end
     end
   end
