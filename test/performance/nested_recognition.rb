@@ -1,4 +1,4 @@
-require 'performance/test_helper'
+require 'performance/abstract_unit'
 
 require 'rack/mount'
 Mount = Rack::Mount::RouteSet.new do |map|

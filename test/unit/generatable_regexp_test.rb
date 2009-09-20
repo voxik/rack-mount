@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class GeneratableRegexpTest < Test::Unit::TestCase
   GeneratableRegexp = Rack::Mount::GeneratableRegexp

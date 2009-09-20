@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 require 'functional/route_set_test'
 
 class OptimizedRouteSetTest < RouteSetTest

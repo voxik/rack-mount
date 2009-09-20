@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class StrexpTest < Test::Unit::TestCase
   Strexp = Rack::Mount::Strexp

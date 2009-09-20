@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class AnalyzerTest < Test::Unit::TestCase
   def test_reports_are_the_best

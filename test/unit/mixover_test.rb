@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class MixoverTest < Test::Unit::TestCase
   Calls = []

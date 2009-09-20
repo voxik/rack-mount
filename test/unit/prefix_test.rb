@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class PrefixTest < Test::Unit::TestCase
   include RequestDSL

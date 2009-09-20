@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 unless Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
   class RegexpWithNamedGroupsTest < Test::Unit::TestCase

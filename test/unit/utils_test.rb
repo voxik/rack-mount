@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class UtilsTest < Test::Unit::TestCase
   include Rack::Mount::Utils

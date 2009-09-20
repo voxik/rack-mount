@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class MultimapTest < Test::Unit::TestCase
   def test_one_level

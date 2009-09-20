@@ -1,5 +1,5 @@
 unless RUBY_VERSION == '1.9.2'
-  require 'test_helper'
+  require 'abstract_unit'
   require 'integration/route_set_tests'
 
   class ActionControllerRouteSetTest < Test::Unit::TestCase

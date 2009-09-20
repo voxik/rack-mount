@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'abstract_unit'
 
 class MetaMethodTest < Test::Unit::TestCase
   MetaMethod = Rack::Mount::MetaMethod
