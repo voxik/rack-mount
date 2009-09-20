@@ -193,10 +193,11 @@ module ActionController
       end
 
       undef :recognize_path
-      def recognize_path(path, environment = {})
+      def recognize_path(path, environment = {}, rescue_error = true)
         method = (environment[:method] || "GET").to_s.upcase
         env = Rack::MockRequest.env_for(path, {:method => method})
         env['action_controller.recognize'] = true
+        env['action_controller.rescue_error'] = rescue_error
         status, headers, body = call(env)
         body
       end
@@ -204,6 +205,27 @@ module ActionController
       undef :call
       def call(env)
         @set.call(env)
+      rescue ActionController::RoutingError => e
+        raise e if env['action_controller.rescue_error'] == false
+
+        method, path = env['REQUEST_METHOD'].downcase.to_sym, env['PATH_INFO']
+
+        # Route was not recognized. Try to find out why (maybe wrong verb).
+        allows = HTTP_METHODS.select { |verb|
+          begin
+            recognize_path(path, {:method => verb}, false)
+          rescue ActionController::RoutingError
+            nil
+          end
+        }
+
+        if !HTTP_METHODS.include?(method)
+          raise NotImplemented.new(*allows)
+        elsif !allows.empty?
+          raise MethodNotAllowed.new(*allows)
+        else
+          raise e
+        end
       end
 
       private
