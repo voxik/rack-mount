@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
     "lib/rack/mount/mixover.rb",
     "lib/rack/mount/multimap.rb",
     "lib/rack/mount/prefix.rb",
-    "lib/rack/mount/recognition/code_generation.rb"
+    "lib/rack/mount/recognition/code_generation.rb",
     "lib/rack/mount/recognition/route.rb",
     "lib/rack/mount/recognition/route_set.rb",
     "lib/rack/mount/regexp_with_named_groups.rb",
