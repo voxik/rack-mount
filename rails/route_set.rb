@@ -88,7 +88,8 @@ module ActionController
       undef :add_route
       def add_route(path, options = {})
         if conditions = options.delete(:conditions)
-          method = conditions.delete(:method).to_s.upcase
+          method = conditions.delete(:method)
+          method = method.to_s.upcase if method
         end
 
         name = options.delete(:_name)
