@@ -113,7 +113,7 @@ module ActionController
 
         if path.is_a?(String)
           path = path.gsub('.:format', '(.:format)')
-          path = optionalize_trailing_dynamic_segments(path, requirements)
+          path = optionalize_trailing_dynamic_segments(path, requirements, defaults)
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
           path = ::Rack::Mount::Utils.normalize_path(path)
           path = ::Rack::Mount::Strexp.compile(path, requirements, %w( / . ? ))
@@ -237,16 +237,19 @@ module ActionController
       end
 
       private
-        def optionalize_trailing_dynamic_segments(path, requirements)
+        def optionalize_trailing_dynamic_segments(path, requirements, defaults)
           path = (path =~ /^\//) ? path.dup : "/#{path}"
           optional, segments = true, []
+
+          required_segments = requirements.keys
+          required_segments -= defaults.map { |k, v| k if v.nil? }.compact
 
           old_segments = path.split('/')
           old_segments.shift
           length = old_segments.length
 
           old_segments.reverse.each_with_index do |segment, index|
-            requirements.keys.each do |required|
+            required_segments.each do |required|
               if segment =~ /#{required}/
                 optional = false
                 break
@@ -255,8 +258,12 @@ module ActionController
 
             if optional && !(segment =~ /^:\w+$/) && !(segment =~ /^:\w+\(\.:format\)$/)
               optional = false
-            elsif optional && segment =~ /^:\w+$/ && segment != ":action" && segment != ":id"
-              optional = false
+            elsif optional && segment =~ /^:(\w+)$/ && segment != ":action" && segment != ":id"
+              if defaults.has_key?($1.to_sym) && defaults[$1.to_sym].nil?
+                defaults.delete($1.to_sym)
+              else
+                optional = false
+              end
             end
 
             if optional && index < length - 1
