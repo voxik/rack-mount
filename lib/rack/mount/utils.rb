@@ -53,7 +53,11 @@ module Rack::Mount
         raise ArgumentError, "value must be a Hash" if prefix.nil?
         "#{prefix}=#{Rack::Utils.escape(value)}"
       else
-        prefix
+        if value.respond_to?(:to_param)
+          build_nested_query(value.to_param, prefix)
+        else
+          prefix
+        end
       end
     end
     module_function :build_nested_query

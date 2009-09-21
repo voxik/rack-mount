@@ -183,6 +183,7 @@ module RailsRouteSetTests
     assert_equal '/posts/create', @routes.generate({:action => 'create'}, {:controller => 'posts'})
     assert_equal '/posts?foo=bar', @routes.generate(:controller => 'posts', :foo => 'bar')
     assert_equal '/posts?foo%5B%5D=bar&foo%5B%5D=baz', @routes.generate(:controller => 'posts', :foo => ['bar', 'baz'])
+    assert_equal '/posts?page=2', @routes.generate(:controller => 'posts', :page => 2)
 
     assert_equal '/', @routes.generate(:controller => 'news', :action => 'index')
     assert_equal '/', @routes.generate(:controller => 'news', :action => 'index', :format => nil)
