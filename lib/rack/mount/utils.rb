@@ -43,20 +43,20 @@ module Rack::Mount
       case value
       when Array
         value.map { |v|
-          build_nested_query(v, Rack::Utils.escape("#{prefix}[]"))
+          build_nested_query(v, "#{prefix}[]")
         }.join("&")
       when Hash
         value.map { |k, v|
-          build_nested_query(v, prefix ? Rack::Utils.escape("#{prefix}[#{k}]") : Rack::Utils.escape(k))
+          build_nested_query(v, prefix ? "#{prefix}[#{k}]" : k)
         }.join("&")
       when String
         raise ArgumentError, "value must be a Hash" if prefix.nil?
-        "#{prefix}=#{Rack::Utils.escape(value)}"
+        "#{Rack::Utils.escape(prefix)}=#{Rack::Utils.escape(value)}"
       else
         if value.respond_to?(:to_param)
           build_nested_query(value.to_param, prefix)
         else
-          prefix
+          Rack::Utils.escape(prefix)
         end
       end
     end
