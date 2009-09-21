@@ -105,12 +105,10 @@ module Rack::Mount
                 source = part.map { |p| p.to_s }.join
                 append_to_segments!(segments, source, separators)
               else
-                scanner = StringScanner.new(part)
-                while s = scanner.scan_until(separators_regexp)
-                  s = s[0...-scanner.matched_size]
-                  append_to_segments!(segments, s, separators)
-                end
-                previous = scanner.rest
+                parts = part.split(separators_regexp)
+                parts.shift if parts[0] == Const::EMPTY_STRING
+                previous = parts.pop
+                parts.each { |p| append_to_segments!(segments, p, separators) }
               end
             end
 
@@ -119,27 +117,28 @@ module Rack::Mount
             # generation failed somewhere, but lets take what we can get
           end
 
-          Utils.pop_trailing_nils!(segments)
+          while segments.length > 0 && (segments.last.nil? || segments.last == '')
+            segments.pop
+          end
 
           segments
         end
 
         def append_to_segments!(segments, s, separators) #:nodoc:
-          if s && s != Const::EMPTY_STRING
-            separators.each do |separator|
-              if s.gsub(/\[[^\]]+\]/, '').include?(separator)
-                raise ArgumentError
-              end
-
-              if Regexp.compile("\\A#{s}\\Z") =~ separator
-                raise ArgumentError
-              end
+          return unless s
+          separators.each do |separator|
+            if s.gsub(/\[[^\]]+\]/, '').include?(separator)
+              raise ArgumentError
             end
 
-            static = Utils.extract_static_regexp(s)
-            segments << (static.is_a?(String) ? static : static)
+            if Regexp.compile("\\A#{s}\\Z") =~ separator
+              raise ArgumentError
+            end
           end
+
+          static = Utils.extract_static_regexp(s)
+          segments << (static.is_a?(String) ? static : static)
         end
-    end
+      end
   end
 end

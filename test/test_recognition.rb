@@ -293,6 +293,33 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal '/foo/bar/1', @env['PATH_INFO']
     assert_equal '/prefix', @env['SCRIPT_NAME']
   end
+
+  def test_small_set_with_ambiguous_splitting
+    @app = Rack::Mount::RouteSet.new do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts/:id(.:format)'))
+    end
+
+    get '/messages'
+    assert_success
+
+    get '/messages.xml'
+    assert_success
+
+    get '/messages/1'
+    assert_success
+
+    get '/messages/1.xml'
+    assert_success
+
+    get '/posts'
+    assert_success
+
+    get '/posts.xml'
+    assert_success
+  end
 end
 
 class TestOptimizedRecognition < TestRecognition
