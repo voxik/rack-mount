@@ -54,7 +54,7 @@ module Rack::Mount
         "#{Rack::Utils.escape(prefix)}=#{Rack::Utils.escape(value)}"
       else
         if value.respond_to?(:to_param)
-          build_nested_query(value.to_param, prefix)
+          build_nested_query(value.to_param.to_s, prefix)
         else
           Rack::Utils.escape(prefix)
         end
