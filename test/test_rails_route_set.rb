@@ -11,6 +11,10 @@ module RailsRouteSetTests
       admin.resources :users
     end
 
+    map.namespace 'api' do |api|
+      api.root :controller => 'users'
+    end
+
     map.connect 'blog/:year/:month/:day',
                 :controller => 'posts',
                 :action => 'show_date',
@@ -60,6 +64,9 @@ module RailsRouteSetTests
 
     assert_equal({:controller => 'admin/posts', :action => 'index'}, @routes.recognize_path('/admin/posts', :method => :get))
     assert_equal({:controller => 'admin/posts', :action => 'new'}, @routes.recognize_path('/admin/posts/new', :method => :get))
+
+    assert_equal({:controller => 'api/users', :action => 'index'}, @routes.recognize_path('/api', :method => :get))
+    assert_equal({:controller => 'api/users', :action => 'index'}, @routes.recognize_path('/api/', :method => :get))
 
     assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009'}, @routes.recognize_path('/blog/2009', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009', :month => '01'}, @routes.recognize_path('/blog/2009/01', :method => :get))

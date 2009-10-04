@@ -92,7 +92,12 @@ module ActionController
           method = method.to_s.upcase if method
         end
 
+        path_prefix = options.delete(:path_prefix)
+        name_prefix = options.delete(:name_prefix)
+        namespace  = options.delete(:namespace)
+
         name = options.delete(:_name)
+        name = "#{name_prefix}#{name}" if name_prefix
 
         requirements = options.delete(:requirements) || {}
         defaults = {}
@@ -111,7 +116,12 @@ module ActionController
 
         defaults[:action] ||= 'index' if defaults[:controller]
 
+        if defaults[:controller] && namespace
+          defaults[:controller] = "#{namespace}#{defaults[:controller]}"
+        end
+
         if path.is_a?(String)
+          path = "#{path_prefix}/#{path}" if path_prefix
           path = path.gsub('.:format', '(.:format)')
           path = optionalize_trailing_dynamic_segments(path, requirements, defaults)
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
