@@ -31,7 +31,7 @@ module RailsRouteSetTests
     map.connect 'news.:format', :controller => 'news'
 
     map.connect 'ws/:controller/:action/:id', :ws => true
-    map.connect 'account/:action', :controller => 'account', :action => 'subscription'
+    map.connect 'account/:action', :controller => :account, :action => :subscription
     map.connect 'pages/:page_id/:controller/:action/:id'
     map.connect ':controller/ping', :action => 'ping'
     map.connect ':controller/:action/:id'

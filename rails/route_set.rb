@@ -114,10 +114,14 @@ module ActionController
         possible_names = Routing.possible_controllers.collect { |n| Regexp.escape(n) }
         requirements[:controller] ||= Regexp.union(*possible_names)
 
-        defaults[:action] ||= 'index' if defaults[:controller]
+        if defaults[:controller]
+          defaults[:action] ||= 'index'
+          defaults[:controller] = defaults[:controller].to_s
+          defaults[:controller] = "#{namespace}#{defaults[:controller]}" if namespace
+        end
 
-        if defaults[:controller] && namespace
-          defaults[:controller] = "#{namespace}#{defaults[:controller]}"
+        if defaults[:action]
+          defaults[:action] = defaults[:action].to_s
         end
 
         if path.is_a?(String)
