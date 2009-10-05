@@ -21,6 +21,7 @@ module ActionController
           params = env[PARAMETERS_KEY]
           merge_default_action!(params)
           split_glob_param!(params) if @glob_param
+          params.each { |key, value| params[key] = URI.unescape(value) if value.is_a?(String) }
 
           if env['action_controller.recognize']
             [200, {}, params]

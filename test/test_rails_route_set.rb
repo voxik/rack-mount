@@ -4,6 +4,16 @@ require 'action_controller'
 ActionController::Routing.generate_best_match = false
 
 module RailsRouteSetTests
+  module UriReservedCharacters
+    SAFE   = %w( : @ & = + $ , ; ).freeze
+    UNSAFE = %w( ^ / ? # [ ] ).freeze
+
+    HEX = UNSAFE.map { |char| '%' + char.unpack('H2').first.upcase }.freeze
+
+    SEGMENT = "#{SAFE.join}#{UNSAFE.join}".freeze
+    ESCAPED = "#{SAFE.join}#{HEX.join}".freeze
+  end
+
   Model = Struct.new(:to_param)
 
   Mapping = lambda { |map|
@@ -112,6 +122,8 @@ module RailsRouteSetTests
     assert_equal({:controller => 'news', :action => 'index', :format => nil}, @routes.recognize_path('/', :method => :get))
     assert_equal({:controller => 'news', :action => 'index', :format => 'rss'}, @routes.recognize_path('/news.rss', :method => :get))
 
+    assert_equal({:controller => 'posts', :action => "act#{UriReservedCharacters::SEGMENT}ion"}, @routes.recognize_path("/posts/act#{UriReservedCharacters::ESCAPED}ion"))
+
     assert_raise(ActionController::RoutingError) { @routes.recognize_path('/none', :method => :get) }
   end
 
@@ -196,6 +208,8 @@ module RailsRouteSetTests
     assert_equal '/', @routes.generate(:controller => 'news', :action => 'index')
     assert_equal '/', @routes.generate(:controller => 'news', :action => 'index', :format => nil)
     assert_equal '/news.rss', @routes.generate(:controller => 'news', :action => 'index', :format => 'rss')
+
+    # assert_equal "/posts/act#{UriReservedCharacters::ESCAPED}ion", @routes.generate(:controller => 'posts', :action => "act#{UriReservedCharacters::SEGMENT}ion")
 
     assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }
   end
