@@ -24,12 +24,12 @@ module Rack::Mount
     # - <tt>Recognition::RouteSet.new</tt>
     def initialize(options = {}, &block)
       @request_class = options.delete(:request_class) || Rack::Request
-
       @routes = []
+      expire!
 
       if block_given?
         yield self
-        freeze
+        rehash
       end
     end
 
@@ -45,6 +45,7 @@ module Rack::Mount
     def add_route(app, conditions = {}, defaults = {}, name = nil)
       route = Route.new(self, app, conditions, defaults, name)
       @routes << route
+      expire!
       route
     end
 
@@ -68,16 +69,26 @@ module Rack::Mount
       @routes.length
     end
 
+    def rehash #:nodoc:
+    end
+
     # Finalizes the set and builds optimized data structures. You *must*
     # freeze the set before you can use <tt>call</tt> and <tt>url</tt>.
     # So remember to call freeze after you are done adding routes.
     def freeze
-      @routes.each { |route| route.freeze }
-      @routes.freeze
+      unless frozen?
+        rehash
+        @routes.each { |route| route.freeze }
+        @routes.freeze
+      end
+
       super
     end
 
     private
+      def expire! #:nodoc:
+      end
+
       # An internal helper method for constructing a nested set from
       # the linear route set.
       #

@@ -3,12 +3,24 @@ require 'rack/mount/meta_method'
 module Rack::Mount
   module Recognition
     module CodeGeneration #:nodoc:
-      def freeze
-        optimize_call! unless frozen?
+      def _expired_call(env) #:nodoc:
+        raise 'route set not finalized'
+      end
+
+      def rehash
         super
+        optimize_call!
       end
 
       private
+        def expire!
+          class << self
+            alias_method :call, :_expired_call
+          end
+
+          super
+        end
+
         def optimize_container_iterator(container)
           m = MetaMethod.new(:optimized_each, :req)
           m << 'env = req.env'
@@ -62,7 +74,7 @@ module Rack::Mount
             method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
             method << "req = #{@request_class.name}.new(env)"
             cache = false
-            keys = recognition_keys.map { |key|
+            keys = @recognition_keys.map { |key|
               if key.is_a?(Array)
                 cache = true
                 key.call_source(:cache, :req)

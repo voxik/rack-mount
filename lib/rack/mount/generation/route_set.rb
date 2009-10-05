@@ -36,7 +36,7 @@ module Rack::Mount
       end
 
       def generate(method, *args) #:nodoc:
-        raise 'route set not finalized' unless frozen?
+        raise 'route set not finalized' unless @generation_graph
 
         case args.length
         when 3
@@ -89,34 +89,31 @@ module Rack::Mount
         end
       end
 
-      # Adds the generation aspect to RouteSet#freeze. Generation keys
-      # are determined and an optimized generation graph is constructed.
-      def freeze
-        @named_routes.freeze
-
-        generation_keys.freeze
-        generation_graph
-
-        @generation_key_analyzer = nil
+      def rehash #:nodoc:
+        @generation_keys  = build_generation_keys
+        @generation_graph = build_generation_graph
 
         super
       end
 
       private
-        def generation_graph
-          @generation_graph ||= begin
-            build_nested_route_set(@generation_keys) { |k, i|
-              if k = @generation_key_analyzer.possible_keys[i][k]
-                k.to_s
-              else
-                nil
-              end
-            }
-          end
+        def expire!
+          @generation_keys = @generation_graph = nil
+          super
         end
 
-        def generation_keys
-          @generation_keys ||= @generation_key_analyzer.report
+        def build_generation_graph
+          build_nested_route_set(@generation_keys) { |k, i|
+            if k = @generation_key_analyzer.possible_keys[i][k]
+              k.to_s
+            else
+              nil
+            end
+          }
+        end
+
+        def build_generation_keys
+          @generation_key_analyzer.report
         end
     end
   end

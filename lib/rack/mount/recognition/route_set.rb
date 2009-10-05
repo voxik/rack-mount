@@ -28,7 +28,7 @@ module Rack::Mount
       # This method can only be invoked after the RouteSet has been
       # finalized.
       def call(env)
-        raise 'route set not finalized' unless frozen?
+        raise 'route set not finalized' unless @recognition_graph
 
         set_expectation = env[Const::EXPECT] != Const::CONTINUE
         env[Const::EXPECT] = Const::CONTINUE if set_expectation
@@ -53,13 +53,9 @@ module Rack::Mount
         env.delete(Const::EXPECT) if set_expectation
       end
 
-      # Adds the recognition aspect to RouteSet#freeze. Recognition keys
-      # are determined and an optimized recognition graph is constructed.
-      def freeze
-        recognition_keys.freeze
-        recognition_graph
-
-        @recognition_key_analyzer = nil
+      def rehash #:nodoc:
+        @recognition_keys  = build_recognition_keys
+        @recognition_graph = build_recognition_graph
 
         super
       end
@@ -73,16 +69,19 @@ module Rack::Mount
       end
 
       private
-        def recognition_graph
-          @recognition_graph ||= begin
-            build_nested_route_set(recognition_keys) { |k, i|
-              @recognition_key_analyzer.possible_keys[i][k]
-            }
-          end
+        def expire!
+          @recognition_keys = @recognition_graph = nil
+          super
         end
 
-        def recognition_keys
-          @recognition_keys ||= @recognition_key_analyzer.report
+        def build_recognition_graph
+          build_nested_route_set(@recognition_keys) { |k, i|
+            @recognition_key_analyzer.possible_keys[i][k]
+          }
+        end
+
+        def build_recognition_keys
+          @recognition_key_analyzer.report
         end
     end
   end
