@@ -28,9 +28,14 @@ module Rack::Mount
       end
 
       def url(params = {}, recall = {})
+        params = URISegment.wrap_values(params)
+        recall = URISegment.wrap_values(recall)
+
         unless part = generate_method(:path_info, params, recall, @defaults)
           return
         end
+
+        params.each { |k, v| params[k] = v.value }
 
         @defaults.each do |key, value|
           if params[key] == value
@@ -56,6 +61,29 @@ module Rack::Mount
       end
 
       private
+        class URISegment < Struct.new(:value)
+          def self.wrap_values(hash)
+            hash.inject({}) { |h, (k, v)| h[k] = new(v); h }
+          end
+
+          def ==(obj)
+            value == obj
+          end
+
+          def eql?(obj)
+            value.eql?(obj)
+          end
+
+          def hash
+            value.hash
+          end
+
+          def to_param
+            v = value.respond_to?(:to_param) ? value.to_param : value
+            URI.escape(v.to_s)
+          end
+        end
+
         def generate_method(method, params, recall, defaults)
           merged = recall.merge(params)
           return nil unless condition = @conditions[method]

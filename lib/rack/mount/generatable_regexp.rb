@@ -102,7 +102,8 @@ module Rack::Mount
             return Const::EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
                 value = merged[segment.name] || defaults[segment.name]
-                value.nil? || segment !~ value.to_s || merged[segment.name] == defaults[segment.name]
+                value = value.to_param if value.respond_to?(:to_param)
+                value.nil? || segment !~ value || merged[segment.name] == defaults[segment.name]
               end
             }
           end
@@ -114,8 +115,8 @@ module Rack::Mount
             when DynamicSegment
               value = params[segment.name] || merged[segment.name] || defaults[segment.name]
               value = value.to_param if value.respond_to?(:to_param)
-              if value && segment =~ value.to_s
-                URI.escape(value.to_s)
+              if value && segment =~ value
+                value
               else
                 return
               end
