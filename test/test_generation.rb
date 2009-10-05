@@ -60,6 +60,24 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal ['josh.backpackit.com', '/host'], @app.generate([:host, :path_info], :controller => 'account', :account => 'josh')
   end
 
+  def test_generate_consumes_defaults
+    params = {:controller => 'sessions', :action => 'new'}
+    assert_equal '/login', @app.generate(:path_info, params)
+    assert_equal({}, params)
+
+    params = {:controller => 'sessions', :action => 'new', :token => '1'}
+    assert_equal '/login', @app.generate(:path_info, params)
+    assert_equal({:token => '1'}, params)
+
+    params = {:controller => 'account', :account => 'josh'}
+    assert_equal 'josh.backpackit.com', @app.generate(:host, params)
+    assert_equal({}, params)
+
+    params = {:controller => 'account', :account => 'josh', :token => '1'}
+    assert_equal 'josh.backpackit.com', @app.generate(:host, params)
+    assert_equal({:token => '1'}, params)
+  end
+
   def test_url_with_query_string
     assert_equal '/login?token=1', @app.url(:login, :token => '1')
     assert_equal '/login?token=1', @app.url(:controller => 'sessions', :action => 'new', :token => '1')
