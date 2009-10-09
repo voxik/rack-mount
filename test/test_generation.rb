@@ -60,22 +60,9 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal [['josh.backpackit.com', '/host'], {}], @app.generate([:host, :path_info], :controller => 'account', :account => 'josh')
   end
 
-  def test_generate_consumes_defaults
-    params = {:controller => 'sessions', :action => 'new'}
-    assert_equal ['/login', params], @app.generate(:path_info, params)
-    assert_equal({}, params)
-
-    params = {:controller => 'sessions', :action => 'new', :token => '1'}
-    assert_equal ['/login', params], @app.generate(:path_info, params)
-    assert_equal({:token => '1'}, params)
-
-    params = {:controller => 'account', :account => 'josh'}
-    assert_equal ['josh.backpackit.com', params], @app.generate(:host, params)
-    assert_equal({}, params)
-
-    params = {:controller => 'account', :account => 'josh', :token => '1'}
-    assert_equal ['josh.backpackit.com', params], @app.generate(:host, params)
-    assert_equal({:token => '1'}, params)
+  def test_does_not_mutuate_params
+    assert_equal '/login', @app.url({:controller => 'sessions', :action => 'new'}.freeze)
+    assert_equal ['josh.backpackit.com', {}], @app.generate(:host, {:controller => 'account', :account => 'josh'}.freeze)
   end
 
   def test_url_with_query_string

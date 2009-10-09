@@ -139,7 +139,7 @@ module Rack::Mount
           params ||= {}
           recall ||= {}
 
-          [named_route, params, recall]
+          [named_route, params.dup, recall.dup]
         end
 
         class URISegment < Struct.new(:_value)
