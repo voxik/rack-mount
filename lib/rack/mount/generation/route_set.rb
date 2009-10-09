@@ -38,10 +38,11 @@ module Rack::Mount
         params = URISegment.wrap_values(params)
         recall = URISegment.wrap_values(recall)
 
-        unless uri = generate(:path_info, named_route, params, recall)
+        unless result = generate(:path_info, named_route, params, recall)
           return
         end
 
+        uri, params = result
         params.each do |k, v|
           if v._value
             params[k] = v._value
@@ -50,7 +51,7 @@ module Rack::Mount
           end
         end
 
-        uri << "?#{Utils.build_nested_query(params)}" if params.any?
+        uri << "?#{Utils.build_nested_query(params)}" if uri && params.any?
         uri
       end
 
@@ -64,7 +65,8 @@ module Rack::Mount
         if named_route
           if route = @named_routes[named_route.to_sym]
             recall = route.defaults.merge(recall)
-            route.generate(method, params, recall)
+            url = route.generate(method, params, recall)
+            [url, params]
           else
             raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
           end
@@ -78,7 +80,7 @@ module Rack::Mount
           }
           @generation_graph[*keys].each do |r|
             if url = r.generate(method, params, recall)
-              return url
+              return [url, params]
             end
           end
 
