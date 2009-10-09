@@ -1,6 +1,5 @@
 require 'rack/mount'
 require 'benchmark'
-require 'fixtures'
 
 module EnvGenerator
   def env_for(n, *args)
