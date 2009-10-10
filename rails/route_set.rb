@@ -82,10 +82,6 @@ module ActionController
         @set = ::Rack::Mount::RouteSet.new(:parameters_key => PARAMETERS_KEY)
       end
 
-      def empty?
-        @set.length == 0
-      end
-
       undef :add_route
       def add_route(path, options = {})
         if conditions = options.delete(:conditions)
@@ -146,6 +142,7 @@ module ActionController
 
         route = @set.add_route(app, conditions, defaults, name)
         route.extend(RouteExtensions)
+        routes << route
         route
       end
 
