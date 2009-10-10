@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
     "lib/rack/mount/vendor/multimap/nested_multimap.rb",
     "lib/rack/mount.rb"
   ]
-  s.extra_rdoc_files = %w[README.rdoc MIT-LICENSE]
+  s.extra_rdoc_files = %w[README.rdoc LICENSE]
   s.require_paths = %w[lib]
   s.add_dependency 'rack', '>= 1.0.0'
   s.add_dependency 'multimap', '>= 1.0.0'
