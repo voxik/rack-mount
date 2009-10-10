@@ -1,6 +1,34 @@
 require 'rack/mount'
 require 'benchmark'
 
+class Rack::Mount::UsherMapper
+  def self.map(&block)
+    context = new
+    context.instance_eval(&block)
+    context.freeze
+  end
+
+  def initialize
+    @set = Rack::Mount::RouteSet.new
+    @path_info = nil
+  end
+
+  def freeze
+    @set.freeze
+  end
+
+  def add(path)
+    @path_info = Rack::Mount::Strexp.compile(path, {}, ['/'])
+    self
+  end
+
+  def to(app)
+    @set.add_route(app, :path_info => @path_info)
+    @path_info = nil
+    self
+  end
+end
+
 module EnvGenerator
   def env_for(n, *args)
     envs = []

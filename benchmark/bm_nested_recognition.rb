@@ -1,18 +1,16 @@
 require 'helper'
 
-require 'rack/mount'
-Mount = Rack::Mount::RouteSet.new do |map|
-  ('a'..'zz').each do |path|
-    map.add_route(EchoApp, :path_info => "/#{path}")
-  end
-end
-
-require 'usher'
-Ush = Usher::Interface.for(:rack) do
+Map = Proc.new {
   ('a'..'zz').each do |path|
     add("/#{path}").to(EchoApp)
   end
-end
+}
+
+require 'rack/mount'
+Mount = Rack::Mount::UsherMapper.map(&Map) 
+
+require 'usher'
+Ush = Usher::Interface.for(:rack, &Map)
 
 TIMES = 10_000.to_i
 
@@ -27,11 +25,11 @@ UshLastEnv = EnvGenerator.env_for(TIMES, '/zz')
 
 Benchmark.bmbm do |x|
   x.report('rack-mount (first)')  { TIMES.times { |n| Mount.call(MountFirstEnv[n]) } }
-  x.report('usher (first)') { TIMES.times { |n| Ush.call(UshFirstEnv[n]) } }
+  x.report('usher (first)')       { TIMES.times { |n| Ush.call(UshFirstEnv[n]) } }
   x.report('rack-mount (mid)')    { TIMES.times { |n| Mount.call(MountMidEnv[n]) } }
-  x.report('usher (mid)')   { TIMES.times { |n| Ush.call(UshMidEnv[n]) } }
+  x.report('usher (mid)')         { TIMES.times { |n| Ush.call(UshMidEnv[n]) } }
   x.report('rack-mount (last)')   { TIMES.times { |n| Mount.call(MountLastEnv[n]) } }
-  x.report('usher (last)')  { TIMES.times { |n| Ush.call(UshLastEnv[n]) } }
+  x.report('usher (last)')        { TIMES.times { |n| Ush.call(UshLastEnv[n]) } }
 end
 
 #                          user     system      total        real

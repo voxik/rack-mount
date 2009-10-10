@@ -1,21 +1,6 @@
 require 'helper'
 
-require 'rack/mount'
-Strexp = Rack::Mount::Strexp
-Mount = Rack::Mount::RouteSet.new do |map|
-  map.add_route(EchoApp, :path_info => %r{^/a/(?:<a>a-z)/x$})
-  ('a'..'w').each do |path|
-    map.add_route(EchoApp, :path_info => %r{^/a/(?:<a>a-z)/#{path}$})
-  end
-  map.add_route(EchoApp, :path_info => %r{^/a/(?:<a>a-z)/y$})
-  ('a'..'w').each do |path|
-    map.add_route(EchoApp, :path_info =>  %r{^/a/(?:<a>a-z)/#{path}$})
-  end
-  map.add_route(EchoApp, :path_info => %r{^/a/(?:<a>a-z)/z$})
-end
-
-require 'usher'
-Ush = Usher::Interface.for(:rack) do
+Map = Proc.new { 
   add('/a/:a/x').to(EchoApp)
   ('a'..'w').each do |path|
     add("/a/:a/#{path}").to(EchoApp)
@@ -25,7 +10,13 @@ Ush = Usher::Interface.for(:rack) do
     add("/a/:a/#{path}").to(EchoApp)
   end
   add('/a/:a/z').to(EchoApp)
-end
+}
+
+require 'rack/mount'
+Mount = Rack::Mount::UsherMapper.map(&Map) 
+
+require 'usher'
+Ush = Usher::Interface.for(:rack, &Map)
 
 TIMES = 10_000.to_i
 
