@@ -84,8 +84,11 @@ module ActionController
 
       undef :add_route
       def add_route(path, options = {})
+        options = options.dup
+
         if conditions = options.delete(:conditions)
-          method = [conditions.delete(:method)].flatten
+          conditions = conditions.dup
+          method = [conditions.delete(:method)].flatten.compact
           method.map! { |m|
             m = m.to_s.upcase
 
