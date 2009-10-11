@@ -127,7 +127,7 @@ module ActionController
               requirements[k.to_sym] = value
             end
           else
-            defaults[k.to_sym] = options.delete(k)
+            defaults[k.to_sym] = options.delete(k).to_param
           end
         end
 

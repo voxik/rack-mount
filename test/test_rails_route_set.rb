@@ -40,6 +40,7 @@ module RailsRouteSetTests
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
+    map.connect 'id_default/:id', :controller => 'foo', :action => 'id_default', :id => 1
     map.connect 'get_or_post', :controller => 'foo', :action => 'get_or_post', :conditions => { :method => [:get, :post] }
     map.connect 'optional/:optional', :controller => 'posts', :action => 'index'
     map.project 'projects/:project_id', :controller => 'project'
@@ -123,6 +124,9 @@ module RailsRouteSetTests
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
     assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/new', :method => :post) }
 
+    assert_equal({:controller => 'foo', :action => 'id_default', :id => '1'}, @routes.recognize_path('/id_default/1'))
+    assert_equal({:controller => 'foo', :action => 'id_default', :id => '2'}, @routes.recognize_path('/id_default/2'))
+    assert_equal({:controller => 'foo', :action => 'id_default', :id => '1'}, @routes.recognize_path('/id_default'))
     assert_equal({:controller => 'foo', :action => 'get_or_post'}, @routes.recognize_path('/get_or_post', :method => :get))
     assert_equal({:controller => 'foo', :action => 'get_or_post'}, @routes.recognize_path('/get_or_post', :method => :post))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/get_or_post', :method => :put) }
@@ -203,6 +207,9 @@ module RailsRouteSetTests
     assert_equal '/people/1?legacy=true', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :legacy => 'true')
     assert_equal '/people?legacy=true', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
 
+    assert_equal '/id_default/2', @routes.generate(:controller => 'foo', :action => 'id_default', :id => '2')
+    assert_equal '/id_default', @routes.generate(:controller => 'foo', :action => 'id_default', :id => '1')
+    assert_equal '/id_default', @routes.generate(:controller => 'foo', :action => 'id_default')
     assert_equal '/optional/bar', @routes.generate(:controller => 'posts', :action => 'index', :optional => 'bar')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
 
