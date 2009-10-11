@@ -149,7 +149,9 @@ module ActionController
       undef :add_named_route
       def add_named_route(name, path, options = {})
         options[:_name] = name
-        named_routes[name.to_sym] = add_route(path, options)
+        route = add_route(path, options)
+        named_routes[route.name] = route
+        route
       end
 
       undef :generate
