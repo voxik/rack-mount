@@ -97,7 +97,7 @@ module ActionController
         name = "#{name_prefix}#{name}" if name_prefix
 
         requirements = options.delete(:requirements) || {}
-        defaults = {}
+        defaults = options.delete(:defaults) || {}
         options.each do |k, v|
           if v.is_a?(Regexp)
             if value = options.delete(k)

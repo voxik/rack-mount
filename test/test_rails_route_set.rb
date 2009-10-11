@@ -32,6 +32,11 @@ module RailsRouteSetTests
                 :day => nil,
                 :month => nil
 
+    map.blog('archive/:year', :controller => 'archive', :action => 'index',
+      :defaults => { :year => nil },
+      :requirements => { :year => /\d{4}/ }
+    )
+
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
@@ -84,6 +89,10 @@ module RailsRouteSetTests
     assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009', :month => '01'}, @routes.recognize_path('/blog/2009/01', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show_date', :year => '2009', :month => '01', :day => '01'}, @routes.recognize_path('/blog/2009/01/01', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/blog/123456789', :method => :get) }
+
+    assert_equal({:controller => 'archive', :action => 'index', :year => '2010'}, @routes.recognize_path('/archive/2010'))
+    assert_equal({:controller => 'archive', :action => 'index'}, @routes.recognize_path('/archive'))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/archive/january') }
 
     assert_equal({:controller => 'people', :action => 'index'}, @routes.recognize_path('/people', :method => :get))
     assert_equal({:controller => 'people', :action => 'index', :format => 'xml'}, @routes.recognize_path('/people.xml', :method => :get))
@@ -146,6 +155,10 @@ module RailsRouteSetTests
     assert_equal '/blog/2009', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009)
     assert_equal '/blog/2009/1', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009, :month => 1)
     assert_equal '/blog/2009/1/1', @routes.generate(:controller => 'posts', :action => 'show_date', :year => 2009, :month => 1, :day => 1)
+
+    assert_equal '/archive/2010', @routes.generate(:controller => 'archive', :action => 'index', :year => '2010')
+    assert_equal '/archive', @routes.generate(:controller => 'archive', :action => 'index')
+    assert_equal '/archive?year=january', @routes.generate(:controller => 'archive', :action => 'index', :year => 'january')
 
     assert_equal '/people', @routes.generate(:use_route => 'people')
     assert_equal '/people', @routes.generate(:use_route => 'people', :controller => 'people', :action => 'index')
