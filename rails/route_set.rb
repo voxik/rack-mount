@@ -128,6 +128,10 @@ module ActionController
           glob = $1.to_sym if path =~ /\/\*(\w+)$/
           path = ::Rack::Mount::Utils.normalize_path(path)
           path = ::Rack::Mount::Strexp.compile(path, requirements, %w( / . ? ))
+
+          if glob && !defaults[glob].blank?
+            raise RoutingError, "paths cannot have non-empty default values"
+          end
         end
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)

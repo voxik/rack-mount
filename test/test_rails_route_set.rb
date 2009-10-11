@@ -65,6 +65,17 @@ module RailsRouteSetTests
     raise NotImplemented
   end
 
+  def test_add_route
+    @routes.clear!
+
+    assert_raise(ActionController::RoutingError) do
+      @routes.draw do |map|
+        map.path 'file/*path', :controller => 'content', :action => 'show_file', :path => %w(fake default)
+        map.connect ':controller/:action/:id'
+      end
+    end
+  end
+
   def test_recognize_path
     assert_equal({:controller => 'admin/users', :action => 'index'}, @routes.recognize_path('/admin/users', :method => :get))
     assert_equal({:controller => 'admin/users', :action => 'create'}, @routes.recognize_path('/admin/users', :method => :post))
