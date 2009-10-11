@@ -85,8 +85,20 @@ module ActionController
       undef :add_route
       def add_route(path, options = {})
         if conditions = options.delete(:conditions)
-          method = conditions.delete(:method)
-          method = method.to_s.upcase if method
+          method = [conditions.delete(:method)].flatten
+          method.map! { |m|
+            m = m.to_s.upcase
+            raise ArgumentError unless HTTP_METHODS.include?(m.downcase.to_sym)
+            m
+          }
+
+          if method.length > 1
+            method = Regexp.union(*method)
+          elsif method.length == 1
+            method = method.first
+          else
+            method = nil
+          end
         end
 
         path_prefix = options.delete(:path_prefix)
@@ -135,10 +147,6 @@ module ActionController
         end
 
         app = Dispatcher.new(:defaults => defaults, :glob => glob)
-
-        if method && !HTTP_METHODS.include?(method.downcase.to_sym)
-          raise ArgumentError
-        end
 
         conditions = {}
         conditions[:request_method] = method if method
