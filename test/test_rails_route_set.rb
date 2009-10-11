@@ -35,11 +35,13 @@ module RailsRouteSetTests
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
+    map.connect 'optional/:optional', :controller => 'posts', :action => 'index'
     map.project 'projects/:project_id', :controller => 'project'
 
     map.connect '', :controller => 'news', :format => nil
     map.connect 'news.:format', :controller => 'news'
 
+    map.connect 'comment/:id/:action', :controller => 'comments', :action => 'show'
     map.connect 'ws/:controller/:action/:id', :ws => true
     map.connect 'account/:action', :controller => :account, :action => :subscription
     map.connect 'pages/:page_id/:controller/:action/:id'
@@ -48,7 +50,7 @@ module RailsRouteSetTests
   }
 
   def setup
-    ActionController::Routing.use_controllers! ['admin/posts', 'posts', 'news', 'notes', 'project']
+    ActionController::Routing.use_controllers! ['admin/posts', 'posts', 'news', 'notes', 'project', 'comments']
     @routes = ActionController::Routing::RouteSet.new
     @routes.draw(&Mapping)
     assert_loaded!
@@ -99,6 +101,9 @@ module RailsRouteSetTests
     assert_equal({:controller => 'people', :action => 'edit', :id => '1', :format => 'xml'}, @routes.recognize_path('/people/1/edit.xml', :method => :get))
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
     assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/new', :method => :post) }
+
+    assert_equal({:controller => 'posts', :action => 'index', :optional => 'bar'}, @routes.recognize_path('/optional/bar'))
+    assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/optional') }
 
     assert_equal({:controller => 'posts', :action => 'show', :id => '1', :ws => true}, @routes.recognize_path('/ws/posts/show/1', :method => :get))
     assert_equal({:controller => 'posts', :action => 'list', :ws => true}, @routes.recognize_path('/ws/posts/list', :method => :get))
@@ -168,12 +173,19 @@ module RailsRouteSetTests
     assert_equal '/people/1?legacy=true', @routes.generate(:controller => 'people', :action => 'show', :id => '1', :legacy => 'true')
     assert_equal '/people?legacy=true', @routes.generate(:controller => 'people', :action => 'index', :legacy => 'true')
 
+    assert_equal '/optional/bar', @routes.generate(:controller => 'posts', :action => 'index', :optional => 'bar')
+    assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')
+
     assert_equal '/project', @routes.generate({:controller => 'project', :action => 'index'})
     assert_equal '/projects/1', @routes.generate({:controller => 'project', :action => 'index', :project_id => '1'})
     assert_equal '/projects/1', @routes.generate({:controller => 'project', :action => 'index'}, {:project_id => '1'})
     assert_raise(ActionController::RoutingError) { @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index'}) }
     assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index', :project_id => '1'})
     assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index'}, {:project_id => '1'})
+
+    assert_equal '/comment/20', @routes.generate({:id => 20}, {:controller => 'comments', :action => 'show'})
+    assert_equal '/comment/20', @routes.generate(:controller => 'comments', :id => 20, :action => 'show')
+    assert_equal '/comments/boo', @routes.generate(:controller => 'comments', :action => 'boo')
 
     assert_equal '/ws/posts/show/1', @routes.generate(:controller => 'posts', :action => 'show', :id => '1', :ws => true)
     assert_equal '/ws/posts', @routes.generate(:controller => 'posts', :action => 'index', :ws => true)

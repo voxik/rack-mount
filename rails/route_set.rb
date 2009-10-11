@@ -268,13 +268,20 @@ module ActionController
               end
             end
 
-            if optional && !(segment =~ /^:\w+$/) && !(segment =~ /^:\w+\(\.:format\)$/)
-              optional = false
-            elsif optional && segment =~ /^:(\w+)$/ && segment != ":action" && segment != ":id"
-              if defaults.has_key?($1.to_sym) && defaults[$1.to_sym].nil?
-                defaults.delete($1.to_sym)
-              else
+            if optional
+              if segment == ":id" && segments.include?(":action")
                 optional = false
+              elsif segment == ":action" || segment == ":id"
+                # Ignore
+              elsif !(segment =~ /^:\w+$/) &&
+                  !(segment =~ /^:\w+\(\.:format\)$/)
+                optional = false
+              elsif segment =~ /^:(\w+)$/
+                if defaults.has_key?($1.to_sym) && defaults[$1.to_sym].nil?
+                  defaults.delete($1.to_sym)
+                else
+                  optional = false
+                end
               end
             end
 
