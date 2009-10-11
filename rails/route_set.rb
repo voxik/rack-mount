@@ -88,7 +88,15 @@ module ActionController
           method = [conditions.delete(:method)].flatten
           method.map! { |m|
             m = m.to_s.upcase
-            raise ArgumentError unless HTTP_METHODS.include?(m.downcase.to_sym)
+
+            if m == :head
+              raise ArgumentError, "HTTP method HEAD is invalid in route conditions. Rails processes HEAD requests the same as GETs, returning just the response headers"
+            end
+
+            unless HTTP_METHODS.include?(m.downcase.to_sym)
+              raise ArgumentError, "Invalid HTTP method specified in route conditions"
+            end
+
             m
           }
 
