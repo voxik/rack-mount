@@ -82,10 +82,13 @@ module Rack::Mount
     #   extract_static_regexp(/^foo$/)      # => "foo"
     #   extract_static_regexp(/^foo\.bar$/) # => "foo.bar"
     #   extract_static_regexp(/^foo|bar$/)  # => /^foo|bar$/
-    def extract_static_regexp(regexp)
+    def extract_static_regexp(regexp, options = nil)
       if regexp.is_a?(String)
-        regexp = Regexp.compile("\\A#{regexp}\\Z")
+        regexp = Regexp.compile("\\A#{regexp}\\Z", options)
       end
+
+      # Just return if regexp is case-insensitive
+      return regexp if regexp.casefold?
 
       source = regexp.source
       if regexp_anchored?(regexp)

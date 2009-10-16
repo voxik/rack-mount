@@ -37,8 +37,15 @@ module Rack::Mount
     private
       def normalize_requirements!(requirements, separators)
         requirements.each do |key, value|
-          requirements[key] = value.is_a?(Regexp) ?
-            value.source : Regexp.escape(value)
+          if value.is_a?(Regexp)
+            if regexp_has_modifiers?(value)
+              requirements[key] = value
+            else
+              requirements[key] = value.source
+            end
+          else
+            requirements[key] = Regexp.escape(value)
+          end
         end
         requirements.default ||= separators.any? ?
           "[^#{separators.join}]+" : '.+'
@@ -77,6 +84,10 @@ module Rack::Mount
         end
         re << scanner.rest
         str.replace(re)
+      end
+
+      def regexp_has_modifiers?(regexp)
+        regexp.options & (Regexp::IGNORECASE | Regexp::EXTENDED) != 0
       end
   end
 end

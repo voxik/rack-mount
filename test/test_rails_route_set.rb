@@ -45,6 +45,16 @@ module RailsRouteSetTests
     map.connect 'optional/:optional', :controller => 'posts', :action => 'index'
     map.project 'projects/:project_id', :controller => 'project'
 
+    map.connect 'ignorecase/geocode/:postalcode', :controller => 'geocode',
+                  :action => 'show', :postalcode => /hx\d\d-\d[a-z]{2}/i
+    map.geocode 'extended/geocode/:postalcode', :controller => 'geocode',
+                  :action => 'show',:requirements => {
+                  :postalcode => /# Postcode format
+                                  \d{5} #Prefix
+                                  (-\d{4})? #Suffix
+                                  /x
+                  }
+
     map.connect '', :controller => 'news', :format => nil
     map.connect 'news.:format', :controller => 'news'
 
@@ -153,6 +163,11 @@ module RailsRouteSetTests
     assert_equal({:controller => 'posts', :action => 'show'}, @routes.recognize_path('/posts/show', :method => :get))
     assert_equal({:controller => 'posts', :action => 'show', :id => '1'}, @routes.recognize_path('/posts/show/1', :method => :get))
     assert_equal({:controller => 'posts', :action => 'create'}, @routes.recognize_path('/posts/create', :method => :post))
+
+    assert_equal({:controller => 'geocode', :action => 'show', :postalcode => 'hx12-1az'}, @routes.recognize_path('/ignorecase/geocode/hx12-1az'))
+    assert_equal({:controller => 'geocode', :action => 'show', :postalcode => 'hx12-1AZ'}, @routes.recognize_path('/ignorecase/geocode/hx12-1AZ'))
+    assert_equal({:controller => 'geocode', :action => 'show', :postalcode => '12345-1234'}, @routes.recognize_path('/extended/geocode/12345-1234'))
+    assert_equal({:controller => 'geocode', :action => 'show', :postalcode => '12345'}, @routes.recognize_path('/extended/geocode/12345'))
 
     assert_equal({:controller => 'news', :action => 'index', :format => nil}, @routes.recognize_path('/', :method => :get))
     assert_equal({:controller => 'news', :action => 'index', :format => 'rss'}, @routes.recognize_path('/news.rss', :method => :get))

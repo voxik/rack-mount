@@ -64,6 +64,16 @@ class TestStrexp < Test::Unit::TestCase
     end
   end
 
+  def test_dynamic_segment_with_requirements_with_case_insensitive
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      bar = /bar/i
+      assert_equal eval('%r{\Afoo/(?<bar>#{bar})\Z}'), Strexp.compile('foo/:bar', {:bar => /bar/i})
+    else
+      bar = /bar/i
+      assert_equal %r{\Afoo/(?:<bar>#{bar})\Z}, Strexp.compile('foo/:bar', {:bar => /bar/i})
+    end
+  end
+
   def test_dynamic_segment_inside_optional_segment
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{\Afoo(\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')

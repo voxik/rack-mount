@@ -64,7 +64,7 @@ class TestRouteSet < Test::Unit::TestCase
     # Make sure we aren't making the tree less efficient. Its okay if
     # this number gets smaller. However it may increase if the more
     # routes are added to the test fixture.
-    assert_equal 6, @app.instance_variable_get('@recognition_graph').height
+    assert_equal 7, @app.instance_variable_get('@recognition_graph').height
     assert_equal 11, @app.instance_variable_get('@generation_graph').height
   end
 

@@ -82,18 +82,19 @@ module Rack::Mount
           escaped_separators = separators.map { |s| Regexp.escape(s) }
           separators_regexp = Regexp.union(*escaped_separators)
           segments, previous = [], nil
+          regexp_options = regexp.options
 
           begin
             Utils.extract_regexp_parts(regexp).each do |part|
               if part.respond_to?(:optional?) && part.optional?
                 if escaped_separators.include?(part.first)
-                  append_to_segments!(segments, previous, separators)
+                  append_to_segments!(segments, previous, separators, regexp_options)
                 end
 
                 raise ArgumentError
               end
 
-              append_to_segments!(segments, previous, separators)
+              append_to_segments!(segments, previous, separators, regexp_options)
               previous = nil
 
               if part == Const::NULL
@@ -103,16 +104,16 @@ module Rack::Mount
 
               if part.is_a?(Utils::Capture)
                 source = part.map { |p| p.to_s }.join
-                append_to_segments!(segments, source, separators)
+                append_to_segments!(segments, source, separators, regexp_options)
               else
                 parts = part.split(separators_regexp)
                 parts.shift if parts[0] == Const::EMPTY_STRING
                 previous = parts.pop
-                parts.each { |p| append_to_segments!(segments, p, separators) }
+                parts.each { |p| append_to_segments!(segments, p, separators, regexp_options) }
               end
             end
 
-            append_to_segments!(segments, previous, separators)
+            append_to_segments!(segments, previous, separators, regexp_options)
           rescue ArgumentError
             # generation failed somewhere, but lets take what we can get
           end
@@ -124,7 +125,7 @@ module Rack::Mount
           segments
         end
 
-        def append_to_segments!(segments, s, separators) #:nodoc:
+        def append_to_segments!(segments, s, separators, regexp_options) #:nodoc:
           return unless s
           separators.each do |separator|
             if s.gsub(/\[[^\]]+\]/, '').include?(separator)
@@ -136,7 +137,7 @@ module Rack::Mount
             end
           end
 
-          static = Utils.extract_static_regexp(s)
+          static = Utils.extract_static_regexp(s, regexp_options)
           segments << (static.is_a?(String) ? static : static)
         end
       end

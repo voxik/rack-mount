@@ -294,6 +294,20 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal '/prefix', @env['SCRIPT_NAME']
   end
 
+  def test_case_insensitive_path
+    get '/ignorecase/foo'
+    assert_success
+    assert_equal({ :controller => 'ignorecase' }, routing_args)
+
+    get '/ignorecase/FOO'
+    assert_success
+    assert_equal({ :controller => 'ignorecase' }, routing_args)
+
+    get '/ignorecase/Foo'
+    assert_success
+    assert_equal({ :controller => 'ignorecase' }, routing_args)
+  end
+
   def test_small_set_with_ambiguous_splitting
     @app = Rack::Mount::RouteSet.new do |set|
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))

@@ -40,8 +40,11 @@ class TestUtils < Test::Unit::TestCase
 
   def test_extract_static_regexp
     assert_equal 'foo', extract_static_regexp(/^foo$/)
+    assert_equal %r{^foo$}i, extract_static_regexp(/^foo$/i)
     assert_equal 'foo.bar', extract_static_regexp(/^foo\.bar$/)
     assert_equal %r{^foo|bar$}, extract_static_regexp(/^foo|bar$/)
+    assert_equal Regexp.union(/^foo$/, /^bar$/),
+      extract_static_regexp(Regexp.union(/^foo$/, /^bar$/))
   end
 
   if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
