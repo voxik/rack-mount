@@ -92,7 +92,7 @@ module ActionController
           method.map! { |m|
             m = m.to_s.upcase
 
-            if m == :head
+            if m == "HEAD"
               raise ArgumentError, "HTTP method HEAD is invalid in route conditions. Rails processes HEAD requests the same as GETs, returning just the response headers"
             end
 
@@ -128,6 +128,15 @@ module ActionController
             end
           else
             defaults[k.to_sym] = options.delete(k).to_param
+          end
+        end
+
+        requirements.each do |name, requirement|
+          if requirement.source =~ %r{\A(\\A|\^)|(\\Z|\\z|\$)\Z}
+            raise ArgumentError, "Regexp anchor characters are not allowed in routing requirements: #{requirement.inspect}"
+          end
+          if requirement.multiline?
+            raise ArgumentError, "Regexp multiline option not allowed in routing requirements: #{requirement.inspect}"
           end
         end
 
