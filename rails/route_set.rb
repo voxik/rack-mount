@@ -131,7 +131,7 @@ module ActionController
           end
         end
 
-        requirements.each do |name, requirement|
+        requirements.each do |_, requirement|
           if requirement.source =~ %r{\A(\\A|\^)|(\\Z|\\z|\$)\Z}
             raise ArgumentError, "Regexp anchor characters are not allowed in routing requirements: #{requirement.inspect}"
           end
