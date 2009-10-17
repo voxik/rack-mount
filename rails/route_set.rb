@@ -179,34 +179,27 @@ module ActionController
 
       undef :generate
       def generate(options, recall = {}, method = :generate)
+        options, recall = options.dup, recall.dup
         named_route = options.delete(:use_route)
 
         options = options_as_params(options)
         expire_on = build_expiry(options, recall)
 
-        # TODO: This is a complete mess
-        not_expired = expire_on.inject([]) { |ary, (key, expired)|
-          ary << key if expired == false
-          ary
-        }
-        recover_others = false
-        if recall[:controller] && options[:controller] != recall[:controller] && not_expired.delete(:controller)
-          options[:controller] ||= recall[:controller]
-          recover_others = true
-        end
-        if !expire_on[:action] && recall[:action] && options[:action] != recall[:action] && (recover_others || not_expired.delete(:action))
-          options[:action] ||= recall[:action]
-          recover_others = true
-        end
-        if !expire_on[:action] && recover_others
-          not_expired.each do |key|
-            options[key] ||= recall[key]
+        recall[:action] ||= 'index' if options[:controller] || recall[:controller]
+
+        if recall[:controller] && (!options.has_key?(:controller) || options[:controller] == recall[:controller])
+          options[:controller] = recall.delete(:controller)
+
+          if recall[:action] && (!options.has_key?(:action) || options[:action] == recall[:action])
+            options[:action] = recall.delete(:action)
+
+            if recall[:id] && (!options.has_key?(:id) || options[:id] == recall[:id])
+              options[:id] = recall.delete(:id)
+            end
           end
         end
 
-        if options[:controller]
-          options[:controller] = options[:controller].to_s
-        end
+        options[:controller] = options[:controller].to_s if options[:controller]
 
         if !named_route && expire_on[:controller] && options[:controller] && options[:controller][0] != ?/
           old_parts = recall[:controller].split('/')
@@ -218,7 +211,6 @@ module ActionController
         options[:controller] = options[:controller][1..-1] if options[:controller] && options[:controller][0] == ?/
 
         merged = options.merge(recall)
-        recall[:action] ||= 'index' if merged[:controller]
         recall[:action] = options.delete(:action) if options[:action] == 'index'
 
         path = @set.url(named_route, options, recall)

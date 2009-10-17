@@ -44,6 +44,7 @@ module RailsRouteSetTests
     map.connect 'get_or_post', :controller => 'foo', :action => 'get_or_post', :conditions => { :method => [:get, :post] }
     map.connect 'optional/:optional', :controller => 'posts', :action => 'index'
     map.project 'projects/:project_id', :controller => 'project'
+    map.connect 'clients', :controller => 'projects', :action => 'index'
 
     map.connect 'ignorecase/geocode/:postalcode', :controller => 'geocode',
                   :action => 'show', :postalcode => /hx\d\d-\d[a-z]{2}/i
@@ -205,6 +206,8 @@ module RailsRouteSetTests
     assert_equal '/people', @routes.generate({:action => 'index'}, {:controller => 'people'})
     assert_equal '/people', @routes.generate({:action => 'index'}, {:controller => 'people', :action => 'show', :id => '1'})
     assert_equal '/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'show', :id => '1'})
+    assert_equal '/people', @routes.generate({}, {:controller => 'people', :action => 'index'})
+    assert_equal '/people/1', @routes.generate({:controller => 'people', :action => 'show'}, {:controller => 'people', :action => 'show', :id => '1'})
     assert_equal '/people/new', @routes.generate(:use_route => 'new_person')
     assert_equal '/people/new', @routes.generate(:controller => 'people', :action => 'new')
     assert_equal '/people/1', @routes.generate(:use_route => 'person', :id => '1')
@@ -214,8 +217,10 @@ module RailsRouteSetTests
     assert_equal '/people/1', @routes.generate(:controller => 'people', :action => 'show', :id => Model.new('1'))
     assert_equal '/people/1', @routes.generate({:action => 'show', :id => '1'}, {:controller => 'people', :action => 'index'})
     assert_equal '/people/1', @routes.generate({:action => 'show', :id => 1}, {:controller => 'people', :action => 'show', :id => '1'})
-    assert_equal '/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'index', :id => '1'})
+    # assert_equal '/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'index', :id => '1'})
     assert_equal '/people', @routes.generate({:controller => 'people', :action => 'index'}, {:controller => 'people', :action => 'show', :id => '1'})
+    assert_equal '/people/1', @routes.generate({}, {:controller => 'people', :action => 'show', :id => '1'})
+    assert_equal '/people/1', @routes.generate({:controller => 'people', :action => 'show'}, {:controller => 'people', :action => 'index', :id => '1'})
     assert_equal '/people/1/edit', @routes.generate(:controller => 'people', :action => 'edit', :id => '1')
     assert_equal '/people/1/edit.xml', @routes.generate(:controller => 'people', :action => 'edit', :id => '1', :format => 'xml')
     assert_equal '/people/1/edit', @routes.generate(:use_route => 'edit_person', :id => '1')
@@ -235,6 +240,11 @@ module RailsRouteSetTests
     assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index', :project_id => '1'})
     assert_equal '/projects/1', @routes.generate({:use_route => 'project', :controller => 'project', :action => 'index'}, {:project_id => '1'})
 
+    assert_equal '/clients', @routes.generate(:controller => 'projects', :action => 'index')
+    assert_equal '/clients?project_id=1', @routes.generate(:controller => 'projects', :action => 'index', :project_id => '1')
+    assert_equal '/clients', @routes.generate({:controller => 'projects', :action => 'index'}, {:project_id => '1'})
+    assert_equal '/clients', @routes.generate({:action => 'index'}, {:controller => 'projects', :action => 'index', :project_id => '1'})
+
     assert_equal '/comment/20', @routes.generate({:id => 20}, {:controller => 'comments', :action => 'show'})
     assert_equal '/comment/20', @routes.generate(:controller => 'comments', :id => 20, :action => 'show')
     assert_equal '/comments/boo', @routes.generate(:controller => 'comments', :action => 'boo')
@@ -253,8 +263,14 @@ module RailsRouteSetTests
     assert_equal '/notes', @routes.generate(:controller => 'notes')
     assert_equal '/notes/print', @routes.generate(:controller => 'notes', :action => 'print')
     assert_equal '/notes/print', @routes.generate({}, {:controller => 'notes', :action => 'print'})
+
+    assert_equal '/notes/index/1', @routes.generate({:controller => 'notes'}, {:controller => 'notes', :id => '1'})
+    assert_equal '/notes/index/1', @routes.generate({:controller => 'notes'}, {:controller => 'notes', :id => '1', :foo => 'bar'})
+    assert_equal '/notes/index/1', @routes.generate({:controller => 'notes'}, {:controller => 'notes', :id => '1'})
+    assert_equal '/notes/index/1', @routes.generate({:action => 'index'}, {:controller => 'notes', :id => '1'})
     assert_equal '/notes/index/1', @routes.generate({}, {:controller => 'notes', :id => '1'})
     assert_equal '/notes/show/1', @routes.generate({}, {:controller => 'notes', :action => 'show', :id => '1'})
+    assert_equal '/notes/index/1', @routes.generate({:controller => 'notes', :id => '1'}, {:foo => 'bar'})
     assert_equal '/posts', @routes.generate({:controller => 'posts'}, {:controller => 'notes', :action => 'show', :id => '1'})
     assert_equal '/notes/list', @routes.generate({:action => 'list'}, {:controller => 'notes', :action => 'show', :id => '1'})
 
