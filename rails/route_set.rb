@@ -221,6 +221,10 @@ module ActionController
         options[:controller] = options[:controller][1..-1] if options[:controller] && options[:controller][0] == ?/
 
         merged = options.merge(recall)
+        if options.has_key?(:action) && options[:action].nil?
+          options.delete(:action)
+          recall[:action] = 'index'
+        end
         recall[:action] = options.delete(:action) if options[:action] == 'index'
 
         path = @set.url(named_route, options, recall)
