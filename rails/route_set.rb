@@ -281,7 +281,7 @@ module ActionController
           optional, segments = true, []
 
           required_segments = requirements.keys
-          required_segments -= defaults.map { |k, v| k if v.nil? }.compact
+          required_segments -= defaults.keys.compact
 
           old_segments = path.split('/')
           old_segments.shift
@@ -298,13 +298,13 @@ module ActionController
             if optional
               if segment == ":id" && segments.include?(":action")
                 optional = false
-              elsif segment == ":action" || segment == ":id"
+              elsif segment == ":controller" || segment == ":action" || segment == ":id"
                 # Ignore
               elsif !(segment =~ /^:\w+$/) &&
                   !(segment =~ /^:\w+\(\.:format\)$/)
                 optional = false
               elsif segment =~ /^:(\w+)$/
-                if defaults.has_key?($1.to_sym) && defaults[$1.to_sym].nil?
+                if defaults.has_key?($1.to_sym)
                   defaults.delete($1.to_sym)
                 else
                   optional = false
@@ -314,6 +314,9 @@ module ActionController
 
             if optional && index < length - 1
               segments.unshift('(/', segment)
+              segments.push(')')
+            elsif optional
+              segments.unshift('/(', segment)
               segments.push(')')
             else
               segments.unshift('/', segment)
