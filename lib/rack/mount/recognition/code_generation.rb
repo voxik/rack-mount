@@ -43,7 +43,7 @@ module Rack::Mount
                   b << "matches = m.captures" if route.named_captures[method].any?
                   route.named_captures[method].each do |k, i|
                     b << MetaMethod::Condition.new("p = matches[#{i}]") do |c2|
-                      c2 << "routing_args[#{k.inspect}] = p"
+                      c2 << "routing_args[#{k.inspect}] = URI.unescape(p)"
                     end
                   end
                   if method == :path_info && !Utils.regexp_anchored?(condition)

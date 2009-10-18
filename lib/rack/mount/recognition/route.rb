@@ -34,7 +34,9 @@ module Rack::Mount
             matches = m.captures
             @named_captures[method].each { |k, i|
               if v = matches[i]
-                routing_args[k] = v
+                # TODO: We only want to unescape params from
+                # uri related methods
+                routing_args[k] = URI.unescape(v)
               end
             }
             # TODO: Don't explict check for :path_info condition

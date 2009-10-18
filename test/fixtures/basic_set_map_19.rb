@@ -77,6 +77,8 @@ BasicSetMap = Proc.new do |set|
                                             foo # bar
                                             $/x) }, { :controller => 'extended' })
 
+  set.add_route(EchoApp, { :path_info => %r{^/uri_escaping/(?<value>.+)$} }, { :controller => 'uri_escaping' })
+
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
   set.add_route(EchoApp, :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})

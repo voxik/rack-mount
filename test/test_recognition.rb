@@ -314,6 +314,20 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'extended' }, routing_args)
   end
 
+  def test_uri_escaping
+    get '/uri_escaping/foo'
+    assert_success
+    assert_equal({ :controller => 'uri_escaping', :value => 'foo' }, routing_args)
+
+    get '/uri_escaping/foo%20bar'
+    assert_success
+    assert_equal({ :controller => 'uri_escaping', :value => 'foo bar' }, routing_args)
+
+    get '/uri_escaping/%E2%88%9E'
+    assert_success
+    assert_equal({ :controller => 'uri_escaping', :value => '∞' }, routing_args)
+  end
+
   def test_small_set_with_ambiguous_splitting
     @app = Rack::Mount::RouteSet.new do |set|
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))
