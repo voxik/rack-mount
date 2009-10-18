@@ -246,6 +246,7 @@ module ActionController
       undef :recognize_path
       def recognize_path(path, environment = {}, rescue_error = true)
         method = (environment[:method] || "GET").to_s.upcase
+        path = URI.escape(path)
 
         begin
           env = Rack::MockRequest.env_for(path, {:method => method})
