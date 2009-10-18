@@ -48,7 +48,7 @@ module ActionController
           end
 
           def split_glob_param!(params)
-            params[@glob_param] = params[@glob_param].split('/')
+            params[@glob_param] = params[@glob_param].split('/').map { |v| URI.unescape(v) }
           end
       end
 
