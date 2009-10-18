@@ -151,8 +151,10 @@ module Rack::Mount
           def_delegators :_value, :==, :eql?, :hash
 
           def to_param
-            v = _value.respond_to?(:to_param) ? _value.to_param : _value
-            URI.escape(v.to_s)
+            @to_param ||= begin
+              v = _value.respond_to?(:to_param) ? _value.to_param : _value
+              URI.escape(v.to_s)
+            end
           end
           alias_method :to_s, :to_param
         end
