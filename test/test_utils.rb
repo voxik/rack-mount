@@ -28,6 +28,13 @@ class TestUtils < Test::Unit::TestCase
     assert_equal 'foo%5B%5D=bar', build_nested_query('foo' => ['bar'])
   end
 
+  def test_normalize_extended_expression
+    assert_equal %r{foo}, normalize_extended_expression(/foo/)
+    assert_equal %r{^/extended/foo$}, normalize_extended_expression(/^\/extended\/ # comment
+                                                      foo # bar
+                                                      $/x)
+  end
+
   def test_regexp_anchored
     assert_equal true, regexp_anchored?(/^foo$/)
     assert_equal true, regexp_anchored?(/\Afoo\Z/)

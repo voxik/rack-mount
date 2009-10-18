@@ -308,6 +308,12 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'ignorecase' }, routing_args)
   end
 
+  def test_extended_path
+    get '/extended/foo'
+    assert_success
+    assert_equal({ :controller => 'extended' }, routing_args)
+  end
+
   def test_small_set_with_ambiguous_splitting
     @app = Rack::Mount::RouteSet.new do |set|
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))
