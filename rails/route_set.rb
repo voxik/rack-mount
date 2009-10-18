@@ -1,3 +1,5 @@
+require 'forwardable'
+
 module ActionController
   module Routing
     class RouteSet
