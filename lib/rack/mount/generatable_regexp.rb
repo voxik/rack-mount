@@ -103,7 +103,22 @@ module Rack::Mount
               if segment.is_a?(DynamicSegment)
                 value = merged[segment.name] || defaults[segment.name]
                 value = value.to_param if value.respond_to?(:to_param)
-                value.nil? || segment !~ value || merged[segment.name] == defaults[segment.name]
+
+                merged_value = merged[segment.name]
+                merged_value = merged_value.to_param if merged_value.respond_to?(:to_param)
+
+                default_value = defaults[segment.name]
+                default_value = default_value.to_param if default_value.respond_to?(:to_param)
+
+                if value.nil? || segment !~ value
+                  true
+                elsif merged_value == default_value
+                  # Nasty control flow
+                  return :clear_remaining_segments
+                  true
+                else
+                  false
+                end
               end
             }
           end
@@ -121,7 +136,15 @@ module Rack::Mount
                 return
               end
             when Array
-              generate_from_segments(segment, params, merged, defaults, true) || Const::EMPTY_STRING
+              value = generate_from_segments(segment, params, merged, defaults, true)
+              if value == :clear_remaining_segments
+                segment.each { |s| params.delete(s.name) if s.is_a?(DynamicSegment) }
+                Const::EMPTY_STRING
+              elsif value.nil?
+                Const::EMPTY_STRING
+              else
+                value
+              end
             end
           end
 

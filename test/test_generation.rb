@@ -74,7 +74,12 @@ class TestGeneration < Test::Unit::TestCase
 
   def test_uses_default_parameters_when_non_are_passed
     assert_equal '/feed/atom', @app.url(:feed, :kind => 'atom')
+    assert_equal '/feed/rss', @app.url(:feed, :kind => 'rss')
     assert_equal '/feed/rss', @app.url(:feed)
+
+    assert_equal '/feed2.atom', @app.url(:feed2, :format => 'atom')
+    assert_equal '/feed2', @app.url(:feed2, :format => 'rss')
+    assert_equal '/feed2', @app.url(:feed2)
   end
 end
 

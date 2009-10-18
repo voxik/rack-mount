@@ -40,6 +40,7 @@ module RailsRouteSetTests
     map.resources :people
     map.connect 'legacy/people', :controller => 'people', :action => 'index', :legacy => 'true'
 
+    map.connect 'symbols', :controller => :symbols, :action => :show, :name => :as_symbol
     map.connect 'id_default/:id', :controller => 'foo', :action => 'id_default', :id => 1
     map.connect 'get_or_post', :controller => 'foo', :action => 'get_or_post', :conditions => { :method => [:get, :post] }
     map.connect 'optional/:optional', :controller => 'posts', :action => 'index'
@@ -135,6 +136,7 @@ module RailsRouteSetTests
     assert_raise(ActionController::ActionControllerError) { @routes.recognize_path('/people/1/edit', :method => :post) }
     assert_raise(ActionController::MethodNotAllowed) { @routes.recognize_path('/people/new', :method => :post) }
 
+    assert_equal({:controller => 'symbols', :action => 'show', :name => :as_symbol}, @routes.recognize_path('/symbols'))
     assert_equal({:controller => 'foo', :action => 'id_default', :id => '1'}, @routes.recognize_path('/id_default/1'))
     assert_equal({:controller => 'foo', :action => 'id_default', :id => '2'}, @routes.recognize_path('/id_default/2'))
     assert_equal({:controller => 'foo', :action => 'id_default', :id => '1'}, @routes.recognize_path('/id_default'))
@@ -229,6 +231,7 @@ module RailsRouteSetTests
 
     assert_equal '/id_default/2', @routes.generate(:controller => 'foo', :action => 'id_default', :id => '2')
     assert_equal '/id_default', @routes.generate(:controller => 'foo', :action => 'id_default', :id => '1')
+    assert_equal '/id_default', @routes.generate(:controller => 'foo', :action => 'id_default', :id => 1)
     assert_equal '/id_default', @routes.generate(:controller => 'foo', :action => 'id_default')
     assert_equal '/optional/bar', @routes.generate(:controller => 'posts', :action => 'index', :optional => 'bar')
     assert_equal '/posts', @routes.generate(:controller => 'posts', :action => 'index')

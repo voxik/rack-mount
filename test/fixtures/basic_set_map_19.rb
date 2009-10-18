@@ -52,6 +52,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, :path_info => %r{^/(?<controller>admin/users|admin/groups)$})
 
   set.add_route(EchoApp, { :path_info => %r{^/feed/(?<kind>[a-z]+)$} }, { :controller => 'feed', :kind => 'rss' }, :feed)
+  set.add_route(EchoApp, { :path_info => %r{^/feed2(\.(?<format>[a-z]+))?$} }, { :controller => 'feed2', :format => 'rss' }, :feed2)
 
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo') }, { :controller => 'foo', :action => 'index' })
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo/bar') }, { :controller => 'foo_bar', :action => 'index' })
