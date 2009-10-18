@@ -227,7 +227,7 @@ module ActionController
         end
         recall[:action] = options.delete(:action) if options[:action] == 'index'
 
-        path = @set.url(named_route, options, recall)
+        path = _uri(named_route, options, recall)
         if path && method == :generate_extras
           uri = URI(path)
           extras = uri.query ?
@@ -246,7 +246,6 @@ module ActionController
       undef :recognize_path
       def recognize_path(path, environment = {}, rescue_error = true)
         method = (environment[:method] || "GET").to_s.upcase
-        path = URI.escape(path)
 
         begin
           env = Rack::MockRequest.env_for(path, {:method => method})
@@ -287,6 +286,45 @@ module ActionController
       end
 
       private
+        def _uri(named_route, params, recall)
+          params = URISegment.wrap_values(params)
+          recall = URISegment.wrap_values(recall)
+
+          unless result = @set.generate(:path_info, named_route, params, recall)
+            return
+          end
+
+          uri, params = result
+          params.each do |k, v|
+            if v._value
+              params[k] = v._value
+            else
+              params.delete(k)
+            end
+          end
+
+          uri << "?#{Rack::Mount::Utils.build_nested_query(params)}" if uri && params.any?
+          uri
+        end
+
+        class URISegment < Struct.new(:_value)
+          def self.wrap_values(hash)
+            hash.inject({}) { |h, (k, v)| h[k] = new(v); h }
+          end
+
+          extend Forwardable
+          def_delegators :_value, :==, :eql?, :hash
+
+          def to_param
+            @to_param ||= begin
+              v = _value.respond_to?(:to_param) ? _value.to_param : _value
+              # URI.escape(v.to_s, Rack::Mount::Const::UNSAFE_PCHAR)
+              URI.escape(v.to_s)
+            end
+          end
+          alias_method :to_s, :to_param
+        end
+
         def optionalize_trailing_dynamic_segments(path, requirements, defaults)
           path = (path =~ /^\//) ? path.dup : "/#{path}"
           optional, segments = true, []
