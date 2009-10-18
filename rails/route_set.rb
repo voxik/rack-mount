@@ -246,7 +246,13 @@ module ActionController
       undef :recognize_path
       def recognize_path(path, environment = {}, rescue_error = true)
         method = (environment[:method] || "GET").to_s.upcase
-        env = Rack::MockRequest.env_for(path, {:method => method})
+
+        begin
+          env = Rack::MockRequest.env_for(path, {:method => method})
+        rescue URI::InvalidURIError => e
+          raise RoutingError, e.message
+        end
+
         env['action_controller.recognize'] = true
         env['action_controller.rescue_error'] = rescue_error
         status, headers, body = call(env)
