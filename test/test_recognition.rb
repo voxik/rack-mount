@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'abstract_unit'
 
 class TestRecognition < Test::Unit::TestCase
