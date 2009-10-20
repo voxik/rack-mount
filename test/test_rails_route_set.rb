@@ -292,7 +292,7 @@ module RailsRouteSetTests
     assert_equal '/', @routes.generate(:controller => 'news', :action => 'index', :format => nil)
     assert_equal '/news.rss', @routes.generate(:controller => 'news', :action => 'index', :format => 'rss')
 
-    # assert_equal "/posts/act#{UriReservedCharacters::ESCAPED}ion", @routes.generate(:controller => 'posts', :action => "act#{UriReservedCharacters::SEGMENT}ion")
+    assert_equal "/posts/act#{UriReservedCharacters::ESCAPED}ion", @routes.generate(:controller => 'posts', :action => "act#{UriReservedCharacters::SEGMENT}ion")
 
     assert_raise(ActionController::RoutingError) { @routes.generate({:action => 'index'}) }
   end

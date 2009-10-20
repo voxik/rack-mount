@@ -153,7 +153,7 @@ module Rack::Mount
           def to_param
             @to_param ||= begin
               v = _value.respond_to?(:to_param) ? _value.to_param : _value
-              URI.escape(v.to_s, Const::UNSAFE_PCHAR)
+              Utils.escape_uri(v)
             end
           end
           alias_method :to_s, :to_param

@@ -309,9 +309,14 @@ module ActionController
           uri
         end
 
-        class URISegment < Struct.new(:_value)
+        class URISegment < Struct.new(:_value, :_escape)
+          EXCLUDED = [:controller]
+
           def self.wrap_values(hash)
-            hash.inject({}) { |h, (k, v)| h[k] = new(v); h }
+            hash.inject({}) { |h, (k, v)|
+              h[k] = new(v, !EXCLUDED.include?(k.to_sym))
+              h
+            }
           end
 
           extend Forwardable
@@ -319,12 +324,20 @@ module ActionController
 
           def to_param
             @to_param ||= begin
-              v = _value.respond_to?(:to_param) ? _value.to_param : _value
-              # URI.escape(v.to_s, Rack::Mount::Const::UNSAFE_PCHAR)
-              URI.escape(v.to_s)
+              if _value.is_a?(Array)
+                _value.map { |v| _escaped(v) }.join('/')
+              else
+                _escaped(_value)
+              end
             end
           end
           alias_method :to_s, :to_param
+
+          private
+            def _escaped(value)
+              v = value.respond_to?(:to_param) ? value.to_param : value
+              _escape ? Rack::Mount::Utils.escape_uri(v) : v.to_s
+            end
         end
 
         def optionalize_trailing_dynamic_segments(path, requirements, defaults)

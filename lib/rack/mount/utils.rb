@@ -1,5 +1,6 @@
 require 'rack/mount/regexp_with_named_groups'
 require 'strscan'
+require 'uri'
 
 module Rack::Mount
   # Private utility methods used throughout Rack::Mount.
@@ -37,6 +38,19 @@ module Rack::Mount
       ary
     end
     module_function :pop_trailing_nils!
+
+    RESERVED_PCHAR = ':@&=+$,;%'
+    SAFE_PCHAR = "#{URI::REGEXP::PATTERN::UNRESERVED}#{RESERVED_PCHAR}"
+    if RUBY_VERSION >= '1.9'
+      UNSAFE_PCHAR = Regexp.new("[^#{SAFE_PCHAR}]", false).freeze
+    else
+      UNSAFE_PCHAR = Regexp.new("[^#{SAFE_PCHAR}]", false, 'N').freeze
+    end
+
+    def escape_uri(uri)
+      URI.escape(uri.to_s, UNSAFE_PCHAR)
+    end
+    module_function :escape_uri
 
     # Taken from Rack 1.1.x to build nested query strings
     def build_nested_query(value, prefix = nil) #:nodoc:
