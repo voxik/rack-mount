@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name     = 'rack-mount'
   s.version  = '0.0.1'
-  s.date     = '2009-07-12'
+  s.date     = '2009-10-21'
   s.summary  = 'Stackable dynamic tree based Rack router'
   s.description = s.summary
   s.email    = 'josh@joshpeek.com'
