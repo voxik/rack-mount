@@ -36,7 +36,7 @@ module Rack::Mount
               if v = matches[i]
                 # TODO: We only want to unescape params from
                 # uri related methods
-                routing_args[k] = URI.unescape(v)
+                routing_args[k] = Utils.unescape_uri(v)
               end
             }
             # TODO: Don't explict check for :path_info condition

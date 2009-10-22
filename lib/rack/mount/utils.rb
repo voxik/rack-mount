@@ -52,6 +52,17 @@ module Rack::Mount
     end
     module_function :escape_uri
 
+    if ''.respond_to?(:force_encoding)
+      def unescape_uri(uri)
+        URI.unescape(uri).force_encoding('utf-8')
+      end
+    else
+      def unescape_uri(uri)
+        URI.unescape(uri)
+      end
+    end
+    module_function :unescape_uri
+
     # Taken from Rack 1.1.x to build nested query strings
     def build_nested_query(value, prefix = nil) #:nodoc:
       case value
