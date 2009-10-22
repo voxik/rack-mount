@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.description = s.summary
   s.email    = 'josh@joshpeek.com'
   s.homepage = 'http://github.com/josh/rack-mount'
+  s.rubyforge_project = 'rack-mount'
   s.has_rdoc = true
   s.authors  = ['Joshua Peek']
   s.files    = [
