@@ -24,6 +24,28 @@ module Rack::Mount
         @named_captures.freeze
       end
 
+      def recognize(obj)
+        params = @defaults.dup
+        if @conditions.all? { |method, condition|
+          value = obj.send(method)
+          if m = value.match(condition)
+            matches = m.captures
+            @named_captures[method].each { |k, i|
+              if v = matches[i]
+                params[k] = v
+              end
+            }
+            true
+          else
+            false
+          end
+        }
+          params
+        else
+          nil
+        end
+      end
+
       def call(req)
         env = req.env
 

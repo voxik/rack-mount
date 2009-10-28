@@ -21,6 +21,30 @@ module Rack::Mount
         route
       end
 
+      def recognize(obj)
+        raise 'route set not finalized' unless @recognition_graph
+
+        cache = {}
+        keys = @recognition_keys.map { |key|
+          if key.is_a?(Array)
+            key.call(cache, obj)
+          else
+            obj.send(key)
+          end
+        }
+        @recognition_graph[*keys].each do |route|
+          if result = route.recognize(obj)
+            if block_given?
+              yield result
+            else
+              return result
+            end
+          end
+        end
+
+        nil
+      end
+
       # Rack compatible recognition and dispatching method. Routes are
       # tried until one returns a non-catch status code. If no routes
       # match, the catch status code is returned.

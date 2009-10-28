@@ -47,6 +47,11 @@ class Test::Unit::TestCase
       @env[routing_args_key]
     end
 
+    def assert_recognizes(params, path)
+      req = Rack::Request.new(Rack::MockRequest.env_for(path))
+      assert_equal(params, @app.recognize(req))
+    end
+
     def get(path, options = {})
       process(path, options.merge(:method => 'GET'))
     end

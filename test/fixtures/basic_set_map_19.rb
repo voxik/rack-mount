@@ -57,6 +57,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo') }, { :controller => 'foo', :action => 'index' })
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo/bar') }, { :controller => 'foo_bar', :action => 'index' })
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('/baz') }, { :controller => 'baz', :action => 'index' })
+  set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('foo') }, { :controller => 'foo', :action => 'shadowed' })
 
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('/slashes/trailing/') }, { :controller => 'slash', :action => 'trailing' })
   set.add_route(EchoApp, { :path_info => Rack::Mount::Utils.normalize_path('//slashes/repeated') }, { :controller => 'slash', :action => 'repeated' })

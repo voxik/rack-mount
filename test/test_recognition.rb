@@ -8,6 +8,26 @@ class TestRecognition < Test::Unit::TestCase
     assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
 
+  def test_raw_recognize
+    assert_recognizes({ :controller => 'foo', :action => 'index' }, '/foo')
+    assert_recognizes({ :controller => 'foo_bar', :action => 'index' }, '/foo/bar')
+    assert_recognizes({ :controller => 'homepage' }, '/')
+    assert_recognizes({ :controller => 'sessions', :action => 'new' }, '/login')
+    assert_recognizes({ :controller => 'people', :action => 'show', :id => '1' }, '/people/1')
+    assert_recognizes(nil, '/admin/widgets/show/random')
+  end
+
+  def test_recognize_with_block
+    req = Rack::Request.new(Rack::MockRequest.env_for('/foo'))
+    results = []
+    @app.recognize(req) { |params| results << params }
+
+    assert_equal([
+      { :controller => 'foo', :action => 'index' },
+      { :controller => 'foo', :action => 'shadowed' }
+    ], results)
+  end
+
   def test_path
     get '/foo'
     assert_success
