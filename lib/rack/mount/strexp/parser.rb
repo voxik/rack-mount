@@ -103,12 +103,12 @@ Racc_debug_parser = false
 # reduce 0 omitted
 
 def _reduce_1(val, _values, result)
- result = "\\A#{val}\\Z" 
+ result = "\\A#{val.join}\\Z" 
     result
 end
 
 def _reduce_2(val, _values, result)
- result = val 
+ result = val.join 
     result
 end
 

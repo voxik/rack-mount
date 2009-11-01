@@ -1,8 +1,8 @@
 class Rack::Mount::StrexpParser
 rule
-  target: expr { result = "\\A#{val}\\Z" }
+  target: expr { result = "\\A#{val.join}\\Z" }
 
-  expr: expr token { result = val }
+  expr: expr token { result = val.join }
       | token
 
   token: PARAM {
