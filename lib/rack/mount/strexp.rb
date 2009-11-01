@@ -2,7 +2,7 @@ require 'strscan'
 require 'rack/mount/strexp/parser'
 
 module Rack::Mount
-  class StrexpParser < Racc::Parser
+  class StrexpParser < Racc::Parser #:nodoc:
     attr_accessor :requirements
   end
 
@@ -29,7 +29,6 @@ module Rack::Mount
     def initialize(str, requirements = {}, separators = [])
       return super(str) if str.is_a?(Regexp)
 
-      re = Regexp.escape(str)
       requirements = requirements ? requirements.dup : {}
       normalize_requirements!(requirements, separators)
 
@@ -37,12 +36,12 @@ module Rack::Mount
       parser.requirements = requirements
 
       begin
-        re = parser.scan_str(re)
+        re = parser.scan_str(str)
       rescue Racc::ParseError => e
         raise RegexpError, e.message
       end
 
-      super("\\A#{re}\\Z")
+      super(re)
     end
 
     private

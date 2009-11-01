@@ -51,16 +51,19 @@ class StrexpParser < Racc::Parser
     token = case @state
     when nil
       case
-      when (text = @ss.scan(/\\\\(\(|\)|:|\*)/))
+      when (text = @ss.scan(/\\(\(|\)|:|\*)/))
          action { [:CHAR,  @ss[1]] }
 
-      when (text = @ss.scan(/(:|\\\*)([a-zA-Z_]\w*)/))
-         action { [:PARAM, @ss[2]] }
+      when (text = @ss.scan(/\:([a-zA-Z_]\w*)/))
+         action { [:PARAM, @ss[1]] }
 
-      when (text = @ss.scan(/\\\(/))
+      when (text = @ss.scan(/\*([a-zA-Z_]\w*)/))
+         action { [:PARAM, @ss[1]] }
+
+      when (text = @ss.scan(/\(/))
          action { [:LPAREN, text]  }
 
-      when (text = @ss.scan(/\\\)/))
+      when (text = @ss.scan(/\)/))
          action { [:RPAREN, text]  }
 
       when (text = @ss.scan(/./))

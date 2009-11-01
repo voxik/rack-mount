@@ -13,44 +13,45 @@ module Rack
 ##### State transition tables begin ###
 
 racc_action_table = [
-     7,    10,     1,     2,   nil,     3,     1,     2,   nil,     3,
-     1,     2,   nil,     3,     1,     2,     9,     3 ]
+     1,     2,     8,     3,     1,     2,    11,     3,     1,     2,
+    10,     3,     1,     2,   nil,     3 ]
 
 racc_action_check = [
-     4,     7,     4,     4,   nil,     4,     0,     0,   nil,     0,
-     2,     2,   nil,     2,     6,     6,     6,     6 ]
+     0,     0,     4,     0,     2,     2,     8,     2,     7,     7,
+     7,     7,     5,     5,   nil,     5 ]
 
 racc_action_pointer = [
-     4,   nil,     8,   nil,     0,   nil,    12,     1,   nil,   nil,
-   nil ]
+    -2,   nil,     2,   nil,     2,    10,   nil,     6,     6,   nil,
+   nil,   nil ]
 
 racc_action_default = [
-    -6,    -3,    -6,    -5,    -6,    -2,    -6,    -6,    -1,    -4,
-    11 ]
+    -7,    -4,    -7,    -6,    -7,    -1,    -3,    -7,    -7,    -2,
+    -5,    12 ]
 
 racc_goto_table = [
-     4,     8,     6,     8 ]
+     9,     5,     9,     7,     4 ]
 
 racc_goto_check = [
-     1,     2,     1,     2 ]
+     3,     2,     3,     2,     1 ]
 
 racc_goto_pointer = [
-   nil,     0,    -3 ]
+   nil,     4,     1,    -5 ]
 
 racc_goto_default = [
-   nil,   nil,     5 ]
+   nil,   nil,   nil,     6 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  2, 7, :_reduce_1,
-  1, 7, :_reduce_none,
-  1, 8, :_reduce_3,
-  3, 8, :_reduce_4,
-  1, 8, :_reduce_5 ]
+  1, 7, :_reduce_1,
+  2, 8, :_reduce_2,
+  1, 8, :_reduce_none,
+  1, 9, :_reduce_4,
+  3, 9, :_reduce_5,
+  1, 9, :_reduce_6 ]
 
-racc_reduce_n = 6
+racc_reduce_n = 7
 
-racc_shift_n = 11
+racc_shift_n = 12
 
 racc_token_table = {
   false => 0,
@@ -88,6 +89,7 @@ Racc_token_to_s_table = [
   "RPAREN",
   "CHAR",
   "$start",
+  "target",
   "expr",
   "token" ]
 
@@ -98,27 +100,32 @@ Racc_debug_parser = false
 # reduce 0 omitted
 
 def _reduce_1(val, _values, result)
- result = "#{val[0]}#{val[1]}" 
+ result = "\\A#{val}\\Z" 
     result
 end
 
-# reduce 2 omitted
-
-def _reduce_3(val, _values, result)
-          name = val[0].to_sym
-          requirement = requirements[name]
-          result = Const::REGEXP_NAMED_CAPTURE % [name, requirement]
-        
+def _reduce_2(val, _values, result)
+ result = val 
     result
 end
+
+# reduce 3 omitted
 
 def _reduce_4(val, _values, result)
- result = "(#{val[1]})?" 
+           name = val[0].to_sym
+           requirement = requirements[name]
+           result = Const::REGEXP_NAMED_CAPTURE % [name, requirement]
+         
     result
 end
 
 def _reduce_5(val, _values, result)
- result = val[0] 
+ result = "(#{val[1]})?" 
+    result
+end
+
+def _reduce_6(val, _values, result)
+ result = Regexp.escape(val[0]) 
     result
 end
 
