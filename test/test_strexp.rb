@@ -91,6 +91,14 @@ class TestStrexp < Test::Unit::TestCase
     end
   end
 
+  def test_glob_ignores_seperators
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      assert_equal eval('%r{\Asrc/(?<files>.+)\Z}'), Strexp.compile('src/*files', {}, %w( / . ? ))
+    else
+      assert_equal %r{\Asrc/(?:<files>.+)\Z}, Strexp.compile('src/*files', {}, %w( / . ? ))
+    end
+  end
+
   def test_glob_segment_at_the_beginning
     if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal eval('%r{\A(?<files>.+)/foo\.txt\Z}'), Strexp.compile('*files/foo.txt')

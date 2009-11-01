@@ -5,7 +5,7 @@ macro
 rule
   \\({RESERVED})   { [:CHAR,  @ss[1]] }
   \:({ALPHA_U}\w*) { [:PARAM, @ss[1]] }
-  \*({ALPHA_U}\w*) { [:PARAM, @ss[1]] }
+  \*({ALPHA_U}\w*) { [:GLOB,  @ss[1]] }
   \(               { [:LPAREN, text]  }
   \)               { [:RPAREN, text]  }
   .                { [:CHAR,   text]  }

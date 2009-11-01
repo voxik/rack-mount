@@ -58,7 +58,7 @@ class StrexpParser < Racc::Parser
          action { [:PARAM, @ss[1]] }
 
       when (text = @ss.scan(/\*([a-zA-Z_]\w*)/))
-         action { [:PARAM, @ss[1]] }
+         action { [:GLOB,  @ss[1]] }
 
       when (text = @ss.scan(/\(/))
          action { [:LPAREN, text]  }

@@ -13,55 +13,57 @@ module Rack
 ##### State transition tables begin ###
 
 racc_action_table = [
-     1,     2,     8,     3,     1,     2,    11,     3,     1,     2,
-    10,     3,     1,     2,   nil,     3 ]
+     1,     2,     3,     9,     4,     1,     2,     3,    12,     4,
+     1,     2,     3,    11,     4,     1,     2,     3,   nil,     4 ]
 
 racc_action_check = [
-     0,     0,     4,     0,     2,     2,     8,     2,     7,     7,
-     7,     7,     5,     5,   nil,     5 ]
+     0,     0,     0,     5,     0,     3,     3,     3,     9,     3,
+     8,     8,     8,     8,     8,     6,     6,     6,   nil,     6 ]
 
 racc_action_pointer = [
-    -2,   nil,     2,   nil,     2,    10,   nil,     6,     6,   nil,
-   nil,   nil ]
+    -2,   nil,   nil,     3,   nil,     3,    13,   nil,     8,     8,
+   nil,   nil,   nil ]
 
 racc_action_default = [
-    -7,    -4,    -7,    -6,    -7,    -1,    -3,    -7,    -7,    -2,
-    -5,    12 ]
+    -8,    -4,    -5,    -8,    -7,    -8,    -1,    -3,    -8,    -8,
+    -2,    -6,    13 ]
 
 racc_goto_table = [
-     9,     5,     9,     7,     4 ]
+     6,     5,    10,     8,    10 ]
 
 racc_goto_check = [
-     3,     2,     3,     2,     1 ]
+     2,     1,     3,     2,     3 ]
 
 racc_goto_pointer = [
-   nil,     4,     1,    -5 ]
+   nil,     1,     0,    -4 ]
 
 racc_goto_default = [
-   nil,   nil,   nil,     6 ]
+   nil,   nil,   nil,     7 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 7, :_reduce_1,
-  2, 8, :_reduce_2,
-  1, 8, :_reduce_none,
-  1, 9, :_reduce_4,
-  3, 9, :_reduce_5,
-  1, 9, :_reduce_6 ]
+  1, 8, :_reduce_1,
+  2, 9, :_reduce_2,
+  1, 9, :_reduce_none,
+  1, 10, :_reduce_4,
+  1, 10, :_reduce_5,
+  3, 10, :_reduce_6,
+  1, 10, :_reduce_7 ]
 
-racc_reduce_n = 7
+racc_reduce_n = 8
 
-racc_shift_n = 12
+racc_shift_n = 13
 
 racc_token_table = {
   false => 0,
   :error => 1,
   :PARAM => 2,
-  :LPAREN => 3,
-  :RPAREN => 4,
-  :CHAR => 5 }
+  :GLOB => 3,
+  :LPAREN => 4,
+  :RPAREN => 5,
+  :CHAR => 6 }
 
-racc_nt_base = 6
+racc_nt_base = 7
 
 racc_use_result_var = true
 
@@ -85,6 +87,7 @@ Racc_token_to_s_table = [
   "$end",
   "error",
   "PARAM",
+  "GLOB",
   "LPAREN",
   "RPAREN",
   "CHAR",
@@ -120,11 +123,18 @@ def _reduce_4(val, _values, result)
 end
 
 def _reduce_5(val, _values, result)
- result = "(#{val[1]})?" 
+           name = val[0].to_sym
+           result = Const::REGEXP_NAMED_CAPTURE % [name, '.+']
+         
     result
 end
 
 def _reduce_6(val, _values, result)
+ result = "(#{val[1]})?" 
+    result
+end
+
+def _reduce_7(val, _values, result)
  result = Regexp.escape(val[0]) 
     result
 end
