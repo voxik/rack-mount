@@ -1,6 +1,11 @@
 require 'strscan'
+require 'rack/mount/strexp/parser'
 
 module Rack::Mount
+  class StrexpParser < Racc::Parser
+    attr_accessor :requirements
+  end
+
   class Strexp < Regexp
     # Parses segmented string expression and converts it into a Regexp
     #
@@ -26,10 +31,16 @@ module Rack::Mount
 
       re = Regexp.escape(str)
       requirements = requirements ? requirements.dup : {}
-
       normalize_requirements!(requirements, separators)
-      parse_dynamic_segments!(re, requirements)
-      parse_optional_segments!(re)
+
+      parser = Rack::Mount::StrexpParser.new
+      parser.requirements = requirements
+
+      begin
+        re = parser.scan_str(re)
+      rescue Racc::ParseError => e
+        raise RegexpError, e.message
+      end
 
       super("\\A#{re}\\Z")
     end
@@ -50,40 +61,6 @@ module Rack::Mount
         requirements.default ||= separators.any? ?
           "[^#{separators.join}]+" : '.+'
         requirements
-      end
-
-      def parse_dynamic_segments!(str, requirements)
-        re, pos, scanner = '', 0, StringScanner.new(str)
-        while scanner.scan_until(/(:|\\\*)([a-zA-Z_]\w*)/)
-          pre, pos = scanner.pre_match[pos..-1], scanner.pos
-          if pre =~ /(.*)\\\\\Z/
-            re << $1 + scanner.matched
-          else
-            name = scanner[2].to_sym
-            requirement = scanner[1] == ':' ?
-              requirements[name] : '.+'
-            re << pre + Const::REGEXP_NAMED_CAPTURE % [name, requirement]
-          end
-        end
-        re << scanner.rest
-        str.replace(re)
-      end
-
-      def parse_optional_segments!(str)
-        re, pos, scanner = '', 0, StringScanner.new(str)
-        while scanner.scan_until(/\\\(|\\\)/)
-          pre, pos = scanner.pre_match[pos..-1], scanner.pos
-          if pre =~ /(.*)\\\\\Z/
-            re << $1 + scanner.matched
-          elsif scanner.matched == '\\('
-            # re << pre + '(?:'
-            re << pre + '('
-          elsif scanner.matched == '\\)'
-            re << pre + ')?'
-          end
-        end
-        re << scanner.rest
-        str.replace(re)
       end
 
       def regexp_has_modifiers?(regexp)

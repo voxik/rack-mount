@@ -28,6 +28,8 @@ Gem::Specification.new do |s|
     'lib/rack/mount/regexp_with_named_groups.rb',
     'lib/rack/mount/route.rb',
     'lib/rack/mount/route_set.rb',
+    'lib/rack/mount/strexp/parser.rb',
+    'lib/rack/mount/strexp/tokenizer.rb',
     'lib/rack/mount/strexp.rb',
     'lib/rack/mount/utils.rb',
     'lib/rack/mount/vendor/multimap/multimap.rb',

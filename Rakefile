@@ -46,6 +46,19 @@ Rake::TestTask.new do |t|
 end
 
 
+task :compile => [
+  'lib/rack/mount/strexp/parser.rb',
+  'lib/rack/mount/strexp/tokenizer.rb'
+]
+
+file 'lib/rack/mount/strexp/parser.rb' => 'lib/rack/mount/strexp/parser.y' do |t|
+  sh "racc -l -o #{t.name} #{t.prerequisites.first}"
+end
+
+file 'lib/rack/mount/strexp/tokenizer.rb' => 'lib/rack/mount/strexp/tokenizer.rex' do |t|
+  sh "rex -o #{t.name} #{t.prerequisites.first}"
+end
+
 namespace :vendor do
   task :update_multimap do
     system 'git clone git://github.com/josh/multimap.git'
