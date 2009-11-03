@@ -21,10 +21,15 @@ module Rack::Mount
           }
           @required_defaults[method].freeze
         end
+        @has_significant_params = (@required_params.any? { |k, v| v.any? } || @required_defaults.any? { |k, v| v.any? }) ? true : false
 
         @required_params.freeze
         @required_defaults.freeze
         @generation_keys.freeze
+      end
+
+      def significant_params?
+        @has_significant_params
       end
 
       def generate(methods, params = {}, recall = {})

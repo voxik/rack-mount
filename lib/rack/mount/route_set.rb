@@ -98,10 +98,12 @@ module Rack::Mount
       def build_nested_route_set(keys, &block)
         graph = Multimap.new
         @routes.each_with_index do |route, index|
-          k = keys.map { |key| block.call(key, index) }
-          Utils.pop_trailing_nils!(k)
-          k.map! { |key| key || /.+/ }
-          graph[*k] = route
+          catch(:skip) do
+            k = keys.map { |key| block.call(key, index) }
+            Utils.pop_trailing_nils!(k)
+            k.map! { |key| key || /.+/ }
+            graph[*k] = route
+          end
         end
         graph
       end

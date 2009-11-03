@@ -54,6 +54,8 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/default/users/show/1', @app.url(:controller => 'users', :action => 'show', :id => '1')
     assert_equal '/default/users/show/1', @app.url({:action => 'show', :id => '1'}, {:controller => 'users'})
     assert_equal '/default/users/show/1', @app.url({:controller => 'users', :id => '1'}, {:action => 'show'})
+
+    assert_raise(Rack::Mount::RoutingError) { @app.url({}) }
   end
 
   def test_generate_host

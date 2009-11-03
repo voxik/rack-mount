@@ -79,6 +79,7 @@ module Rack::Mount
             end
           }
           @generation_graph[*keys].each do |r|
+            next unless r.significant_params?
             if url = r.generate(method, params, recall)
               return [url, params]
             end
@@ -103,6 +104,8 @@ module Rack::Mount
 
         def build_generation_graph
           build_nested_route_set(@generation_keys) { |k, i|
+            throw :skip unless @routes[i].significant_params?
+
             if k = @generation_key_analyzer.possible_keys[i][k]
               k.to_s
             else
