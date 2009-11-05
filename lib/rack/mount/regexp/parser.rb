@@ -34,7 +34,7 @@ class Expression < Array
 end
 
 class Group < Struct.new(:value)
-  attr_accessor :quantifier, :capture
+  attr_accessor :quantifier, :capture, :name
 
   def initialize(*args)
     @capture = true
@@ -48,7 +48,8 @@ class Group < Struct.new(:value)
   def ==(other)
     self.value == other.value &&
       self.quantifier == other.quantifier &&
-      self.capture == other.capture
+      self.capture == other.capture &&
+      self.name == other.name
   end
 end
 
@@ -63,55 +64,58 @@ end
 ##### State transition tables begin ###
 
 racc_action_table = [
-     9,    17,    10,    11,     3,     4,     9,    12,    10,    11,
-     3,     4,     3,     4,     3,     4,    16,    18,    14,    20 ]
+    12,     7,    12,    10,    11,    10,    11,     5,     6,    17,
+    14,     5,     6,    18,    19,     5,     6,     5,     6,     5,
+     6,    15,    22,    23 ]
 
 racc_action_check = [
-     7,    13,     7,     7,     4,     4,     2,     4,     2,     2,
-     0,     0,     1,     1,    16,    16,    12,    14,     6,    19 ]
+     8,     1,     3,     8,     8,     3,     3,     6,     6,    13,
+     6,     0,     0,    14,    14,    19,    19,     2,     2,    18,
+    18,     7,    20,    21 ]
 
 racc_action_pointer = [
-     8,    10,     1,   nil,     2,   nil,    18,    -5,   nil,   nil,
-   nil,   nil,    10,    -3,    17,   nil,    12,   nil,   nil,    15,
-   nil ]
+     9,     1,    15,    -3,   nil,   nil,     5,    21,    -5,   nil,
+   nil,   nil,   nil,     5,     7,   nil,   nil,   nil,    17,    13,
+    18,    19,   nil,   nil ]
 
 racc_action_default = [
-   -13,    -1,    -5,    -7,   -13,    -6,   -13,    -3,    -4,   -12,
-   -10,   -11,   -13,   -13,   -13,    -2,   -13,    -8,    21,   -13,
-    -9 ]
+   -14,   -14,    -1,    -5,    -6,    -7,   -14,   -14,    -3,    -4,
+   -11,   -12,   -13,   -14,   -14,    24,    -2,    -8,   -14,   -14,
+   -14,   -14,    -9,   -10 ]
 
 racc_goto_table = [
-     6,     8,     7,   nil,    13,   nil,    15,   nil,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,   nil,    19 ]
+     1,     8,     9,   nil,   nil,   nil,    13,    16,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,    20,    21 ]
 
 racc_goto_check = [
-     1,     4,     3,   nil,     1,   nil,     4,   nil,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,   nil,     1 ]
+     1,     3,     4,   nil,   nil,   nil,     1,     4,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     1,     1 ]
 
 racc_goto_pointer = [
-   nil,     0,   nil,     1,    -1,   nil ]
+   nil,     0,   nil,    -1,    -1,   nil ]
 
 racc_goto_default = [
-   nil,   nil,     1,     2,   nil,     5 ]
+   nil,   nil,     2,     3,   nil,     4 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 10, :_reduce_1,
-  3, 11, :_reduce_2,
-  2, 11, :_reduce_3,
-  2, 11, :_reduce_4,
-  1, 11, :_reduce_none,
+  1, 11, :_reduce_1,
+  3, 12, :_reduce_2,
+  2, 12, :_reduce_3,
+  2, 12, :_reduce_4,
   1, 12, :_reduce_none,
-  1, 12, :_reduce_7,
-  3, 14, :_reduce_8,
-  5, 14, :_reduce_9,
   1, 13, :_reduce_none,
-  1, 13, :_reduce_none,
-  1, 13, :_reduce_none ]
+  1, 13, :_reduce_7,
+  3, 15, :_reduce_8,
+  5, 15, :_reduce_9,
+  5, 15, :_reduce_10,
+  1, 14, :_reduce_none,
+  1, 14, :_reduce_none,
+  1, 14, :_reduce_none ]
 
-racc_reduce_n = 13
+racc_reduce_n = 14
 
-racc_shift_n = 21
+racc_shift_n = 24
 
 racc_token_table = {
   false => 0,
@@ -121,10 +125,11 @@ racc_token_table = {
   :RPAREN => 4,
   :QMARK => 5,
   :COLON => 6,
-  :STAR => 7,
-  :PLUS => 8 }
+  :NAME => 7,
+  :STAR => 8,
+  :PLUS => 9 }
 
-racc_nt_base = 9
+racc_nt_base = 10
 
 racc_use_result_var = true
 
@@ -152,6 +157,7 @@ Racc_token_to_s_table = [
   "RPAREN",
   "QMARK",
   "COLON",
+  "NAME",
   "STAR",
   "PLUS",
   "$start",
@@ -210,11 +216,16 @@ def _reduce_9(val, _values, result)
     result
 end
 
-# reduce 10 omitted
+def _reduce_10(val, _values, result)
+ result = Group.new(val[3]); result.name = val[2] 
+    result
+end
 
 # reduce 11 omitted
 
 # reduce 12 omitted
+
+# reduce 13 omitted
 
 def _reduce_none(val, _values, result)
   val[0]

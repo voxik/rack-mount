@@ -18,6 +18,7 @@ rule
 
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
        | LPAREN QMARK COLON expression RPAREN { result = Group.new(val[3]); result.capture = false }
+       | LPAREN QMARK NAME expression RPAREN { result = Group.new(val[3]); result.name = val[2] }
 
   quantifier: STAR
             | PLUS
@@ -50,7 +51,7 @@ class Expression < Array
 end
 
 class Group < Struct.new(:value)
-  attr_accessor :quantifier, :capture
+  attr_accessor :quantifier, :capture, :name
 
   def initialize(*args)
     @capture = true
@@ -64,7 +65,8 @@ class Group < Struct.new(:value)
   def ==(other)
     self.value == other.value &&
       self.quantifier == other.quantifier &&
-      self.capture == other.capture
+      self.capture == other.capture &&
+      self.name == other.name
   end
 end
 

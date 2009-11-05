@@ -51,6 +51,9 @@ class RegexpParser < Racc::Parser
     token = case @state
     when nil
       case
+      when (text = @ss.scan(/<(\w+)>/))
+         action { [:NAME, @ss[1]] }
+
       when (text = @ss.scan(/\(/))
          action { [:LPAREN,  text] }
 

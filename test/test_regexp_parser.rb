@@ -90,6 +90,22 @@ class TestRegexpParser < Test::Unit::TestCase
     ], parse(%r{/foo(?:/bar)})
   end
 
+  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    def test_named_group
+      assert_equal [
+        char('/'),
+        char('f'),
+        char('o'),
+        char('o'),
+        group([
+          char('b'),
+          char('a'),
+          char('z')
+        ], :name => 'bar')
+      ], parse(eval('%r{/foo(?<bar>baz)}'))
+    end
+  end
+
   private
     def parse(regexp)
       @parser.scan_str(regexp.source)
