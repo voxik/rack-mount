@@ -1,12 +1,16 @@
 class Rack::Mount::RegexpParser
 rule
-  expression: branch { result = Expression.new(val[0].flatten) }
+  expression: branch { result = Expression.new(val[0]) }
 
   branch: branch atom quantifier {
             val[1].quantifier = val[2]
             result = Node.new(val[0], val[1])
           }
         | branch atom { result = Node.new(val[0], val[1]) }
+        | atom quantifier {
+            val[0].quantifier = val[1]
+            result = val[0]
+          }
         | atom
 
   atom: group
@@ -14,7 +18,9 @@ rule
 
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
 
-  quantifier: QMARK
+  quantifier: STAR
+            | PLUS
+            | QMARK
 end
 
 ---- header
@@ -33,6 +39,13 @@ class Node < Struct.new(:left, :right)
 end
 
 class Expression < Array
+  def initialize(ary)
+    if ary.is_a?(Node)
+      super(ary.flatten)
+    else
+      super([ary])
+    end
+  end
 end
 
 class Group < Struct.new(:value)

@@ -21,11 +21,13 @@ rule
   # \{        { [:RCURLY,  text] }
 
   # \.        { [:DOT, text] }
-  \?        { [:QMARK,  text] }
-  # \+        { [:PLUS,  text] }
   # \-        { [:MINUS,  text] }
-  # \*        { [:STAR,  text] }
 
+  \?          { [:QMARK, text] }
+  \+          { [:PLUS,  text] }
+  \*          { [:STAR,  text] }
+
+  \\(.)       { [:CHAR, @ss[1]] }
   .           { [:CHAR, text] }
 
   # \\?(.)            { [:CHAR, @ss[1]] }

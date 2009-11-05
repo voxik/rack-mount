@@ -24,6 +24,13 @@ class Node < Struct.new(:left, :right)
 end
 
 class Expression < Array
+  def initialize(ary)
+    if ary.is_a?(Node)
+      super(ary.flatten)
+    else
+      super([ary])
+    end
+  end
 end
 
 class Group < Struct.new(:value)
@@ -46,45 +53,52 @@ end
 ##### State transition tables begin ###
 
 racc_action_table = [
-     2,     3,     2,     3,     2,     3,     8,    10,    11,    12 ]
+     8,     9,    10,     8,     9,    10,     2,     4,     2,     4,
+     2,     4,    14,    15,    12 ]
 
 racc_action_check = [
-     0,     0,     3,     3,     5,     5,     4,     7,     8,     9 ]
+    13,    13,    13,     1,     1,     1,     6,     6,     0,     0,
+     4,     4,    11,    12,     5 ]
 
 racc_action_pointer = [
-    -2,   nil,   nil,     0,     6,     2,   nil,     3,     8,     4,
-   nil,   nil,   nil,   nil ]
+     6,    -2,   nil,   nil,     8,    14,     4,   nil,   nil,   nil,
+   nil,     8,    13,    -5,   nil,   nil,   nil ]
 
 racc_action_default = [
-    -9,    -5,    -6,    -9,    -9,    -1,    -4,    -9,    -9,    -3,
-    -7,    14,    -8,    -2 ]
+   -12,    -5,    -7,    -6,   -12,   -12,    -1,    -4,    -9,   -10,
+   -11,   -12,   -12,    -3,    -8,    17,    -2 ]
 
 racc_goto_table = [
-     4,     9,    13,     7 ]
+     7,     5,    13,   nil,   nil,    11,   nil,   nil,   nil,   nil,
+   nil,   nil,    16 ]
 
 racc_goto_check = [
-     1,     3,     4,     1 ]
+     4,     1,     3,   nil,   nil,     1,   nil,   nil,   nil,   nil,
+   nil,   nil,     4 ]
 
 racc_goto_pointer = [
-   nil,     0,   nil,    -4,    -7,   nil ]
+   nil,     1,   nil,    -4,    -1,   nil ]
 
 racc_goto_default = [
-   nil,   nil,     5,     6,   nil,     1 ]
+   nil,   nil,     6,     1,   nil,     3 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 7, :_reduce_1,
-  3, 8, :_reduce_2,
-  2, 8, :_reduce_3,
-  1, 8, :_reduce_none,
-  1, 9, :_reduce_none,
-  1, 9, :_reduce_6,
-  3, 11, :_reduce_7,
-  1, 10, :_reduce_none ]
+  1, 9, :_reduce_1,
+  3, 10, :_reduce_2,
+  2, 10, :_reduce_3,
+  2, 10, :_reduce_4,
+  1, 10, :_reduce_none,
+  1, 11, :_reduce_none,
+  1, 11, :_reduce_7,
+  3, 13, :_reduce_8,
+  1, 12, :_reduce_none,
+  1, 12, :_reduce_none,
+  1, 12, :_reduce_none ]
 
-racc_reduce_n = 9
+racc_reduce_n = 12
 
-racc_shift_n = 14
+racc_shift_n = 17
 
 racc_token_table = {
   false => 0,
@@ -92,9 +106,11 @@ racc_token_table = {
   :CHAR => 2,
   :LPAREN => 3,
   :RPAREN => 4,
-  :QMARK => 5 }
+  :STAR => 5,
+  :PLUS => 6,
+  :QMARK => 7 }
 
-racc_nt_base = 6
+racc_nt_base = 8
 
 racc_use_result_var = true
 
@@ -120,6 +136,8 @@ Racc_token_to_s_table = [
   "CHAR",
   "LPAREN",
   "RPAREN",
+  "STAR",
+  "PLUS",
   "QMARK",
   "$start",
   "expression",
@@ -135,7 +153,7 @@ Racc_debug_parser = false
 # reduce 0 omitted
 
 def _reduce_1(val, _values, result)
- result = Expression.new(val[0].flatten) 
+ result = Expression.new(val[0]) 
     result
 end
 
@@ -151,21 +169,32 @@ def _reduce_3(val, _values, result)
     result
 end
 
-# reduce 4 omitted
+def _reduce_4(val, _values, result)
+            val[0].quantifier = val[1]
+            result = val[0]
+          
+    result
+end
 
 # reduce 5 omitted
 
-def _reduce_6(val, _values, result)
+# reduce 6 omitted
+
+def _reduce_7(val, _values, result)
  result = Character.new(val[0]) 
     result
 end
 
-def _reduce_7(val, _values, result)
+def _reduce_8(val, _values, result)
  result = Group.new(val[1]) 
     result
 end
 
-# reduce 8 omitted
+# reduce 9 omitted
+
+# reduce 10 omitted
+
+# reduce 11 omitted
 
 def _reduce_none(val, _values, result)
   val[0]
