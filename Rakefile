@@ -47,9 +47,19 @@ end
 
 
 task :compile => [
+  'lib/rack/mount/regexp/parser.rb',
+  'lib/rack/mount/regexp/tokenizer.rb',
   'lib/rack/mount/strexp/parser.rb',
   'lib/rack/mount/strexp/tokenizer.rb'
 ]
+
+file 'lib/rack/mount/regexp/parser.rb' => 'lib/rack/mount/regexp/parser.y' do |t|
+  sh "racc -l -o #{t.name} #{t.prerequisites.first}"
+end
+
+file 'lib/rack/mount/regexp/tokenizer.rb' => 'lib/rack/mount/regexp/tokenizer.rex' do |t|
+  sh "rex -o #{t.name} #{t.prerequisites.first}"
+end
 
 file 'lib/rack/mount/strexp/parser.rb' => 'lib/rack/mount/strexp/parser.y' do |t|
   sh "racc -l -o #{t.name} #{t.prerequisites.first}"
