@@ -26,6 +26,7 @@ rule
   \?          { [:QMARK, text] }
   \+          { [:PLUS,  text] }
   \*          { [:STAR,  text] }
+  \:          { [:COLON, text] }
 
   \\(.)       { [:CHAR, @ss[1]] }
   .           { [:CHAR, text] }

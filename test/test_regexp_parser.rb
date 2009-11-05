@@ -75,6 +75,21 @@ class TestRegexpParser < Test::Unit::TestCase
     ], parse(%r{/foo(/bar)?})
   end
 
+  def test_noncapture_group
+    assert_equal [
+      char('/'),
+      char('f'),
+      char('o'),
+      char('o'),
+      group([
+        char('/'),
+        char('b'),
+        char('a'),
+        char('r')
+      ], :capture => false)
+    ], parse(%r{/foo(?:/bar)})
+  end
+
   private
     def parse(regexp)
       @parser.scan_str(regexp.source)
@@ -88,7 +103,7 @@ class TestRegexpParser < Test::Unit::TestCase
 
     def group(value, options = {})
       group = RegexpParser::Group.new(value)
-      group.quantifier = options.delete(:quantifier)
+      options.each { |k, v| group.send("#{k}=", v) }
       group
     end
 end

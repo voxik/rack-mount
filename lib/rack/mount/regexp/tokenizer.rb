@@ -66,6 +66,9 @@ class RegexpParser < Racc::Parser
       when (text = @ss.scan(/\*/))
          action { [:STAR,  text] }
 
+      when (text = @ss.scan(/\:/))
+         action { [:COLON, text] }
+
       when (text = @ss.scan(/\\(.)/))
          action { [:CHAR, @ss[1]] }
 

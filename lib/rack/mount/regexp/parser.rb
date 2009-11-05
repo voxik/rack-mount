@@ -34,11 +34,21 @@ class Expression < Array
 end
 
 class Group < Struct.new(:value)
-  attr_accessor :quantifier
+  attr_accessor :quantifier, :capture
+
+  def initialize(*args)
+    @capture = true
+    super
+  end
+
+  def capture?
+    capture
+  end
 
   def ==(other)
     self.value == other.value &&
-      self.quantifier == other.quantifier
+      self.quantifier == other.quantifier &&
+      self.capture == other.capture
   end
 end
 
@@ -53,52 +63,55 @@ end
 ##### State transition tables begin ###
 
 racc_action_table = [
-     8,     9,    10,     8,     9,    10,     2,     4,     2,     4,
-     2,     4,    14,    15,    12 ]
+     9,    17,    10,    11,     3,     4,     9,    12,    10,    11,
+     3,     4,     3,     4,     3,     4,    16,    18,    14,    20 ]
 
 racc_action_check = [
-    13,    13,    13,     1,     1,     1,     6,     6,     0,     0,
-     4,     4,    11,    12,     5 ]
+     7,    13,     7,     7,     4,     4,     2,     4,     2,     2,
+     0,     0,     1,     1,    16,    16,    12,    14,     6,    19 ]
 
 racc_action_pointer = [
-     6,    -2,   nil,   nil,     8,    14,     4,   nil,   nil,   nil,
-   nil,     8,    13,    -5,   nil,   nil,   nil ]
+     8,    10,     1,   nil,     2,   nil,    18,    -5,   nil,   nil,
+   nil,   nil,    10,    -3,    17,   nil,    12,   nil,   nil,    15,
+   nil ]
 
 racc_action_default = [
-   -12,    -5,    -7,    -6,   -12,   -12,    -1,    -4,    -9,   -10,
-   -11,   -12,   -12,    -3,    -8,    17,    -2 ]
+   -13,    -1,    -5,    -7,   -13,    -6,   -13,    -3,    -4,   -12,
+   -10,   -11,   -13,   -13,   -13,    -2,   -13,    -8,    21,   -13,
+    -9 ]
 
 racc_goto_table = [
-     7,     5,    13,   nil,   nil,    11,   nil,   nil,   nil,   nil,
-   nil,   nil,    16 ]
+     6,     8,     7,   nil,    13,   nil,    15,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,    19 ]
 
 racc_goto_check = [
-     4,     1,     3,   nil,   nil,     1,   nil,   nil,   nil,   nil,
-   nil,   nil,     4 ]
+     1,     4,     3,   nil,     1,   nil,     4,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,     1 ]
 
 racc_goto_pointer = [
-   nil,     1,   nil,    -4,    -1,   nil ]
+   nil,     0,   nil,     1,    -1,   nil ]
 
 racc_goto_default = [
-   nil,   nil,     6,     1,   nil,     3 ]
+   nil,   nil,     1,     2,   nil,     5 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 9, :_reduce_1,
-  3, 10, :_reduce_2,
-  2, 10, :_reduce_3,
-  2, 10, :_reduce_4,
-  1, 10, :_reduce_none,
+  1, 10, :_reduce_1,
+  3, 11, :_reduce_2,
+  2, 11, :_reduce_3,
+  2, 11, :_reduce_4,
   1, 11, :_reduce_none,
-  1, 11, :_reduce_7,
-  3, 13, :_reduce_8,
   1, 12, :_reduce_none,
-  1, 12, :_reduce_none,
-  1, 12, :_reduce_none ]
+  1, 12, :_reduce_7,
+  3, 14, :_reduce_8,
+  5, 14, :_reduce_9,
+  1, 13, :_reduce_none,
+  1, 13, :_reduce_none,
+  1, 13, :_reduce_none ]
 
-racc_reduce_n = 12
+racc_reduce_n = 13
 
-racc_shift_n = 17
+racc_shift_n = 21
 
 racc_token_table = {
   false => 0,
@@ -106,11 +119,12 @@ racc_token_table = {
   :CHAR => 2,
   :LPAREN => 3,
   :RPAREN => 4,
-  :STAR => 5,
-  :PLUS => 6,
-  :QMARK => 7 }
+  :QMARK => 5,
+  :COLON => 6,
+  :STAR => 7,
+  :PLUS => 8 }
 
-racc_nt_base = 8
+racc_nt_base = 9
 
 racc_use_result_var = true
 
@@ -136,9 +150,10 @@ Racc_token_to_s_table = [
   "CHAR",
   "LPAREN",
   "RPAREN",
+  "QMARK",
+  "COLON",
   "STAR",
   "PLUS",
-  "QMARK",
   "$start",
   "expression",
   "branch",
@@ -190,11 +205,16 @@ def _reduce_8(val, _values, result)
     result
 end
 
-# reduce 9 omitted
+def _reduce_9(val, _values, result)
+ result = Group.new(val[3]); result.capture = false 
+    result
+end
 
 # reduce 10 omitted
 
 # reduce 11 omitted
+
+# reduce 12 omitted
 
 def _reduce_none(val, _values, result)
   val[0]
