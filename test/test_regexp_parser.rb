@@ -43,6 +43,9 @@ class TestRegexpParser < Test::Unit::TestCase
     assert_equal [char('a', :quantifier => '*')], parse(%r{a*})
     assert_equal [char('a', :quantifier => '+')], parse(%r{a+})
     assert_equal [char('a', :quantifier => '?')], parse(%r{a?})
+    assert_equal [char('a', :quantifier => '?')], parse(%r{a?})
+    assert_equal [char('a', :quantifier => '{3}')], parse(%r{a{3}})
+    assert_equal [char('a', :quantifier => '{3,4}')], parse(%r{a{3,4}})
   end
 
   def test_anchors
@@ -82,6 +85,10 @@ class TestRegexpParser < Test::Unit::TestCase
       range('.'),
       char('k')
     ], parse(%r{f..k})
+  end
+
+  def test_digit_range
+    assert_equal [range('\d'), char('s')], parse(%r{\ds})
   end
 
   def test_bracket_expression

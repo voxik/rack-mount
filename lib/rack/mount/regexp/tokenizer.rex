@@ -1,5 +1,12 @@
 class Rack::Mount::RegexpParser
 rule
+  \\c         { [:CHAR_CLASS, text] }
+  \\s         { [:CHAR_CLASS, text] }
+  \\S         { [:CHAR_CLASS, text] }
+  \\d         { [:CHAR_CLASS, text] }
+  \\w         { [:CHAR_CLASS, text] }
+  \\W         { [:CHAR_CLASS, text] }
+
   \^          { [:L_ANCHOR, text] }
   \\A         { [:L_ANCHOR, text] }
   \$          { [:R_ANCHOR, text] }
@@ -12,7 +19,7 @@ rule
   \[          { [:LBRACK,  text] }
   \]          { [:RBRACK,  text] }
   \{          { [:LCURLY,  text] }
-  \{          { [:RCURLY,  text] }
+  \}          { [:RCURLY,  text] }
 
   \.          { [:DOT, text] }
   \?          { [:QMARK, text] }
