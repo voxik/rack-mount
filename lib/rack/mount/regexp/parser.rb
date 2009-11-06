@@ -53,6 +53,15 @@ class Group < Struct.new(:value)
   end
 end
 
+class CharacterRange < Struct.new(:value)
+  attr_accessor :quantifier
+
+  def ==(other)
+    self.value == other.value &&
+      self.quantifier == other.quantifier
+  end
+end
+
 class Character < Struct.new(:value)
   attr_accessor :quantifier
 
@@ -64,72 +73,81 @@ end
 ##### State transition tables begin ###
 
 racc_action_table = [
-    12,     7,    12,    10,    11,    10,    11,     5,     6,    17,
-    14,     5,     6,    18,    19,     5,     6,     5,     6,     5,
-     6,    15,    22,    23 ]
+     6,     7,    22,    23,     8,    14,    17,    15,    12,    13,
+     6,     7,     6,     7,     8,    21,     8,     6,     7,     6,
+     7,     8,    14,     8,    18,    12,    13,    20,     9,    26,
+    27 ]
 
 racc_action_check = [
-     8,     1,     3,     8,     8,     3,     3,     6,     6,    13,
-     6,     0,     0,    14,    14,    19,    19,     2,     2,    18,
-    18,     7,    20,    21 ]
+     8,     8,    17,    17,     8,     3,     8,     7,     3,     3,
+     2,     2,    23,    23,     2,    16,    23,    22,    22,     0,
+     0,    22,    10,     0,     9,    10,    10,    15,     1,    24,
+    25 ]
 
 racc_action_pointer = [
-     9,     1,    15,    -3,   nil,   nil,     5,    21,    -5,   nil,
-   nil,   nil,   nil,     5,     7,   nil,   nil,   nil,    17,    13,
-    18,    19,   nil,   nil ]
+    17,    28,     8,    -3,   nil,   nil,   nil,     3,    -2,    24,
+    14,   nil,   nil,   nil,   nil,    22,     8,    -7,   nil,   nil,
+   nil,   nil,    15,    10,    22,    23,   nil,   nil ]
 
 racc_action_default = [
-   -14,   -14,    -1,    -5,    -6,    -7,   -14,   -14,    -3,    -4,
-   -11,   -12,   -13,   -14,   -14,    24,    -2,    -8,   -14,   -14,
-   -14,   -14,    -9,   -10 ]
+   -16,   -16,    -1,    -5,    -6,    -7,    -8,   -16,   -16,   -16,
+    -3,    -4,   -13,   -14,   -15,   -16,   -16,   -16,    28,    -2,
+    -9,   -10,   -16,   -16,   -16,   -16,   -11,   -12 ]
 
 racc_goto_table = [
-     1,     8,     9,   nil,   nil,   nil,    13,    16,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,    20,    21 ]
+     1,    10,    11,   nil,   nil,   nil,   nil,   nil,    16,    19,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
+   nil,   nil,    24,    25 ]
 
 racc_goto_check = [
-     1,     3,     4,   nil,   nil,   nil,     1,     4,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     1,     1 ]
+     1,     3,     4,   nil,   nil,   nil,   nil,   nil,     1,     4,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
+   nil,   nil,     1,     1 ]
 
 racc_goto_pointer = [
-   nil,     0,   nil,    -1,    -1,   nil ]
+   nil,     0,   nil,    -1,    -1,   nil,   nil ]
 
 racc_goto_default = [
-   nil,   nil,     2,     3,   nil,     4 ]
+   nil,   nil,     2,     3,   nil,     4,     5 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 11, :_reduce_1,
-  3, 12, :_reduce_2,
-  2, 12, :_reduce_3,
-  2, 12, :_reduce_4,
-  1, 12, :_reduce_none,
-  1, 13, :_reduce_none,
-  1, 13, :_reduce_7,
-  3, 15, :_reduce_8,
-  5, 15, :_reduce_9,
-  5, 15, :_reduce_10,
-  1, 14, :_reduce_none,
-  1, 14, :_reduce_none,
-  1, 14, :_reduce_none ]
+  1, 14, :_reduce_1,
+  3, 15, :_reduce_2,
+  2, 15, :_reduce_3,
+  2, 15, :_reduce_4,
+  1, 15, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_8,
+  3, 19, :_reduce_9,
+  3, 18, :_reduce_10,
+  5, 18, :_reduce_11,
+  5, 18, :_reduce_12,
+  1, 17, :_reduce_none,
+  1, 17, :_reduce_none,
+  1, 17, :_reduce_none ]
 
-racc_reduce_n = 14
+racc_reduce_n = 16
 
-racc_shift_n = 24
+racc_shift_n = 28
 
 racc_token_table = {
   false => 0,
   :error => 1,
   :CHAR => 2,
-  :LPAREN => 3,
-  :RPAREN => 4,
-  :QMARK => 5,
-  :COLON => 6,
-  :NAME => 7,
-  :STAR => 8,
-  :PLUS => 9 }
+  :LBRACK => 3,
+  :RANGE => 4,
+  :RBRACK => 5,
+  :LPAREN => 6,
+  :RPAREN => 7,
+  :QMARK => 8,
+  :COLON => 9,
+  :NAME => 10,
+  :STAR => 11,
+  :PLUS => 12 }
 
-racc_nt_base = 10
+racc_nt_base = 13
 
 racc_use_result_var = true
 
@@ -153,6 +171,9 @@ Racc_token_to_s_table = [
   "$end",
   "error",
   "CHAR",
+  "LBRACK",
+  "RANGE",
+  "RBRACK",
   "LPAREN",
   "RPAREN",
   "QMARK",
@@ -165,7 +186,8 @@ Racc_token_to_s_table = [
   "branch",
   "atom",
   "quantifier",
-  "group" ]
+  "group",
+  "bracket_expression" ]
 
 Racc_debug_parser = false
 
@@ -201,31 +223,38 @@ end
 
 # reduce 6 omitted
 
-def _reduce_7(val, _values, result)
+# reduce 7 omitted
+
+def _reduce_8(val, _values, result)
  result = Character.new(val[0]) 
     result
 end
 
-def _reduce_8(val, _values, result)
- result = Group.new(val[1]) 
-    result
-end
-
 def _reduce_9(val, _values, result)
- result = Group.new(val[3]); result.capture = false 
+ result = CharacterRange.new(val[1]) 
     result
 end
 
 def _reduce_10(val, _values, result)
+ result = Group.new(val[1]) 
+    result
+end
+
+def _reduce_11(val, _values, result)
+ result = Group.new(val[3]); result.capture = false 
+    result
+end
+
+def _reduce_12(val, _values, result)
  result = Group.new(val[3]); result.name = val[2] 
     result
 end
 
-# reduce 11 omitted
-
-# reduce 12 omitted
-
 # reduce 13 omitted
+
+# reduce 14 omitted
+
+# reduce 15 omitted
 
 def _reduce_none(val, _values, result)
   val[0]

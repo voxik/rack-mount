@@ -45,6 +45,14 @@ class TestRegexpParser < Test::Unit::TestCase
     assert_equal [char('a', :quantifier => '?')], parse(%r{a?})
   end
 
+  def test_bracket_expression
+    assert_equal [range('a-z')], parse(%r{[a-z]})
+  end
+
+  def test_bracket_expression_with_quantifier
+    assert_equal [range('a-z', :quantifier => '+')], parse(%r{[a-z]+})
+  end
+
   def test_group
     assert_equal [
       char('/'),
@@ -113,8 +121,14 @@ class TestRegexpParser < Test::Unit::TestCase
 
     def char(value, options = {})
       char = RegexpParser::Character.new(value)
-      char.quantifier = options.delete(:quantifier)
+      options.each { |k, v| char.send("#{k}=", v) }
       char
+    end
+
+    def range(value, options = {})
+      range = RegexpParser::CharacterRange.new(value)
+      options.each { |k, v| range.send("#{k}=", v) }
+      range
     end
 
     def group(value, options = {})

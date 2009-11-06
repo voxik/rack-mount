@@ -60,6 +60,12 @@ class RegexpParser < Racc::Parser
       when (text = @ss.scan(/\)/))
          action { [:RPAREN,  text] }
 
+      when (text = @ss.scan(/\[/))
+         action { [:LBRACK,  text] }
+
+      when (text = @ss.scan(/\]/))
+         action { [:RBRACK,  text] }
+
       when (text = @ss.scan(/\?/))
          action { [:QMARK, text] }
 
@@ -71,6 +77,9 @@ class RegexpParser < Racc::Parser
 
       when (text = @ss.scan(/\:/))
          action { [:COLON, text] }
+
+      when (text = @ss.scan(/(?:\\.|[^-])-(\\.|[^-\]])/))
+         action { [:RANGE, text] }
 
       when (text = @ss.scan(/\\(.)/))
          action { [:CHAR, @ss[1]] }

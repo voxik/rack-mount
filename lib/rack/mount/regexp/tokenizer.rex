@@ -14,8 +14,8 @@ rule
 
   \(          { [:LPAREN,  text] }
   \)          { [:RPAREN,  text] }
-  # \[        { [:LBRACK,  text] }
-  # \]        { [:RBRACK,  text] }
+  \[          { [:LBRACK,  text] }
+  \]          { [:RBRACK,  text] }
   # \{        { [:LCURLY,  text] }
   # \{        { [:RCURLY,  text] }
 
@@ -26,6 +26,8 @@ rule
   \+          { [:PLUS,  text] }
   \*          { [:STAR,  text] }
   \:          { [:COLON, text] }
+
+  (?:\\.|[^-])-(\\.|[^-\]]) { [:RANGE, text] }
 
   \\(.)       { [:CHAR, @ss[1]] }
   .           { [:CHAR, text] }

@@ -14,7 +14,10 @@ rule
         | atom
 
   atom: group
+      | bracket_expression
       | CHAR { result = Character.new(val[0]) }
+
+  bracket_expression: LBRACK RANGE RBRACK { result = CharacterRange.new(val[1]) }
 
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
        | LPAREN QMARK COLON expression RPAREN { result = Group.new(val[3]); result.capture = false }
@@ -67,6 +70,15 @@ class Group < Struct.new(:value)
       self.quantifier == other.quantifier &&
       self.capture == other.capture &&
       self.name == other.name
+  end
+end
+
+class CharacterRange < Struct.new(:value)
+  attr_accessor :quantifier
+
+  def ==(other)
+    self.value == other.value &&
+      self.quantifier == other.quantifier
   end
 end
 
