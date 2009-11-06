@@ -151,25 +151,44 @@ class TestRegexpParser < Test::Unit::TestCase
     ], parse(%r{/foo(?:/bar)})
   end
 
-  if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
-    def test_named_group
-      assert_equal [
-        char('/'),
-        char('f'),
-        char('o'),
-        char('o'),
-        group([
-          char('b'),
-          char('a'),
-          char('z')
-        ], :name => 'bar')
-      ], parse(eval('%r{/foo(?<bar>baz)}'))
+  def test_named_group
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      regexp = eval('%r{/foo(?<bar>baz)}')
+    else
+      regexp = %r{/foo(?:<bar>baz)}
     end
+
+    assert_equal [
+      char('/'),
+      char('f'),
+      char('o'),
+      char('o'),
+      group([
+        char('b'),
+        char('a'),
+        char('z')
+      ], :name => 'bar')
+    ], parse(regexp)
+  end
+
+  def test_nested_named_group
+    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+      regexp = eval('%r{a((?<b>c))?}')
+    else
+      regexp = %r{a((?:<b>c))?}
+    end
+
+    assert_equal [
+      char('a'),
+      group([
+        group([char('c')], :name => 'b')
+      ], :quantifier => '?')
+    ], parse(regexp)
   end
 
   private
     def parse(regexp)
-      @parser.scan_str(regexp.source)
+      @parser.parse_regexp(regexp)
     end
 
     def anchor(value)

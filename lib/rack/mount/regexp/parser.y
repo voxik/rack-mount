@@ -43,6 +43,36 @@ require 'rack/mount/regexp/tokenizer'
 
 ---- inner
 
+def parse_regexp(regexp)
+  unless regexp.is_a?(RegexpWithNamedGroups)
+    regexp = RegexpWithNamedGroups.new(regexp)
+  end
+
+  expression = scan_str(regexp.source)
+
+  unless Const::SUPPORTS_NAMED_CAPTURES
+    @capture_index = 0
+    tag_captures!(regexp.names, expression)
+  end
+
+  expression
+end
+
+def tag_captures!(names, group)
+  group.each do |child|
+    if child.is_a?(Group)
+      if child.capture
+        child.name = names[@capture_index]
+        @capture_index += 1
+      end
+      tag_captures!(names, child)
+    elsif child.is_a?(Array)
+      tag_captures!(names, child)
+    end
+  end
+end
+
+
 class Node < Struct.new(:left, :right)
   def flatten
     if left.is_a?(Node)
