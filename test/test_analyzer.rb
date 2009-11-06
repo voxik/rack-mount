@@ -167,8 +167,8 @@ class TestAnalyzer < Test::Unit::TestCase
       {:path => %r{^/comments$} }
     ).separators(:path))
 
-    assert_equal(['e', '.'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
-      {:path => %r{^/people(\.([a-z]+))?$}}
+    assert_equal(['/'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
+      {:path => %r{^/([a-z]+)/(\.([a-z]+))?$}}
     ).separators(:path))
 
     assert_equal(['.'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
