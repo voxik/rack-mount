@@ -45,6 +45,36 @@ class TestRegexpParser < Test::Unit::TestCase
     assert_equal [char('a', :quantifier => '?')], parse(%r{a?})
   end
 
+  def test_anchors
+    assert_equal [
+      anchor('^'),
+      char('f'),
+      char('o'),
+      char('o')
+    ], parse(%r{^foo})
+
+    assert_equal [
+      anchor('\A'),
+      char('f'),
+      char('o'),
+      char('o')
+    ], parse(%r{\Afoo})
+
+    assert_equal [
+      char('f'),
+      char('o'),
+      char('o'),
+      anchor('$')
+    ], parse(%r{foo$})
+
+    assert_equal [
+      char('f'),
+      char('o'),
+      char('o'),
+      anchor('\Z')
+    ], parse(%r{foo\Z})
+  end
+
   def test_bracket_expression
     assert_equal [range('a-z')], parse(%r{[a-z]})
     assert_equal [range('0-9')], parse(%r{[0-9]})
@@ -124,6 +154,10 @@ class TestRegexpParser < Test::Unit::TestCase
   private
     def parse(regexp)
       @parser.scan_str(regexp.source)
+    end
+
+    def anchor(value)
+      RegexpParser::Anchor.new(value)
     end
 
     def char(value, options = {})

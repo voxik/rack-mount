@@ -16,6 +16,7 @@ rule
   atom: group
       | LBRACK bracket_expression RBRACK { result = CharacterRange.new(val[1]) }
       | LBRACK L_ANCHOR bracket_expression RBRACK { result = CharacterRange.new(val[2]); result.negate = true }
+      | anchor { result = Anchor.new(val[0]) }
       | CHAR { result = Character.new(val[0]) }
 
   bracket_expression: bracket_expression CHAR { result = val.join }
@@ -24,6 +25,9 @@ rule
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
        | LPAREN QMARK COLON expression RPAREN { result = Group.new(val[3]); result.capture = false }
        | LPAREN QMARK NAME expression RPAREN { result = Group.new(val[3]); result.name = val[2] }
+
+  anchor: L_ANCHOR
+        | R_ANCHOR
 
   quantifier: STAR
             | PLUS
@@ -73,6 +77,9 @@ class Group < Struct.new(:value)
       self.capture == other.capture &&
       self.name == other.name
   end
+end
+
+class Anchor < Struct.new(:value)
 end
 
 class CharacterRange < Struct.new(:value)

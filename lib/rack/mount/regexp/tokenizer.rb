@@ -54,7 +54,13 @@ class RegexpParser < Racc::Parser
       when (text = @ss.scan(/\^/))
          action { [:L_ANCHOR, text] }
 
+      when (text = @ss.scan(/\\A/))
+         action { [:L_ANCHOR, text] }
+
       when (text = @ss.scan(/\$/))
+         action { [:R_ANCHOR, text] }
+
+      when (text = @ss.scan(/\\Z/))
          action { [:R_ANCHOR, text] }
 
       when (text = @ss.scan(/<(\w+)>/))
@@ -71,6 +77,15 @@ class RegexpParser < Racc::Parser
 
       when (text = @ss.scan(/\]/))
          action { [:RBRACK,  text] }
+
+      when (text = @ss.scan(/\{/))
+         action { [:LCURLY,  text] }
+
+      when (text = @ss.scan(/\{/))
+         action { [:RCURLY,  text] }
+
+      when (text = @ss.scan(/\./))
+         action { [:DOT, text] }
 
       when (text = @ss.scan(/\?/))
          action { [:QMARK, text] }
