@@ -75,6 +75,15 @@ class TestRegexpParser < Test::Unit::TestCase
     ], parse(%r{foo\Z})
   end
 
+  def test_wild_card_range
+    assert_equal [
+      char('f'),
+      range('.'),
+      range('.'),
+      char('k')
+    ], parse(%r{f..k})
+  end
+
   def test_bracket_expression
     assert_equal [range('a-z')], parse(%r{[a-z]})
     assert_equal [range('0-9')], parse(%r{[0-9]})

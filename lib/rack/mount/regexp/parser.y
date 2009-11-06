@@ -16,6 +16,7 @@ rule
   atom: group
       | LBRACK bracket_expression RBRACK { result = CharacterRange.new(val[1]) }
       | LBRACK L_ANCHOR bracket_expression RBRACK { result = CharacterRange.new(val[2]); result.negate = true }
+      | DOT { result = CharacterRange.new(val[0]) }
       | anchor { result = Anchor.new(val[0]) }
       | CHAR { result = Character.new(val[0]) }
 
