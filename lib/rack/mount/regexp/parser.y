@@ -14,10 +14,12 @@ rule
         | atom
 
   atom: group
-      | bracket_expression
+      | LBRACK bracket_expression RBRACK { result = CharacterRange.new(val[1]) }
+      | LBRACK L_ANCHOR bracket_expression RBRACK { result = CharacterRange.new(val[2]); result.negate = true }
       | CHAR { result = Character.new(val[0]) }
 
-  bracket_expression: LBRACK RANGE RBRACK { result = CharacterRange.new(val[1]) }
+  bracket_expression: bracket_expression CHAR { result = val.join }
+                    | CHAR
 
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
        | LPAREN QMARK COLON expression RPAREN { result = Group.new(val[3]); result.capture = false }
@@ -74,10 +76,11 @@ class Group < Struct.new(:value)
 end
 
 class CharacterRange < Struct.new(:value)
-  attr_accessor :quantifier
+  attr_accessor :negate, :quantifier
 
   def ==(other)
     self.value == other.value &&
+      self.negate == other.negate &&
       self.quantifier == other.quantifier
   end
 end

@@ -5,10 +5,9 @@ rule
   # \\\)      { [:CHAR, '\)']}
 
   # \\[0-9]   { [:BACKREF,  text] }
-  # \\A       { [:L_ANCHOR, text] }
-  # \\Z       { [:R_ANCHOR, text] }
-  # \^        { [:L_ANCHOR, text] }
-  # \$        { [:R_ANCHOR, text] }
+
+  \^          { [:L_ANCHOR, text] }
+  \$          { [:R_ANCHOR, text] }
 
   <(\w+)>     { [:NAME, @ss[1]] }
 
@@ -26,8 +25,6 @@ rule
   \+          { [:PLUS,  text] }
   \*          { [:STAR,  text] }
   \:          { [:COLON, text] }
-
-  (?:\\.|[^-])-(\\.|[^-\]]) { [:RANGE, text] }
 
   \\(.)       { [:CHAR, @ss[1]] }
   .           { [:CHAR, text] }

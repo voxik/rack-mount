@@ -51,6 +51,12 @@ class RegexpParser < Racc::Parser
     token = case @state
     when nil
       case
+      when (text = @ss.scan(/\^/))
+         action { [:L_ANCHOR, text] }
+
+      when (text = @ss.scan(/\$/))
+         action { [:R_ANCHOR, text] }
+
       when (text = @ss.scan(/<(\w+)>/))
          action { [:NAME, @ss[1]] }
 
@@ -77,9 +83,6 @@ class RegexpParser < Racc::Parser
 
       when (text = @ss.scan(/\:/))
          action { [:COLON, text] }
-
-      when (text = @ss.scan(/(?:\\.|[^-])-(\\.|[^-\]])/))
-         action { [:RANGE, text] }
 
       when (text = @ss.scan(/\\(.)/))
          action { [:CHAR, @ss[1]] }

@@ -47,6 +47,13 @@ class TestRegexpParser < Test::Unit::TestCase
 
   def test_bracket_expression
     assert_equal [range('a-z')], parse(%r{[a-z]})
+    assert_equal [range('0-9')], parse(%r{[0-9]})
+    assert_equal [range('abc')], parse(%r{[abc]})
+  end
+
+  def test_negated_bracket_expression
+    assert_equal [range('abc', :negate => true)], parse(%r{[^abc]})
+    assert_equal [range('/.?', :negate => true)], parse(%r{[^/\.\?]})
   end
 
   def test_bracket_expression_with_quantifier
