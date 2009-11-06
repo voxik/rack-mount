@@ -53,28 +53,31 @@ module Rack::Mount
         def analyze_capture_boundaries(regexp, boundaries) #:nodoc:
           return boundaries unless regexp.is_a?(Regexp)
 
-          parts = Utils.extract_regexp_parts(regexp) rescue []
+          parts = RegexpParser.new.parse_regexp(regexp) rescue []
           parts.each_with_index do |part, index|
-            break if part == Const::NULL
-
-            if index > 0
-              previous = parts[index-1]
-              if previous.is_a?(Utils::Capture)
-                previous = Utils.extract_static_regexp(previous.last_part) rescue nil
+            if part.is_a?(RegexpParser::Group)
+              if index > 0
+                previous = parts[index-1]
+                if previous.is_a?(RegexpParser::Character)
+                  boundaries << previous.value.to_str
+                end
               end
-              boundaries << previous[-1..-1] if previous.is_a?(String)
-            end
 
-            if index < parts.length
-              following = parts[index+1]
-              if following.is_a?(Utils::Capture)
-                following = Utils.extract_static_regexp(following.first_part) rescue nil
+              if inside = part[0][0]
+                if inside.is_a?(RegexpParser::Character)
+                  boundaries << inside.value.to_str
+                end
               end
-              if following.is_a?(String) && following != Const::NULL
-                boundaries << following[0..0] == '\\' ? following[1..1] : following[0..0]
+
+              if index < parts.length
+                following = parts[index+1]
+                if following.is_a?(RegexpParser::Character)
+                  boundaries << following.value.to_str
+                end
               end
             end
           end
+
           boundaries
         end
 

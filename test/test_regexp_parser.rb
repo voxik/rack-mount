@@ -1,5 +1,4 @@
 require 'abstract_unit'
-require 'rack/mount/regexp/parser'
 
 class TestRegexpParser < Test::Unit::TestCase
   RegexpParser = Rack::Mount::RegexpParser

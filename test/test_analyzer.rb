@@ -172,7 +172,7 @@ class TestAnalyzer < Test::Unit::TestCase
     ).separators(:path))
 
     assert_equal(['.'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
-      {:host => %r{^([a-z]+).37signals.com$}}
+      {:host => %r{^([a-z]+)\.37signals.com$}}
     ).separators(:host))
 
     assert_equal(['-'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,

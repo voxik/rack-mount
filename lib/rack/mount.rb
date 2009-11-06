@@ -8,6 +8,7 @@ module Rack #:nodoc:
     autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
     autoload :Prefix, 'rack/mount/prefix'
+    autoload :RegexpParser, 'rack/mount/regexp/parser'
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'
     autoload :Route, 'rack/mount/route'
     autoload :RouteSet, 'rack/mount/route_set'
