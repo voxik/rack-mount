@@ -42,8 +42,8 @@ module Rack::Mount
               matchers << MetaMethod::Block.new do |matcher|
                 matcher << c = MetaMethod::Condition.new("m = req.#{method}.match(#{condition.inspect})") do |b|
                   b << "matches = m.captures" if route.named_captures[method].any?
-                  route.named_captures[method].each do |k, i|
-                    b << MetaMethod::Condition.new("p = matches[#{i}]") do |c2|
+                  route.named_captures[method].each do |k, j|
+                    b << MetaMethod::Condition.new("p = matches[#{j}]") do |c2|
                       c2 << "routing_args[#{k.inspect}] = Utils.unescape_uri(p)"
                     end
                   end
