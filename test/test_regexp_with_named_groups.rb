@@ -11,6 +11,13 @@ unless Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
       assert_equal({}, regexp.named_captures)
     end
 
+    def test_simple_string
+      regexp = RegexpWithNamedGroups.new('foo')
+      assert_equal(/foo/, regexp)
+      assert_equal([], regexp.names)
+      assert_equal({}, regexp.named_captures)
+    end
+
     def test_regexp_with_captures
       regexp = RegexpWithNamedGroups.new(/(bar|baz)/)
       assert_equal(/(bar|baz)/, regexp)
