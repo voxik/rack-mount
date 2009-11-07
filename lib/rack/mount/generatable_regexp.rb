@@ -119,7 +119,6 @@ module Rack::Mount
                 elsif merged_value == default_value
                   # Nasty control flow
                   return :clear_remaining_segments
-                  true
                 else
                   false
                 end
