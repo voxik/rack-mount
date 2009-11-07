@@ -140,7 +140,7 @@ def _reduce_5(val, _values, result)
 end
 
 def _reduce_6(val, _values, result)
- result = "(#{val[1]})?" 
+ result = "(?:#{val[1]})?" 
     result
 end
 

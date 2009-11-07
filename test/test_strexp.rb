@@ -76,10 +76,9 @@ class TestStrexp < Test::Unit::TestCase
 
   def test_dynamic_segment_inside_optional_segment
     if supports_named_captures?
-      assert_equal eval('%r{\Afoo(\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')
+      assert_equal eval('%r{\Afoo(?:\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')
     else
-      # assert_equal %r{\Afoo(?:\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
-      assert_equal %r{\Afoo(\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
+      assert_equal %r{\Afoo(?:\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
     end
   end
 
@@ -128,18 +127,15 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_optional_segment
-    # assert_equal %r{\A/foo(?:/bar)?\Z}, Strexp.compile('/foo(/bar)')
-    assert_equal %r{\A/foo(/bar)?\Z}, Strexp.compile('/foo(/bar)')
+    assert_equal %r{\A/foo(?:/bar)?\Z}, Strexp.compile('/foo(/bar)')
   end
 
   def test_consecutive_optional_segments
-    # assert_equal %r{\A/foo(?:/bar)?(?:/baz)?\Z}, Strexp.compile('/foo(/bar)(/baz)')
-    assert_equal %r{\A/foo(/bar)?(/baz)?\Z}, Strexp.compile('/foo(/bar)(/baz)')
+    assert_equal %r{\A/foo(?:/bar)?(?:/baz)?\Z}, Strexp.compile('/foo(/bar)(/baz)')
   end
 
   def test_multiple_optional_segments
-    # assert_equal %r{\A(?:/foo)?(?:/bar)?(?:/baz)?\Z}, Strexp.compile('(/foo)(/bar)(/baz)')
-    assert_equal %r{\A(/foo)?(/bar)?(/baz)?\Z}, Strexp.compile('(/foo)(/bar)(/baz)')
+    assert_equal %r{\A(?:/foo)?(?:/bar)?(?:/baz)?\Z}, Strexp.compile('(/foo)(/bar)(/baz)')
   end
 
   def test_escapes_optional_segment_parenthesis
@@ -147,8 +143,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_escapes_one_optional_segment_parenthesis
-    # assert_equal %r{\A/foo\((?:/bar)?\Z}, Strexp.compile('/foo\((/bar)')
-    assert_equal %r{\A/foo\((/bar)?\Z}, Strexp.compile('/foo\((/bar)')
+    assert_equal %r{\A/foo\((?:/bar)?\Z}, Strexp.compile('/foo\((/bar)')
   end
 
   def test_raises_regexp_error_if_optional_segment_parenthesises_are_unblanced
