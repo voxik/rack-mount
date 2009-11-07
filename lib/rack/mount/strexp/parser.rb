@@ -7,9 +7,19 @@
 require 'racc/parser.rb'
 
 require 'rack/mount/strexp/tokenizer'
+
 module Rack
   module Mount
     class StrexpParser < Racc::Parser
+
+
+if Const::SUPPORTS_NAMED_CAPTURES
+  REGEXP_NAMED_CAPTURE = '(?<%s>%s)'.freeze
+else
+  REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
+end
+
+attr_accessor :requirements
 ##### State transition tables begin ###
 
 racc_action_table = [
@@ -117,14 +127,14 @@ end
 def _reduce_4(val, _values, result)
            name = val[0].to_sym
            requirement = requirements[name]
-           result = Const::REGEXP_NAMED_CAPTURE % [name, requirement]
+           result = REGEXP_NAMED_CAPTURE % [name, requirement]
          
     result
 end
 
 def _reduce_5(val, _values, result)
            name = val[0].to_sym
-           result = Const::REGEXP_NAMED_CAPTURE % [name, '.+']
+           result = REGEXP_NAMED_CAPTURE % [name, '.+']
          
     result
 end

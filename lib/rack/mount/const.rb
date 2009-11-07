@@ -5,10 +5,8 @@ module Rack::Mount
     begin
       eval('/(?<foo>.*)/').named_captures
       SUPPORTS_NAMED_CAPTURES = true
-      REGEXP_NAMED_CAPTURE = '(?<%s>%s)'.freeze
     rescue SyntaxError, NoMethodError
       SUPPORTS_NAMED_CAPTURES = false
-      REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
     end
 
     EMPTY_ARRAY = [].freeze

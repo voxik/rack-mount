@@ -2,10 +2,6 @@ require 'strscan'
 require 'rack/mount/strexp/parser'
 
 module Rack::Mount
-  class StrexpParser < Racc::Parser #:nodoc:
-    attr_accessor :requirements
-  end
-
   class Strexp < Regexp
     # Parses segmented string expression and converts it into a Regexp
     #
