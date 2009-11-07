@@ -15,6 +15,7 @@ module Rack::Mount
       private
         def expire!
           class << self
+            undef :call
             alias_method :call, :_expired_call
           end
 
@@ -92,6 +93,7 @@ module Rack::Mount
           end
 
           # puts "\n#{method.inspect}"
+          class << self; undef :call; end
           instance_eval(method, __FILE__, __LINE__)
         end
     end
