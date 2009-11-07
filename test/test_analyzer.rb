@@ -80,8 +80,8 @@ class GraphReport
 
   private
     def filter_minimum_statistic(report, stat)
-      min = report.inject(1/0.0) { |min, (_, stats)| min > stats[stat] ? stats[stat] : min }
-      report.select { |_, stats| stats[stat] == min }
+      report_min = report.inject(1/0.0) { |min, (_, stats)| min > stats[stat] ? stats[stat] : min }
+      report.select { |_, stats| stats[stat] == report_min }
     end
 
     def format_report(report)
