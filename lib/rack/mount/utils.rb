@@ -1,5 +1,4 @@
 require 'rack/mount/regexp_with_named_groups'
-require 'strscan'
 require 'uri'
 
 module Rack::Mount
@@ -137,37 +136,5 @@ module Rack::Mount
       regexp
     end
     module_function :extract_static_regexp
-
-    if Const::SUPPORTS_NAMED_CAPTURES
-      NAMED_CAPTURE_REGEXP = /\?<([^>]+)>/
-    else
-      NAMED_CAPTURE_REGEXP = /\?:<([^>]+)>/
-    end
-
-    # Strips shim named capture syntax and returns a clean Regexp and
-    # an ordered array of the named captures.
-    #
-    #   extract_named_captures(/[a-z]+/)          # => /[a-z]+/, []
-    #   extract_named_captures(/(?:<foo>[a-z]+)/) # => /([a-z]+)/, ['foo']
-    #   extract_named_captures(/([a-z]+)(?:<foo>[a-z]+)/)
-    #     # => /([a-z]+)([a-z]+)/, [nil, 'foo']
-    def extract_named_captures(regexp)
-      options = regexp.is_a?(Regexp) ? regexp.options : nil
-      source = Regexp.compile(regexp).source
-      names, scanner = [], StringScanner.new(source)
-
-      while scanner.skip_until(/\(/)
-        if scanner.scan(NAMED_CAPTURE_REGEXP)
-          names << scanner[1]
-        else
-          names << nil
-        end
-      end
-
-      names = [] unless names.any?
-      source.gsub!(NAMED_CAPTURE_REGEXP, Const::EMPTY_STRING)
-      return Regexp.compile(source, options), names
-    end
-    module_function :extract_named_captures
   end
 end

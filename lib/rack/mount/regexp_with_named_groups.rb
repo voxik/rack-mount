@@ -2,6 +2,8 @@ require 'rack/mount/utils'
 
 module Rack::Mount
   unless Const::SUPPORTS_NAMED_CAPTURES
+    require 'strscan'
+
     # A wrapper that adds shim named capture support to older
     # versions of Ruby.
     #
@@ -26,9 +28,22 @@ module Rack::Mount
 
       # Wraps Regexp with named capture support.
       def initialize(regexp)
-        regexp, @names = Utils.extract_named_captures(regexp)
+        source, options = regexp.source, regexp.options
+        @names, scanner = [], StringScanner.new(source)
+
+        while scanner.skip_until(/\(/)
+          if scanner.scan(/\?:<([^>]+)>/)
+            @names << scanner[1]
+          else
+            @names << nil
+          end
+        end
+        source.gsub!(/\?:<([^>]+)>/, Const::EMPTY_STRING)
+
+        @names = [] unless @names.any?
         @names.freeze
-        super(regexp)
+
+        super(source, options)
       end
 
       def names
