@@ -41,7 +41,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_capture
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo/(?<id>[0-9]+)$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<id>[0-9]+)$})
@@ -53,7 +53,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_leading_capture
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/(?<foo>[a-z]+)/bar(\.(?<format>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/(?:<foo>[a-z]+)/bar(\.(?:<format>[a-z]+))?$})
@@ -67,7 +67,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_capture_inside_requirement
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/msg/get/(?<id>\d+(?:,\d+)*)$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/msg/get/(?:<id>\d+(?:,\d+)*)$})
@@ -79,7 +79,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_multiple_captures
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo/(?<action>[a-z]+)/(?<id>[0-9]+)$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<action>[a-z]+)/(?:<id>[0-9]+)$})
@@ -95,7 +95,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_optional_capture
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo/bar(\.(?<format>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/bar(\.(?:<format>[a-z]+))?$})
@@ -107,7 +107,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_multiple_optional_captures
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/(?<foo>[a-z]+)(/(?<bar>[a-z]+))?(/(?<baz>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/(?:<foo>[a-z]+)(/(?:<bar>[a-z]+))?(/(?:<baz>[a-z]+))?$})
@@ -124,7 +124,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_capture_followed_by_an_optional_capture
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/people/(?<id>[0-9]+)(\.(?<format>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/people/(?:<id>[0-9]+)(\.(?:<format>[a-z]+))?$})
@@ -140,7 +140,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_period_seperator
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo/(?<id>[0-9]+)\.(?<format>[a-z]+)$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<id>[0-9]+)\.(?:<format>[a-z]+)$})
@@ -161,7 +161,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_seperators_inside_optional_captures
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo(/(?<action>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo(/(?:<action>[a-z]+))?$})
@@ -172,7 +172,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_optional_capture_with_slash_and_dot
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/foo(\.(?<format>[a-z]+))?$}'))
     else
       regexp = GeneratableRegexp.compile(%r{^/foo(\.(?:<format>[a-z]+))?$})

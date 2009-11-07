@@ -2,7 +2,6 @@ require 'rack'
 
 module Rack #:nodoc:
   module Mount #:nodoc:
-    autoload :Const, 'rack/mount/const'
     autoload :GeneratableRegexp, 'rack/mount/generatable_regexp'
     autoload :MetaMethod, 'rack/mount/meta_method'
     autoload :Mixover, 'rack/mount/mixover'

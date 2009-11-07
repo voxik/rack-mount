@@ -18,9 +18,9 @@ module Rack::Mount
     #   normalize_path("")      # => "/"
     def normalize_path(path)
       path = "/#{path}"
-      path.squeeze!(Const::SLASH)
-      path.sub!(%r{/+\Z}, Const::EMPTY_STRING)
-      path = Const::SLASH if path == Const::EMPTY_STRING
+      path.squeeze!('/')
+      path.sub!(%r{/+\Z}, '')
+      path = '/' if path == ''
       path
     end
     module_function :normalize_path
@@ -127,7 +127,7 @@ module Rack::Mount
       source = regexp.source
       if regexp_anchored?(regexp)
         source.sub!(/^(\\A|\^)(.*)(\\Z|\$)$/, '\2')
-        unescaped_source = source.gsub(/\\/, Const::EMPTY_STRING)
+        unescaped_source = source.gsub(/\\/, '')
         if source == Regexp.escape(unescaped_source) &&
             Regexp.compile("\\A(#{source})\\Z") =~ unescaped_source
           return unescaped_source

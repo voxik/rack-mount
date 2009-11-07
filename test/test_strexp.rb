@@ -12,7 +12,7 @@ class TestStrexp < Test::Unit::TestCase
     requirements = { :bar  => /[a-z]+/.freeze }.freeze
     separators = ['/'.freeze].freeze
 
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Afoo/(?<bar>[a-z]+)\Z}'), Strexp.compile(str, requirements, separators)
     else
       assert_equal %r{\Afoo/(?:<bar>[a-z]+)\Z}, Strexp.compile(str, requirements, separators)
@@ -24,7 +24,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\A(?<foo>.+)\.example\.com\Z}'), Strexp.compile(':foo.example.com')
     else
       assert_equal %r{\A(?:<foo>.+)\.example\.com\Z}, Strexp.compile(':foo.example.com')
@@ -32,7 +32,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment_with_leading_underscore
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\A(?<_foo>.+)\.example\.com\Z}'), Strexp.compile(':_foo.example.com')
     else
       assert_equal %r{\A(?:<_foo>.+)\.example\.com\Z}, Strexp.compile(':_foo.example.com')
@@ -49,7 +49,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment_with_separators
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Afoo/(?<bar>[^/]+)\Z}'), Strexp.compile('foo/:bar', {}, ['/'])
     else
       assert_equal %r{\Afoo/(?:<bar>[^/]+)\Z}, Strexp.compile('foo/:bar', {}, ['/'])
@@ -57,7 +57,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment_with_requirements
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Afoo/(?<bar>[a-z]+)\Z}'), Strexp.compile('foo/:bar', {:bar => /[a-z]+/}, ['/'])
     else
       assert_equal %r{\Afoo/(?:<bar>[a-z]+)\Z}, Strexp.compile('foo/:bar', {:bar => /[a-z]+/}, ['/'])
@@ -65,7 +65,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment_with_requirements_with_case_insensitive
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       bar = /bar/i
       assert_equal eval('%r{\Afoo/(?<bar>#{bar})\Z}'), Strexp.compile('foo/:bar', {:bar => /bar/i})
     else
@@ -75,7 +75,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_dynamic_segment_inside_optional_segment
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Afoo(\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')
     else
       # assert_equal %r{\Afoo(?:\.(?:<extension>.+))?\Z}, Strexp.compile('foo(.:extension)')
@@ -84,7 +84,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_glob_segment
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Asrc/(?<files>.+)\Z}'), Strexp.compile('src/*files')
     else
       assert_equal %r{\Asrc/(?:<files>.+)\Z}, Strexp.compile('src/*files')
@@ -92,7 +92,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_glob_ignores_seperators
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Asrc/(?<files>.+)\Z}'), Strexp.compile('src/*files', {}, %w( / . ? ))
     else
       assert_equal %r{\Asrc/(?:<files>.+)\Z}, Strexp.compile('src/*files', {}, %w( / . ? ))
@@ -100,7 +100,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_glob_segment_at_the_beginning
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\A(?<files>.+)/foo\.txt\Z}'), Strexp.compile('*files/foo.txt')
     else
       assert_equal %r{\A(?:<files>.+)/foo\.txt\Z}, Strexp.compile('*files/foo.txt')
@@ -108,7 +108,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_glob_segment_in_the_middle
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Asrc/(?<files>.+)/foo\.txt\Z}'), Strexp.compile('src/*files/foo.txt')
     else
       assert_equal %r{\Asrc/(?:<files>.+)/foo\.txt\Z}, Strexp.compile('src/*files/foo.txt')
@@ -116,7 +116,7 @@ class TestStrexp < Test::Unit::TestCase
   end
 
   def test_multiple_glob_segments
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       assert_equal eval('%r{\Asrc/(?<files>.+)/dir/(?<morefiles>.+)/foo\.txt\Z}'), Strexp.compile('src/*files/dir/*morefiles/foo.txt')
     else
       assert_equal %r{\Asrc/(?:<files>.+)/dir/(?:<morefiles>.+)/foo\.txt\Z}, Strexp.compile('src/*files/dir/*morefiles/foo.txt')

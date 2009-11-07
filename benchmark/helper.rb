@@ -38,7 +38,8 @@ module EnvGenerator
   module_function :env_for
 end
 
-EchoApp = lambda { |env| Rack::Mount::Const::OK_RESPONSE }
+OK_RESPONSE = [200, {'Content-Type' => 'text/html'}, ['OK']]
+EchoApp = lambda { |env| OK_RESPONSE }
 
 def Object.const_missing(name)
   if name.to_s =~ /Controller$/

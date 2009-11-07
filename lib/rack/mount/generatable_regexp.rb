@@ -50,7 +50,7 @@ module Rack::Mount
 
       def segments
         @segments ||= begin
-          segments = Const::EMPTY_ARRAY
+          segments = []
           catch(:halt) do
             expression = RegexpParser.new.parse_regexp(self) rescue []
             segments = parse_segments(expression)
@@ -97,13 +97,15 @@ module Rack::Mount
           s
         end
 
+        EMPTY_STRING = ''.freeze
+
         def generate_from_segments(segments, params, merged, defaults, optional = false)
           if optional
-            return Const::EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
-            return Const::EMPTY_STRING unless segments.flatten.any? { |s|
+            return EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
+            return EMPTY_STRING unless segments.flatten.any? { |s|
               params[s.name] if s.is_a?(DynamicSegment)
             }
-            return Const::EMPTY_STRING if segments.any? { |segment|
+            return EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
                 value = merged[segment.name] || defaults[segment.name]
                 value = value.to_param if value.respond_to?(:to_param)
@@ -142,9 +144,9 @@ module Rack::Mount
               value = generate_from_segments(segment, params, merged, defaults, true)
               if value == :clear_remaining_segments
                 segment.each { |s| params.delete(s.name) if s.is_a?(DynamicSegment) }
-                Const::EMPTY_STRING
+                EMPTY_STRING
               elsif value.nil?
-                Const::EMPTY_STRING
+                EMPTY_STRING
               else
                 value
               end

@@ -169,7 +169,7 @@ class TestRegexpParser < Test::Unit::TestCase
   end
 
   def test_named_group
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = eval('%r{/foo(?<bar>baz)}')
     else
       regexp = %r{/foo(?:<bar>baz)}
@@ -189,7 +189,7 @@ class TestRegexpParser < Test::Unit::TestCase
   end
 
   def test_nested_named_group
-    if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+    if supports_named_captures?
       regexp = eval('%r{a((?<b>c))?}')
     else
       regexp = %r{a((?:<b>c))?}

@@ -1,6 +1,6 @@
 file = File.join(File.dirname(__FILE__), 'basic_set_map_19.rb')
 
-if Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+if supports_named_captures?
   load(file)
 else
   src = File.read(file)

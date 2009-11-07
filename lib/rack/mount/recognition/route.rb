@@ -73,7 +73,7 @@ module Rack::Mount
           env[@set.parameters_key] = routing_args
           @app.call(env)
         else
-          Const::EXPECTATION_FAILED_RESPONSE
+          [417, {'Content-Type' => 'text/html'}, ['Expectation failed']]
         end
       end
     end

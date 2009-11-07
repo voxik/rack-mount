@@ -1,6 +1,8 @@
 module Rack::Mount
   module Analysis
     module Splitting
+      NULL = "\0".freeze
+
       class Key < Array
         def initialize(method, index, separators)
           replace([method, index, separators])
@@ -8,8 +10,8 @@ module Rack::Mount
 
         def self.split(value, separator_pattern)
           keys = value.split(separator_pattern)
-          keys.shift if keys[0] == Const::EMPTY_STRING
-          keys << Const::NULL
+          keys.shift if keys[0] == ''
+          keys << NULL
           keys
         end
 
@@ -91,7 +93,7 @@ module Rack::Mount
               if part.value == '^' || part.value == '\A'
               elsif part.value == '$' || part.value == '\Z'
                 segments << join_buffer(buf, regexp) if buf
-                segments << Const::NULL
+                segments << NULL
                 buf = nil
                 break
               end
@@ -101,7 +103,7 @@ module Rack::Mount
                 segments << join_buffer(buf, regexp) if buf
                 peek = parts[index+1]
                 if peek.is_a?(RegexpParser::Character) && separators.include?(peek.value)
-                  segments << Const::EMPTY_STRING
+                  segments << ''
                 end
                 buf = nil
               else
@@ -144,7 +146,7 @@ module Rack::Mount
             segments.pop
           end
 
-          segments.shift if segments[0].nil? || segments[0] == Const::EMPTY_STRING
+          segments.shift if segments[0].nil? || segments[0] == ''
 
           segments
         end

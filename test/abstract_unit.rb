@@ -25,6 +25,10 @@ end
 
 Object.extend(ControllerConstants)
 
+def supports_named_captures?
+  Rack::Mount::RegexpWithNamedGroups.supports_named_captures?
+end
+
 class Test::Unit::TestCase
   private
     def set_included_modules
@@ -40,7 +44,7 @@ class Test::Unit::TestCase
     end
 
     def routing_args_key
-      Rack::Mount::Const::RACK_ROUTING_ARGS
+      'rack.routing_args'
     end
 
     def routing_args

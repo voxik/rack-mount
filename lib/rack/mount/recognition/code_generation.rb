@@ -65,32 +65,28 @@ module Rack::Mount
         def optimize_call!
           method = MetaMethod.new(:call, :env)
 
-          if @routes.empty?
-            method << 'env[Const::EXPECT] != Const::CONTINUE ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE'
-          else
-            method << 'begin'
-            method << 'set_expectation = env[Const::EXPECT] != Const::CONTINUE'
-            method << 'env[Const::EXPECT] = Const::CONTINUE if set_expectation'
+          method << 'begin'
+          method << 'set_expectation = env[EXPECT] != \'100-continue\''
+          method << 'env[EXPECT] = \'100-continue\' if set_expectation'
 
-            method << 'env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])'
-            method << "req = #{@request_class.name}.new(env)"
-            cache = false
-            keys = @recognition_keys.map { |key|
-              if key.is_a?(Array)
-                cache = true
-                key.call_source(:cache, :req)
-              else
-                "req.#{key}"
-              end
-            }.join(', ')
-            method << 'cache = {}' if cache
-            method << "container = @recognition_graph[#{keys}]"
-            method << "optimize_container_iterator(container) unless container.respond_to?(:optimized_each)"
-            method << "container.optimized_each(req) || (set_expectation ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE)"
-            method << 'ensure'
-            method << 'env.delete(Const::EXPECT) if set_expectation'
-            method << 'end'
-          end
+          method << 'env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])'
+          method << "req = #{@request_class.name}.new(env)"
+          cache = false
+          keys = @recognition_keys.map { |key|
+            if key.is_a?(Array)
+              cache = true
+              key.call_source(:cache, :req)
+            else
+              "req.#{key}"
+            end
+          }.join(', ')
+          method << 'cache = {}' if cache
+          method << "container = @recognition_graph[#{keys}]"
+          method << 'optimize_container_iterator(container) unless container.respond_to?(:optimized_each)'
+          method << 'container.optimized_each(req) || (set_expectation ? [404, {\'Content-Type\' => \'text/html\'}, [\'Not Found\']] : [417, {\'Content-Type\' => \'text/html\'}, [\'Expectation failed\']])'
+          method << 'ensure'
+          method << 'env.delete(EXPECT) if set_expectation'
+          method << 'end'
 
           # puts "\n#{method.inspect}"
           class << self; undef :call; end

@@ -7,7 +7,7 @@ module Rack::Mount
 
       # Adds recognition related concerns to RouteSet.new.
       def initialize(options = {})
-        @parameters_key = options.delete(:parameters_key) || Const::RACK_ROUTING_ARGS
+        @parameters_key = options.delete(:parameters_key) || 'rack.routing_args'
         @parameters_key.freeze
         @recognition_key_analyzer = Analysis::Frequency.new_with_module(Analysis::Splitting)
 
@@ -45,6 +45,9 @@ module Rack::Mount
         nil
       end
 
+      EXPECT    = 'Expect'.freeze
+      PATH_INFO = 'PATH_INFO'.freeze
+
       # Rack compatible recognition and dispatching method. Routes are
       # tried until one returns a non-catch status code. If no routes
       # match, the catch status code is returned.
@@ -54,10 +57,10 @@ module Rack::Mount
       def call(env)
         raise 'route set not finalized' unless @recognition_graph
 
-        set_expectation = env[Const::EXPECT] != Const::CONTINUE
-        env[Const::EXPECT] = Const::CONTINUE if set_expectation
+        set_expectation = env[EXPECT] != '100-continue'
+        env[EXPECT] = '100-continue' if set_expectation
 
-        env[Const::PATH_INFO] = Utils.normalize_path(env[Const::PATH_INFO])
+        env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])
 
         cache = {}
         req = @request_class.new(env)
@@ -72,9 +75,9 @@ module Rack::Mount
           result = route.call(req)
           return result unless result[0].to_i == 417
         end
-        set_expectation ? Const::NOT_FOUND_RESPONSE : Const::EXPECTATION_FAILED_RESPONSE
+        set_expectation ? [404, {'Content-Type' => 'text/html'}, ['Not Found']] : [417, {'Content-Type' => 'text/html'}, ['Expectation failed']]
       ensure
-        env.delete(Const::EXPECT) if set_expectation
+        env.delete(EXPECT) if set_expectation
       end
 
       def rehash #:nodoc:

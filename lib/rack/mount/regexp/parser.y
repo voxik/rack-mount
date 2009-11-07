@@ -55,7 +55,7 @@ def parse_regexp(regexp)
   expression = scan_str(regexp.source)
   expression.ignorecase = regexp.casefold?
 
-  unless Const::SUPPORTS_NAMED_CAPTURES
+  unless RegexpWithNamedGroups.supports_named_captures?
     @capture_index = 0
     tag_captures!(regexp.names, expression)
   end

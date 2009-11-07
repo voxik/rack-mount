@@ -1,6 +1,6 @@
 require 'abstract_unit'
 
-unless Rack::Mount::Const::SUPPORTS_NAMED_CAPTURES
+unless supports_named_captures?
   class TestRegexpWithNamedGroups < Test::Unit::TestCase
     RegexpWithNamedGroups = Rack::Mount::RegexpWithNamedGroups
 

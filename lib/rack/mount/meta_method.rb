@@ -11,7 +11,7 @@ module Rack::Mount
       end
 
       def inspect(indented = 2)
-        return Const::EMPTY_STRING if empty?
+        return '' if empty?
         space = ' ' * indented
         space + map { |p|
           if p.is_a?(Condition)

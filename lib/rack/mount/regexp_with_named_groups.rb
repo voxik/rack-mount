@@ -1,7 +1,15 @@
 require 'rack/mount/utils'
 
 module Rack::Mount
-  unless Const::SUPPORTS_NAMED_CAPTURES
+  begin
+    eval('/(?<foo>.*)/').named_captures
+
+    class RegexpWithNamedGroups < Regexp
+      def self.supports_named_captures?
+        true
+      end
+    end
+  rescue SyntaxError, NoMethodError
     require 'strscan'
 
     # A wrapper that adds shim named capture support to older
@@ -18,6 +26,10 @@ module Rack::Mount
     #
     #   /(?:<foo>[a-z]+)/
     class RegexpWithNamedGroups < Regexp
+      def self.supports_named_captures?
+        false
+      end
+
       def self.new(regexp) #:nodoc:
         if regexp.is_a?(RegexpWithNamedGroups)
           regexp
@@ -39,7 +51,7 @@ module Rack::Mount
             @names << nil
           end
         end
-        source.gsub!(/\?:<([^>]+)>/, Const::EMPTY_STRING)
+        source.gsub!(/\?:<([^>]+)>/, '')
 
         @names = [] unless @names.any?
         @names.freeze
@@ -59,7 +71,5 @@ module Rack::Mount
         named_captures
       end
     end
-  else
-    RegexpWithNamedGroups = Regexp
   end
 end
