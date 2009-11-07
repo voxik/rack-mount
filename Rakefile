@@ -22,19 +22,6 @@ Rake::RDocTask.new { |rdoc|
   rdoc.rdoc_files.exclude('lib/rack/mount/mappers/*.rb')
 }
 
-namespace :rdoc do
-  task :publish => :rdoc do
-    Dir.chdir(File.join(File.dirname(__FILE__), 'doc')) do
-      system 'git init'
-      system 'git add .'
-      system 'git commit -m "generate rdoc"'
-      system 'git remote add origin git@github.com:josh/rack-mount.git'
-      system 'git checkout -b gh-pages'
-      system 'git push -f origin gh-pages'
-    end
-  end
-end
-
 
 require 'rake/testtask'
 
