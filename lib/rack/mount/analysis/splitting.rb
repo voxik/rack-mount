@@ -157,6 +157,6 @@ module Rack::Mount
             Regexp.compile("\\A#{source}\\Z", regexp.options)
           end
         end
-      end
+    end
   end
 end
