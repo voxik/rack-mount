@@ -19,6 +19,7 @@ def parse_regexp(regexp)
   end
 
   expression = scan_str(regexp.source)
+  expression.ignorecase = regexp.casefold?
 
   unless Const::SUPPORTS_NAMED_CAPTURES
     @capture_index = 0
@@ -54,12 +55,18 @@ class Node < Struct.new(:left, :right)
 end
 
 class Expression < Array
+  attr_accessor :ignorecase
+
   def initialize(ary)
     if ary.is_a?(Node)
       super(ary.flatten)
     else
       super([ary])
     end
+  end
+
+  def casefold?
+    ignorecase
   end
 end
 
@@ -69,6 +76,14 @@ class Group < Struct.new(:value)
   def initialize(*args)
     @capture = true
     super
+  end
+
+  def to_regexp
+    value.map { |e| e.regexp_source }.join
+  end
+
+  def regexp_source
+    "(#{value.map { |e| e.regexp_source }.join})#{quantifier}"
   end
 
   def capture?
@@ -89,6 +104,18 @@ end
 class CharacterRange < Struct.new(:value)
   attr_accessor :negate, :quantifier
 
+  def regexp_source
+    if value == '.' || value == '\d'
+      "#{value}#{quantifier}"
+    else
+      "[#{negate && '^'}#{value}]#{quantifier}"
+    end
+  end
+
+  def include?(char)
+    Regexp.compile("^#{regexp_source}$") =~ char.to_s
+  end
+
   def ==(other)
     self.value == other.value &&
       self.negate == other.negate &&
@@ -98,6 +125,10 @@ end
 
 class Character < Struct.new(:value)
   attr_accessor :quantifier
+
+  def regexp_source
+    "#{value}#{quantifier}"
+  end
 
   def ==(other)
     self.value == other.value &&

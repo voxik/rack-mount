@@ -84,6 +84,13 @@ class TestRegexpParser < Test::Unit::TestCase
       range('.'),
       char('k')
     ], parse(%r{f..k})
+
+    result = parse(%r{f..k})
+    assert result[0].include?('f')
+    assert !result[0].include?('F')
+    assert result[1].include?('u')
+    assert result[2].include?('c')
+    assert result[3].include?('k')
   end
 
   def test_digit_range
@@ -183,6 +190,11 @@ class TestRegexpParser < Test::Unit::TestCase
         group([char('c')], :name => 'b')
       ], :quantifier => '?')
     ], parse(regexp)
+  end
+
+  def test_ignorecase_option
+    re = parse(/abc/i)
+    assert re.casefold?
   end
 
   private

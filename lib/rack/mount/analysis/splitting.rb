@@ -82,66 +82,80 @@ module Rack::Mount
         end
 
         def generate_split_keys(regexp, separators) #:nodoc:
-          escaped_separators = separators.map { |s| Regexp.escape(s) }
-          separators_regexp = Regexp.union(*escaped_separators)
-          segments, previous = [], nil
-          regexp_options = regexp.options
-
-          begin
-            Utils.extract_regexp_parts(regexp).each do |part|
-              if part.respond_to?(:optional?) && part.optional?
-                if escaped_separators.include?(part.first)
-                  append_to_segments!(segments, previous, separators, regexp_options)
-                end
-
-                raise ArgumentError
-              end
-
-              append_to_segments!(segments, previous, separators, regexp_options)
-              previous = nil
-
-              if part == Const::NULL
+          segments = []
+          buf = nil
+          casefold = regexp.casefold?
+          parts = RegexpParser.new.parse_regexp(regexp) rescue []
+          parts.each_with_index do |part, index|
+            if part.is_a?(RegexpParser::Anchor)
+              if part.value == '^' || part.value == '\A'
+              elsif part.value == '$' || part.value == '\Z'
+                segments << join_buffer(buf, regexp) if buf
                 segments << Const::NULL
-                raise ArgumentError
+                buf = nil
+                break
               end
-
-              if part.is_a?(Utils::Capture)
-                source = part.map { |p| p.to_s }.join
-                append_to_segments!(segments, source, separators, regexp_options)
+            elsif part.is_a?(RegexpParser::Character)
+              value = part.value
+              if separators.include?(value)
+                segments << join_buffer(buf, regexp) if buf
+                peek = parts[index+1]
+                if peek.is_a?(RegexpParser::Character) && separators.include?(peek.value)
+                  segments << Const::EMPTY_STRING
+                end
+                buf = nil
               else
-                parts = part.split(separators_regexp)
-                parts.shift if parts[0] == Const::EMPTY_STRING
-                previous = parts.pop
-                parts.each { |p| append_to_segments!(segments, p, separators, regexp_options) }
+                buf ||= []
+                buf << part
               end
+            elsif part.is_a?(RegexpParser::Group)
+              if part.quantifier == '?'
+                value = part.value.first.value
+                if separators.include?(value)
+                  segments << join_buffer(buf, regexp) if buf
+                  buf = nil
+                end
+                break
+              elsif part.quantifier == nil
+                break if part.value.any? { |p|
+                  separators.any? { |s| p.include?(s) }
+                }
+                buf = nil
+                segments << Regexp.compile("\\A#{part.to_regexp}\\Z")
+              else
+                break
+              end
+            elsif part.is_a?(RegexpParser::CharacterRange)
+              break if separators.any? { |s| part.include?(s) }
+              buf = nil
+              segments << Regexp.compile("\\A#{part.regexp_source}\\Z")
+            else
+              break
             end
 
-            append_to_segments!(segments, previous, separators, regexp_options)
-          rescue ArgumentError
-            # generation failed somewhere, but lets take what we can get
+            if index + 1 == parts.size
+              segments << join_buffer(buf, regexp) if buf
+              buf = nil
+              break
+            end
           end
 
           while segments.length > 0 && (segments.last.nil? || segments.last == '')
             segments.pop
           end
 
+          segments.shift if segments[0].nil? || segments[0] == Const::EMPTY_STRING
+
           segments
         end
 
-        def append_to_segments!(segments, s, separators, regexp_options) #:nodoc:
-          return unless s
-          separators.each do |separator|
-            if s.gsub(/\[[^\]]+\]/, '').include?(separator)
-              raise ArgumentError
-            end
-
-            if Regexp.compile("\\A#{s}\\Z") =~ separator
-              raise ArgumentError
-            end
+        def join_buffer(parts, regexp)
+          if parts.all? { |p| p.quantifier.nil? } && !regexp.casefold?
+            parts.map { |p| p.value }.join
+          else
+            source = parts.map { |p| p.regexp_source }.join
+            Regexp.compile("\\A#{source}\\Z", regexp.options)
           end
-
-          static = Utils.extract_static_regexp(s, regexp_options)
-          segments << (static.is_a?(String) ? static : static)
         end
       end
   end
