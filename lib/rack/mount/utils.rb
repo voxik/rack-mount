@@ -136,5 +136,12 @@ module Rack::Mount
       regexp
     end
     module_function :extract_static_regexp
+
+    def parse_regexp(regexp)
+      RegexpParser.new.memoized_parse_regexp(regexp)
+    rescue Racc::ParseError
+      []
+    end
+    module_function :parse_regexp
   end
 end

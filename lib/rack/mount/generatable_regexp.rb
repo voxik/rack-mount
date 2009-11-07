@@ -52,7 +52,7 @@ module Rack::Mount
         @segments ||= begin
           segments = []
           catch(:halt) do
-            expression = RegexpParser.new.parse_regexp(self) rescue []
+            expression = Utils.parse_regexp(self)
             segments = parse_segments(expression)
           end
           segments
@@ -78,7 +78,7 @@ module Rack::Mount
               if s.last.is_a?(String)
                 s.last << part.value
               else
-                s << part.value
+                s << part.value.dup
               end
             when RegexpParser::Group
               if part.name

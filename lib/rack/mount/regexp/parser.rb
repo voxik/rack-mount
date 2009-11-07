@@ -13,6 +13,31 @@ module Rack
     class RegexpParser < Racc::Parser
 
 
+class << self
+  def memo
+    Thread.current[:regexp_parser_memo]
+  end
+
+  def memo=(memo)
+    Thread.current[:regexp_parser_memo] = memo
+  end
+
+  def with_memo(memo = {})
+    old_memo, self.memo = self.memo, memo
+    yield
+  ensure
+    self.memo = old_memo
+  end
+end
+
+def memoized_parse_regexp(regexp, memo = self.class.memo)
+  if memo
+    memo[regexp] ||= parse_regexp(regexp)
+  else
+    parse_regexp(regexp)
+  end
+end
+
 def parse_regexp(regexp)
   unless regexp.is_a?(RegexpWithNamedGroups)
     regexp = RegexpWithNamedGroups.new(regexp)
@@ -26,7 +51,7 @@ def parse_regexp(regexp)
     tag_captures!(regexp.names, expression)
   end
 
-  expression
+  expression.freeze
 rescue Racc::ParseError => e
   puts "Failed to parse #{regexp.inspect}: #{e.message}" if $DEBUG
   raise e
@@ -45,7 +70,6 @@ def tag_captures!(names, group)
     end
   end
 end
-
 
 class Node < Struct.new(:left, :right)
   def flatten
@@ -70,6 +94,10 @@ class Expression < Array
 
   def casefold?
     ignorecase
+  end
+
+  def freeze
+    each { |e| e.freeze }
   end
 end
 
@@ -99,9 +127,16 @@ class Group < Struct.new(:value)
       self.capture == other.capture &&
       self.name == other.name
   end
+
+  def freeze
+    value.each { |e| e.freeze }
+  end
 end
 
 class Anchor < Struct.new(:value)
+  def freeze
+    value.freeze
+  end
 end
 
 class CharacterRange < Struct.new(:value)
@@ -124,6 +159,10 @@ class CharacterRange < Struct.new(:value)
       self.negate == other.negate &&
       self.quantifier == other.quantifier
   end
+
+  def freeze
+    value.freeze
+  end
 end
 
 class Character < Struct.new(:value)
@@ -136,6 +175,10 @@ class Character < Struct.new(:value)
   def ==(other)
     self.value == other.value &&
       self.quantifier == other.quantifier
+  end
+
+  def freeze
+    value.freeze
   end
 end
 ##### State transition tables begin ###

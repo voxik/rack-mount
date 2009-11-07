@@ -3,10 +3,6 @@ require 'abstract_unit'
 class TestRegexpParser < Test::Unit::TestCase
   RegexpParser = Rack::Mount::RegexpParser
 
-  def setup
-    @parser = RegexpParser.new
-  end
-
   def test_slash
     assert_equal [char('/')], parse(/\//)
     assert_equal [char('/')], parse(%r{/})
@@ -210,7 +206,7 @@ class TestRegexpParser < Test::Unit::TestCase
 
   private
     def parse(regexp)
-      @parser.parse_regexp(regexp)
+      Rack::Mount::Utils.parse_regexp(regexp)
     end
 
     def anchor(value)

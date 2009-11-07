@@ -6,9 +6,30 @@ module Rack::Mount
   class RouteSet
     extend Mixover
 
+    module RegexpParserCache #:nodoc:
+      def initialize(*args, &block)
+        @memo = {}
+        super
+      end
+
+      def add_route(*args)
+        RegexpParser.with_memo(@memo) { super }
+      end
+
+      def rehash
+        RegexpParser.with_memo(@memo) { super }
+      end
+
+      def freeze
+        @memo = nil
+        super
+      end
+    end
+
     # Include generation and recognition concerns
     include Generation::RouteSet, Recognition::RouteSet
     include Recognition::CodeGeneration
+    include RegexpParserCache
 
     # Initialize a new RouteSet without optimizations
     def self.new_without_optimizations(*args, &block)
@@ -40,7 +61,7 @@ module Rack::Mount
     #                       Conditions may be expressed as strings or
     #                       regexps to match against.
     # <tt>defaults</tt>:: A hash of values that always gets merged in
-    # <tt>name</tt>:: Symbol identifier for the route used with named 
+    # <tt>name</tt>:: Symbol identifier for the route used with named
     #                 route generations
     def add_route(app, conditions = {}, defaults = {}, name = nil)
       route = Route.new(self, app, conditions, defaults, name)

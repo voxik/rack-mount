@@ -55,7 +55,7 @@ module Rack::Mount
         def analyze_capture_boundaries(regexp, boundaries) #:nodoc:
           return boundaries unless regexp.is_a?(Regexp)
 
-          parts = RegexpParser.new.parse_regexp(regexp) rescue []
+          parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
             if part.is_a?(RegexpParser::Group)
               if index > 0
@@ -87,7 +87,7 @@ module Rack::Mount
           segments = []
           buf = nil
           casefold = regexp.casefold?
-          parts = RegexpParser.new.parse_regexp(regexp) rescue []
+          parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
             if part.is_a?(RegexpParser::Anchor)
               if part.value == '^' || part.value == '\A'
