@@ -52,7 +52,8 @@ module Rack::Mount
         @segments ||= begin
           segments = Const::EMPTY_ARRAY
           catch(:halt) do
-            segments = parse_segments(RegexpParser.new.parse_regexp(self))
+            expression = RegexpParser.new.parse_regexp(self) rescue []
+            segments = parse_segments(expression)
           end
           segments
         end

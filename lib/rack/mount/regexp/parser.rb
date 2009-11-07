@@ -27,6 +27,9 @@ def parse_regexp(regexp)
   end
 
   expression
+rescue Racc::ParseError => e
+  puts "Failed to parse #{regexp.inspect}: #{e.message}" if $DEBUG
+  raise e
 end
 
 def tag_captures!(names, group)
@@ -293,26 +296,26 @@ Racc_debug_parser = false
 # reduce 0 omitted
 
 def _reduce_1(val, _values, result)
- result = Expression.new(val[0]) 
+ result = Expression.new(val[0])
     result
 end
 
 def _reduce_2(val, _values, result)
             val[1].quantifier = val[2]
             result = Node.new(val[0], val[1])
-          
+
     result
 end
 
 def _reduce_3(val, _values, result)
- result = Node.new(val[0], val[1]) 
+ result = Node.new(val[0], val[1])
     result
 end
 
 def _reduce_4(val, _values, result)
             val[0].quantifier = val[1]
             result = val[0]
-          
+
     result
 end
 
@@ -321,54 +324,54 @@ end
 # reduce 6 omitted
 
 def _reduce_7(val, _values, result)
- result = CharacterRange.new(val[1]) 
+ result = CharacterRange.new(val[1])
     result
 end
 
 def _reduce_8(val, _values, result)
- result = CharacterRange.new(val[2]); result.negate = true 
+ result = CharacterRange.new(val[2]); result.negate = true
     result
 end
 
 def _reduce_9(val, _values, result)
- result = CharacterRange.new(val[0]) 
+ result = CharacterRange.new(val[0])
     result
 end
 
 def _reduce_10(val, _values, result)
- result = CharacterRange.new(val[0]) 
+ result = CharacterRange.new(val[0])
     result
 end
 
 def _reduce_11(val, _values, result)
- result = Anchor.new(val[0]) 
+ result = Anchor.new(val[0])
     result
 end
 
 def _reduce_12(val, _values, result)
- result = Character.new(val[0]) 
+ result = Character.new(val[0])
     result
 end
 
 def _reduce_13(val, _values, result)
- result = val.join 
+ result = val.join
     result
 end
 
 # reduce 14 omitted
 
 def _reduce_15(val, _values, result)
- result = Group.new(val[1]) 
+ result = Group.new(val[1])
     result
 end
 
 def _reduce_16(val, _values, result)
- result = Group.new(val[3]); result.capture = false 
+ result = Group.new(val[3]); result.capture = false
     result
 end
 
 def _reduce_17(val, _values, result)
- result = Group.new(val[3]); result.name = val[2] 
+ result = Group.new(val[3]); result.name = val[2]
     result
 end
 
@@ -383,12 +386,12 @@ end
 # reduce 22 omitted
 
 def _reduce_23(val, _values, result)
- result = val.join 
+ result = val.join
     result
 end
 
 def _reduce_24(val, _values, result)
- result = val.join 
+ result = val.join
     result
 end
 

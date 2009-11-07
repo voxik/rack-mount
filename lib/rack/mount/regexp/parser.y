@@ -57,6 +57,9 @@ def parse_regexp(regexp)
   end
 
   expression
+rescue Racc::ParseError => e
+  puts "Failed to parse #{regexp.inspect}: #{e.message}" if $DEBUG
+  raise e
 end
 
 def tag_captures!(names, group)
