@@ -50,9 +50,11 @@ module Rack::Mount
 
       def segments
         @segments ||= begin
-          parse_segments(Utils.extract_regexp_parts(self))
-        rescue ArgumentError
-          Const::EMPTY_ARRAY
+          segments = Const::EMPTY_ARRAY
+          catch(:halt) do
+            segments = parse_segments(RegexpParser.new.parse_regexp(self))
+          end
+          segments
         end
       end
 
@@ -67,29 +69,31 @@ module Rack::Mount
       private
         def parse_segments(segments)
           s = []
-          segments.each do |part|
-            if part.is_a?(String) && part == Const::NULL
-              return s
-            elsif part.is_a?(Utils::Capture)
-              if part.named?
-                source = part.map { |p| p.to_s }.join
-                requirement = Regexp.compile(source)
+          segments.each_with_index do |part, index|
+            case part
+            when RegexpParser::Anchor
+              # ignore
+            when RegexpParser::Character
+              if s.last.is_a?(String)
+                s.last << part.value
+              else
+                s << part.value
+              end
+            when RegexpParser::Group
+              if part.name
+                requirement = Regexp.compile(part.to_regexp)
                 s << DynamicSegment.new(part.name, requirement)
               else
                 s << parse_segments(part)
               end
+            when RegexpParser::Expression
+              return parse_segments(part)
             else
-              part = part.gsub('\\/', '/')
-              static = Utils.extract_static_regexp(part)
-              if static.is_a?(String)
-                s << static.freeze
-              else
-                raise ArgumentError, "failed to parse #{part.inspect}"
-              end
+              throw :halt
             end
           end
 
-          s.freeze
+          s
         end
 
         def generate_from_segments(segments, params, merged, defaults, optional = false)

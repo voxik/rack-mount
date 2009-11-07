@@ -113,7 +113,7 @@ class Group < Struct.new(:value)
   end
 
   def regexp_source
-    "(#{value.map { |e| e.regexp_source }.join})#{quantifier}"
+    "(#{capture ? '' : '?:'}#{value.map { |e| e.regexp_source }.join})#{quantifier}"
   end
 
   def capture?
