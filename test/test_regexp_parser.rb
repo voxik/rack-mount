@@ -103,6 +103,17 @@ class TestRegexpParser < Test::Unit::TestCase
     assert_equal [range('abc')], parse(%r{[abc]})
   end
 
+  def test_bracket_expression_with_special_chars
+    assert_equal [
+      char('/'),
+      char('f'),
+      char('o'),
+      char('o'),
+      char('/'),
+      group([range('/.?', :negate => true, :quantifier => '+')])
+    ], parse(%r{/foo/([^/.?]+)})
+  end
+
   def test_negated_bracket_expression
     assert_equal [range('abc', :negate => true)], parse(%r{[^abc]})
     assert_equal [range('/.?', :negate => true)], parse(%r{[^/\.\?]})

@@ -22,7 +22,11 @@ rule
       | CHAR { result = Character.new(val[0]) }
 
   bracket_expression: bracket_expression CHAR { result = val.join }
+                    | bracket_expression DOT { result = val.join }
+                    | bracket_expression QMARK { result = val.join }
                     | CHAR
+                    | DOT
+                    | QMARK
 
   group: LPAREN expression RPAREN { result = Group.new(val[1]) }
        | LPAREN QMARK COLON expression RPAREN { result = Group.new(val[3]); result.capture = false }
