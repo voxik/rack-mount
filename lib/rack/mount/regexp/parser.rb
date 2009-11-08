@@ -20,6 +20,7 @@ def memoized_parse_regexp(regexp)
     ref.__getobj__
   else
     expression = parse_regexp(regexp)
+    ObjectSpace.define_finalizer(expression, lambda { memo.delete(regexp) })
     memo[regexp] = WeakRef.new(expression)
     expression
   end
