@@ -7,34 +7,21 @@
 require 'racc/parser.rb'
 
 require 'rack/mount/regexp/tokenizer'
+require 'weakref'
 
 module Rack
   module Mount
     class RegexpParser < Racc::Parser
 
 
-class << self
-  def memo
-    Thread.current[:regexp_parser_memo]
-  end
-
-  def memo=(memo)
-    Thread.current[:regexp_parser_memo] = memo
-  end
-
-  def with_memo(memo = {})
-    old_memo, self.memo = self.memo, memo
-    yield
-  ensure
-    self.memo = old_memo
-  end
-end
-
-def memoized_parse_regexp(regexp, memo = self.class.memo)
-  if memo
-    memo[regexp] ||= parse_regexp(regexp)
+def memoized_parse_regexp(regexp)
+  memo = Thread.current[:regexp_parser_memo] ||= {}
+  if (ref = memo[regexp]) && ref.weakref_alive?
+    ref.__getobj__
   else
-    parse_regexp(regexp)
+    expression = parse_regexp(regexp)
+    memo[regexp] = WeakRef.new(expression)
+    expression
   end
 end
 
