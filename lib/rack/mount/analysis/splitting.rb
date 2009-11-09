@@ -89,16 +89,16 @@ module Rack::Mount
           casefold = regexp.casefold?
           parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
-            if part.is_a?(Reginald::Anchor)
-              if part.value == '^' || part.value == '\A'
-              elsif part.value == '$' || part.value == '\Z'
+            case part
+            when Reginald::Anchor
+              if part.value == '$' || part.value == '\Z'
                 segments << join_buffer(buf, regexp) if buf
                 segments << NULL
                 buf = nil
                 break
               end
-            elsif part.is_a?(Reginald::Character)
-              if separators.include?(part)
+            when Reginald::Character
+              if separators.any? { |s| part.include?(s) }
                 segments << join_buffer(buf, regexp) if buf
                 peek = parts[index+1]
                 if peek.is_a?(Reginald::Character) && separators.include?(peek)
@@ -109,10 +109,10 @@ module Rack::Mount
                 buf ||= Reginald::Expression.new([])
                 buf << part
               end
-            elsif part.is_a?(Reginald::Group)
+            when Reginald::Group
               if part.quantifier == '?'
                 value = part.expression.first
-                if separators.include?(value)
+                if separators.any? { |s| value.include?(s) }
                   segments << join_buffer(buf, regexp) if buf
                   buf = nil
                 end
@@ -124,7 +124,7 @@ module Rack::Mount
               else
                 break
               end
-            elsif part.is_a?(Reginald::CharacterRange)
+            when Reginald::CharacterClass
               break if separators.any? { |s| part.include?(s) }
               buf = nil
               segments << part.to_regexp
@@ -149,7 +149,7 @@ module Rack::Mount
         end
 
         def join_buffer(parts, regexp)
-          if parts.all? { |p| p.quantifier.nil? } && !regexp.casefold?
+          if parts.literal? && !regexp.casefold?
             parts.to_s
           else
             parts.to_regexp

@@ -1,7 +1,8 @@
 module Reginald
+  autoload :Alternation, 'reginald/alternation'
   autoload :Anchor, 'reginald/anchor'
   autoload :Character, 'reginald/character'
-  autoload :CharacterRange, 'reginald/character_range'
+  autoload :CharacterClass, 'reginald/character_class'
   autoload :Expression, 'reginald/expression'
   autoload :Group, 'reginald/group'
   autoload :Node, 'reginald/node'
