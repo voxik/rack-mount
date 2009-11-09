@@ -33,10 +33,15 @@ module Rack::Mount
 
       def process_key(requirements, method, requirement)
         if requirement.is_a?(Regexp)
-          requirements[method] = Utils.extract_static_regexp(requirement)
-        else
-          requirements[method] = requirement
+          expression = Utils.parse_regexp(requirement)
+          expression.reject! { |e| e.is_a?(Reginald::Anchor) }
+
+          if expression.literal?
+            return requirements[method] = expression.to_s
+          end
         end
+
+        requirements[method] = requirement
       end
 
       def report

@@ -116,34 +116,6 @@ module Rack::Mount
     end
     module_function :regexp_anchored?
 
-    # Returns static string source of Regexp if it only includes static
-    # characters and no metacharacters. Otherwise the original Regexp is
-    # returned.
-    #
-    #   extract_static_regexp(/^foo$/)      # => "foo"
-    #   extract_static_regexp(/^foo\.bar$/) # => "foo.bar"
-    #   extract_static_regexp(/^foo|bar$/)  # => /^foo|bar$/
-    def extract_static_regexp(regexp, options = nil)
-      if regexp.is_a?(String)
-        regexp = Regexp.compile("\\A#{regexp}\\Z", options)
-      end
-
-      # Just return if regexp is case-insensitive
-      return regexp if regexp.casefold?
-
-      source = regexp.source
-      if regexp_anchored?(regexp)
-        source.sub!(/^(\\A|\^)(.*)(\\Z|\$)$/, '\2')
-        unescaped_source = source.gsub(/\\/, '')
-        if source == Regexp.escape(unescaped_source) &&
-            Regexp.compile("\\A(#{source})\\Z") =~ unescaped_source
-          return unescaped_source
-        end
-      end
-      regexp
-    end
-    module_function :extract_static_regexp
-
     def parse_regexp(regexp)
       unless regexp.is_a?(RegexpWithNamedGroups)
         regexp = RegexpWithNamedGroups.new(regexp)

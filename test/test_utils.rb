@@ -44,13 +44,4 @@ class TestUtils < Test::Unit::TestCase
     assert_equal false, regexp_anchored?(/foo$/)
     assert_equal false, regexp_anchored?(/foo\Z/)
   end
-
-  def test_extract_static_regexp
-    assert_equal 'foo', extract_static_regexp(/^foo$/)
-    assert_equal %r{^foo$}i, extract_static_regexp(/^foo$/i)
-    assert_equal 'foo.bar', extract_static_regexp(/^foo\.bar$/)
-    assert_equal %r{^foo|bar$}, extract_static_regexp(/^foo|bar$/)
-    assert_equal Regexp.union(/^foo$/, /^bar$/),
-      extract_static_regexp(Regexp.union(/^foo$/, /^bar$/))
-  end
 end
