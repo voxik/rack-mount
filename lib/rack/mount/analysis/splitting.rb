@@ -57,24 +57,24 @@ module Rack::Mount
 
           parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
-            if part.is_a?(RegexpParser::Group)
+            if part.is_a?(Reginald::Group)
               if index > 0
                 previous = parts[index-1]
-                if previous.is_a?(RegexpParser::Character)
-                  boundaries << previous.value.to_str
+                if previous.is_a?(Reginald::Character)
+                  boundaries << previous.to_str
                 end
               end
 
               if inside = part[0][0]
-                if inside.is_a?(RegexpParser::Character)
-                  boundaries << inside.value.to_str
+                if inside.is_a?(Reginald::Character)
+                  boundaries << inside.to_str
                 end
               end
 
               if index < parts.length
                 following = parts[index+1]
-                if following.is_a?(RegexpParser::Character)
-                  boundaries << following.value.to_str
+                if following.is_a?(Reginald::Character)
+                  boundaries << following.to_str
                 end
               end
             end
@@ -89,7 +89,7 @@ module Rack::Mount
           casefold = regexp.casefold?
           parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
-            if part.is_a?(RegexpParser::Anchor)
+            if part.is_a?(Reginald::Anchor)
               if part.value == '^' || part.value == '\A'
               elsif part.value == '$' || part.value == '\Z'
                 segments << join_buffer(buf, regexp) if buf
@@ -97,40 +97,37 @@ module Rack::Mount
                 buf = nil
                 break
               end
-            elsif part.is_a?(RegexpParser::Character)
-              value = part.value
-              if separators.include?(value)
+            elsif part.is_a?(Reginald::Character)
+              if separators.include?(part)
                 segments << join_buffer(buf, regexp) if buf
                 peek = parts[index+1]
-                if peek.is_a?(RegexpParser::Character) && separators.include?(peek.value)
+                if peek.is_a?(Reginald::Character) && separators.include?(peek)
                   segments << ''
                 end
                 buf = nil
               else
-                buf ||= []
+                buf ||= Reginald::Expression.new([])
                 buf << part
               end
-            elsif part.is_a?(RegexpParser::Group)
+            elsif part.is_a?(Reginald::Group)
               if part.quantifier == '?'
-                value = part.value.first.value
+                value = part.expression.first
                 if separators.include?(value)
                   segments << join_buffer(buf, regexp) if buf
                   buf = nil
                 end
                 break
               elsif part.quantifier == nil
-                break if part.value.any? { |p|
-                  separators.any? { |s| p.include?(s) }
-                }
+                break if separators.any? { |s| part.include?(s) }
                 buf = nil
-                segments << Regexp.compile("\\A#{part.to_regexp}\\Z")
+                segments << part.to_regexp
               else
                 break
               end
-            elsif part.is_a?(RegexpParser::CharacterRange)
+            elsif part.is_a?(Reginald::CharacterRange)
               break if separators.any? { |s| part.include?(s) }
               buf = nil
-              segments << Regexp.compile("\\A#{part.regexp_source}\\Z")
+              segments << part.to_regexp
             else
               break
             end
@@ -153,10 +150,9 @@ module Rack::Mount
 
         def join_buffer(parts, regexp)
           if parts.all? { |p| p.quantifier.nil? } && !regexp.casefold?
-            parts.map { |p| p.value }.join
+            parts.to_s
           else
-            source = parts.map { |p| p.regexp_source }.join
-            Regexp.compile("\\A#{source}\\Z", regexp.options)
+            parts.to_regexp
           end
         end
     end

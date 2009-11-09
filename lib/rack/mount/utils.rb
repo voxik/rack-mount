@@ -1,3 +1,10 @@
+begin
+  require 'reginald'
+rescue LoadError
+  $: << File.expand_path(File.join(File.dirname(__FILE__), 'vendor/reginald'))
+  require 'reginald'
+end
+
 require 'rack/mount/regexp_with_named_groups'
 require 'uri'
 
@@ -138,7 +145,31 @@ module Rack::Mount
     module_function :extract_static_regexp
 
     def parse_regexp(regexp)
-      RegexpParser.new.memoized_parse_regexp(regexp)
+      unless regexp.is_a?(RegexpWithNamedGroups)
+        regexp = RegexpWithNamedGroups.new(regexp)
+      end
+
+      expression = Reginald.parse(regexp)
+
+      unless RegexpWithNamedGroups.supports_named_captures?
+        capture_index = 0
+        tag_captures = Proc.new do |group|
+          group.each do |child|
+            if child.is_a?(Reginald::Group)
+              if child.capture
+                child.name = regexp.names[capture_index]
+                capture_index += 1
+              end
+              tag_captures.call(child)
+            elsif child.is_a?(Array)
+              tag_captures.call(child)
+            end
+          end
+        end
+        tag_captures.call(expression)
+      end
+
+      expression
     rescue Racc::ParseError
       []
     end

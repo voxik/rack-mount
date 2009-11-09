@@ -6,7 +6,7 @@ module Rack::Mount
       attr_reader :name, :requirement
 
       def initialize(name, requirement)
-        @name, @requirement = name.to_sym, bound_expression(requirement)
+        @name, @requirement = name.to_sym, requirement
         freeze
       end
 
@@ -25,13 +25,6 @@ module Rack::Mount
       def inspect
         "/(?<#{@name}>#{@requirement.source})/"
       end
-
-      private
-        def bound_expression(regexp)
-          source, options = regexp.source, regexp.options
-          source = "\\A#{source}\\Z"
-          Regexp.compile(source, options).freeze
-        end
     end
 
     module InstanceMethods
@@ -72,22 +65,22 @@ module Rack::Mount
           s = []
           segments.each_with_index do |part, index|
             case part
-            when RegexpParser::Anchor
+            when Reginald::Anchor
               # ignore
-            when RegexpParser::Character
+            when Reginald::Character
               if s.last.is_a?(String)
-                s.last << part.value
+                s.last << part.dup
               else
-                s << part.value.dup
+                s << part.dup
               end
-            when RegexpParser::Group
+            when Reginald::Group
               if part.name
-                requirement = Regexp.compile(part.to_regexp)
+                requirement = Regexp.compile(part.expression.to_regexp)
                 s << DynamicSegment.new(part.name, requirement)
               else
                 s << parse_segments(part)
               end
-            when RegexpParser::Expression
+            when Reginald::Expression
               return parse_segments(part)
             else
               throw :halt

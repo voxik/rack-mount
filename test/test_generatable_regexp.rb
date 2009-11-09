@@ -46,7 +46,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<id>[0-9]+)$})
     end
-    assert_equal(['/foo/', DynamicSegment.new(:id, %r{[0-9]+})], regexp.segments)
+    assert_equal(['/foo/', DynamicSegment.new(:id, %r{\A[0-9]+\Z})], regexp.segments)
 
     assert_equal '/foo/123', regexp.generate(:id => 123)
     assert_nil regexp.generate(:id => 'abc')
@@ -58,8 +58,8 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/(?:<foo>[a-z]+)/bar(\.(?:<format>[a-z]+))?$})
     end
-    assert_equal(['/', DynamicSegment.new(:foo, %r{[a-z]+}),
-      '/bar', ['.', DynamicSegment.new(:format, %r{[a-z]+})]], regexp.segments)
+    assert_equal(['/', DynamicSegment.new(:foo, %r{\A[a-z]+\Z}),
+      '/bar', ['.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})]], regexp.segments)
 
     assert_equal '/foo/bar.xml', regexp.generate(:foo => 'foo', :format => 'xml')
     assert_equal '/foo/bar', regexp.generate(:foo => 'foo')
@@ -72,7 +72,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/msg/get/(?:<id>\d+(?:,\d+)*)$})
     end
-    assert_equal(['/msg/get/', DynamicSegment.new(:id, %r{\d+(?:,\d+)*})], regexp.segments)
+    assert_equal(['/msg/get/', DynamicSegment.new(:id, %r{\A\d+(?:,\d+)*\Z})], regexp.segments)
 
     assert_equal '/msg/get/123', regexp.generate(:id => 123)
     assert_nil regexp.generate(:id => 'abc')
@@ -85,8 +85,8 @@ class TestGeneratableRegexp < Test::Unit::TestCase
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<action>[a-z]+)/(?:<id>[0-9]+)$})
     end
     assert_equal(['/foo/',
-      DynamicSegment.new(:action, %r{[a-z]+}), '/',
-      DynamicSegment.new(:id, %r{[0-9]+})],
+      DynamicSegment.new(:action, %r{\A[a-z]+\Z}), '/',
+      DynamicSegment.new(:id, %r{\A[0-9]+\Z})],
     regexp.segments)
 
     assert_equal '/foo/show/1', regexp.generate(:action => 'show', :id => '1')
@@ -100,7 +100,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/foo/bar(\.(?:<format>[a-z]+))?$})
     end
-    assert_equal(['/foo/bar', ['.', DynamicSegment.new(:format, %r{[a-z]+})]], regexp.segments)
+    assert_equal(['/foo/bar', ['.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})]], regexp.segments)
 
     assert_equal '/foo/bar.xml', regexp.generate(:format => 'xml')
     assert_equal '/foo/bar', regexp.generate
@@ -112,9 +112,9 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/(?:<foo>[a-z]+)(/(?:<bar>[a-z]+))?(/(?:<baz>[a-z]+))?$})
     end
-    assert_equal(['/', DynamicSegment.new(:foo, %r{[a-z]+}),
-      ['/', DynamicSegment.new(:bar, %r{[a-z]+})],
-      ['/', DynamicSegment.new(:baz, %r{[a-z]+})]
+    assert_equal(['/', DynamicSegment.new(:foo, %r{\A[a-z]+\Z}),
+      ['/', DynamicSegment.new(:bar, %r{\A[a-z]+\Z})],
+      ['/', DynamicSegment.new(:baz, %r{\A[a-z]+\Z})]
     ], regexp.segments)
 
     assert_equal '/foo/bar/baz', regexp.generate(:foo => 'foo', :bar => 'bar', :baz => 'baz')
@@ -130,8 +130,8 @@ class TestGeneratableRegexp < Test::Unit::TestCase
       regexp = GeneratableRegexp.compile(%r{^/people/(?:<id>[0-9]+)(\.(?:<format>[a-z]+))?$})
     end
     assert_equal(['/people/',
-      DynamicSegment.new(:id, %r{[0-9]+}),
-      ['.', DynamicSegment.new(:format, %r{[a-z]+})]],
+      DynamicSegment.new(:id, %r{\A[0-9]+\Z}),
+      ['.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})]],
     regexp.segments)
 
     assert_equal '/people/123.xml', regexp.generate(:id => '123', :format => 'xml')
@@ -146,8 +146,8 @@ class TestGeneratableRegexp < Test::Unit::TestCase
       regexp = GeneratableRegexp.compile(%r{^/foo/(?:<id>[0-9]+)\.(?:<format>[a-z]+)$})
     end
     assert_equal(['/foo/',
-      DynamicSegment.new(:id, %r{[0-9]+}), '.',
-      DynamicSegment.new(:format, %r{[a-z]+})],
+      DynamicSegment.new(:id, %r{\A[0-9]+\Z}), '.',
+      DynamicSegment.new(:format, %r{\A[a-z]+\Z})],
     regexp.segments)
 
     assert_equal '/foo/123.xml', regexp.generate(:id => '123', :format => 'xml')
@@ -166,7 +166,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/foo(/(?:<action>[a-z]+))?$})
     end
-    assert_equal(['/foo', ['/', DynamicSegment.new(:action, %r{[a-z]+})]], regexp.segments)
+    assert_equal(['/foo', ['/', DynamicSegment.new(:action, %r{\A[a-z]+\Z})]], regexp.segments)
     assert_equal '/foo/show', regexp.generate(:action => 'show')
     assert_equal '/foo', regexp.generate
   end
@@ -177,7 +177,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     else
       regexp = GeneratableRegexp.compile(%r{^/foo(\.(?:<format>[a-z]+))?$})
     end
-    assert_equal(['/foo', ['.', DynamicSegment.new(:format, %r{[a-z]+})]], regexp.segments)
+    assert_equal(['/foo', ['.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})]], regexp.segments)
     assert_equal '/foo.xml', regexp.generate(:format => 'xml')
     assert_equal '/foo', regexp.generate
   end
