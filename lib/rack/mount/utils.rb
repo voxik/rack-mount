@@ -152,16 +152,12 @@ module Rack::Mount
       expression = Reginald.parse(regexp)
 
       unless RegexpWithNamedGroups.supports_named_captures?
-        capture_index = 0
         tag_captures = Proc.new do |group|
           group.each do |child|
             if child.is_a?(Reginald::Group)
-              if child.capture
-                child.name = regexp.names[capture_index]
-                capture_index += 1
-              end
+              child.name = regexp.names[child.index] if child.index
               tag_captures.call(child)
-            elsif child.is_a?(Array)
+            elsif child.is_a?(Reginald::Expression)
               tag_captures.call(child)
             end
           end

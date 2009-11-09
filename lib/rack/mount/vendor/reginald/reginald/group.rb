@@ -1,6 +1,6 @@
 module Reginald
   class Group < Struct.new(:expression)
-    attr_accessor :quantifier, :capture, :name
+    attr_accessor :quantifier, :capture, :index, :name
 
     def initialize(*args)
       @capture = true
@@ -28,9 +28,20 @@ module Reginald
     end
 
     def ==(other)
-      self.expression == other.expression &&
+      case other
+      when String
+        other == to_s
+      else
+        eql?(other)
+      end
+    end
+
+    def eql?(other)
+      other.is_a?(self.class) &&
+        self.expression == other.expression &&
         self.quantifier == other.quantifier &&
         self.capture == other.capture &&
+        self.index == other.index &&
         self.name == other.name
     end
 
