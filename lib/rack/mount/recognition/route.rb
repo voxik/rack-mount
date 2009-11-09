@@ -8,12 +8,6 @@ module Rack::Mount
       def initialize(*args)
         super
 
-        # TODO: Don't explict check for :path_info condition
-        if @conditions.has_key?(:path_info) &&
-            !Utils.regexp_anchored?(@conditions[:path_info])
-          @app = Prefix.new(@app)
-        end
-
         @named_captures = {}
         @conditions.map { |method, condition|
           @named_captures[method] = condition.named_captures.inject({}) { |named_captures, (k, v)|
@@ -61,10 +55,6 @@ module Rack::Mount
                 routing_args[k] = Utils.unescape_uri(v)
               end
             }
-            # TODO: Don't explict check for :path_info condition
-            if method == :path_info && !Utils.regexp_anchored?(condition)
-              env[Prefix::KEY] = m.to_s
-            end
             true
           else
             false

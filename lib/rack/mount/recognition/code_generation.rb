@@ -27,8 +27,6 @@ module Rack::Mount
           m << 'env = req.env'
 
           container.each_with_index { |route, i|
-            path_info_unanchored = route.conditions[:path_info] &&
-              !Utils.regexp_anchored?(route.conditions[:path_info])
             m << "route = self[#{i}]"
             m << 'routing_args = route.defaults.dup'
 
@@ -46,9 +44,6 @@ module Rack::Mount
                     b << MetaMethod::Condition.new("p = matches[#{j}]") do |c2|
                       c2 << "routing_args[#{k.inspect}] = Utils.unescape_uri(p)"
                     end
-                  end
-                  if method == :path_info && !Utils.regexp_anchored?(condition)
-                    b << "env[Prefix::KEY] = m.to_s"
                   end
                   b << "true"
                 end

@@ -105,17 +105,6 @@ module Rack::Mount
     end
     module_function :normalize_extended_expression
 
-    # Determines whether the regexp must match the entire string.
-    #
-    #   regexp_anchored?(/^foo$/) # => true
-    #   regexp_anchored?(/foo/)   # => false
-    #   regexp_anchored?(/^foo/)  # => false
-    #   regexp_anchored?(/foo$/)  # => false
-    def regexp_anchored?(regexp)
-      regexp.source =~ /\A(\\A|\^).*(\\Z|\$)\Z/ ? true : false
-    end
-    module_function :regexp_anchored?
-
     def parse_regexp(regexp)
       unless regexp.is_a?(RegexpWithNamedGroups)
         regexp = RegexpWithNamedGroups.new(regexp)

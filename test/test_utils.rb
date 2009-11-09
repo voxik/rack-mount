@@ -34,14 +34,4 @@ class TestUtils < Test::Unit::TestCase
                                                       foo # bar
                                                       $/x)
   end
-
-  def test_regexp_anchored
-    assert_equal true, regexp_anchored?(/^foo$/)
-    assert_equal true, regexp_anchored?(/\Afoo\Z/)
-    assert_equal false, regexp_anchored?(/foo/)
-    assert_equal false, regexp_anchored?(/^foo/)
-    assert_equal false, regexp_anchored?(/\Afoo/)
-    assert_equal false, regexp_anchored?(/foo$/)
-    assert_equal false, regexp_anchored?(/foo\Z/)
-  end
 end
