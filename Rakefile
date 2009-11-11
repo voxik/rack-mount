@@ -40,6 +40,8 @@ task :compile => [
 
 file 'lib/rack/mount/strexp/parser.rb' => 'lib/rack/mount/strexp/parser.y' do |t|
   sh "racc -l -o #{t.name} #{t.prerequisites.first}"
+  sh "sed -i '' -e 's/    end   # module Mount/  end   # module Mount/' #{t.name}"
+  sh "sed -i '' -e 's/  end   # module Rack/end   # module Rack/' #{t.name}"
 end
 
 file 'lib/rack/mount/strexp/tokenizer.rb' => 'lib/rack/mount/strexp/tokenizer.rex' do |t|

@@ -23,32 +23,32 @@ attr_accessor :requirements
 ##### State transition tables begin ###
 
 racc_action_table = [
-     1,     2,     3,     9,     4,     1,     2,     3,    12,     4,
-     1,     2,     3,    11,     4,     1,     2,     3,   nil,     4 ]
+     4,     5,     6,    11,     7,     4,     5,     6,    12,     7,
+     4,     5,     6,     8,     7,     4,     5,     6,   nil,     7 ]
 
 racc_action_check = [
-     0,     0,     0,     5,     0,     3,     3,     3,     9,     3,
-     8,     8,     8,     8,     8,     6,     6,     6,   nil,     6 ]
+     0,     0,     0,     8,     0,    10,    10,    10,    10,    10,
+     2,     2,     2,     1,     2,     6,     6,     6,   nil,     6 ]
 
 racc_action_pointer = [
-    -2,   nil,   nil,     3,   nil,     3,    13,   nil,     8,     8,
-   nil,   nil,   nil ]
+    -2,    13,     8,   nil,   nil,   nil,    13,   nil,     3,   nil,
+     3,   nil,   nil ]
 
 racc_action_default = [
-    -8,    -4,    -5,    -8,    -7,    -8,    -1,    -3,    -8,    -8,
-    -2,    -6,    13 ]
+    -8,    -8,    -1,    -3,    -4,    -5,    -8,    -7,    -8,    -2,
+    -8,    13,    -6 ]
 
 racc_goto_table = [
-     6,     5,    10,     8,    10 ]
+     9,     2,     1,   nil,   nil,   nil,   nil,    10,     9 ]
 
 racc_goto_check = [
-     2,     1,     3,     2,     3 ]
+     3,     2,     1,   nil,   nil,   nil,   nil,     2,     3 ]
 
 racc_goto_pointer = [
-   nil,     1,     0,    -4 ]
+   nil,     2,     1,    -2 ]
 
 racc_goto_default = [
-   nil,   nil,   nil,     7 ]
+   nil,   nil,   nil,     3 ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
@@ -154,5 +154,5 @@ def _reduce_none(val, _values, result)
 end
 
     end   # class StrexpParser
-    end   # module Mount
-  end   # module Rack
+  end   # module Mount
+end   # module Rack
