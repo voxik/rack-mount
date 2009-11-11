@@ -36,7 +36,7 @@ module Rack::Mount
           expression = Utils.parse_regexp(requirement)
           expression.reject! { |e| e.is_a?(Reginald::Anchor) }
 
-          if expression.literal?
+          if expression.is_a?(Reginald::Expression) && expression.literal?
             return requirements[method] = expression.to_s
           end
         end
