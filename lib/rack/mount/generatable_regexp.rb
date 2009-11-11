@@ -75,8 +75,7 @@ module Rack::Mount
               end
             when Reginald::Group
               if part.name
-                requirement = Regexp.compile(part.expression.to_regexp)
-                s << DynamicSegment.new(part.name, requirement)
+                s << DynamicSegment.new(part.name, part.expression.to_regexp)
               else
                 s << parse_segments(part)
               end
