@@ -1,5 +1,3 @@
-require 'rack/mount/meta_method'
-
 module Rack::Mount
   module Recognition
     module CodeGeneration #:nodoc:
@@ -23,49 +21,43 @@ module Rack::Mount
         end
 
         def optimize_container_iterator(container)
-          m = MetaMethod.new(:optimized_each, :req)
-          m << 'env = req.env'
+          body = []
 
           container.each_with_index { |route, i|
-            m << "route = self[#{i}]"
-            m << 'routing_args = route.defaults.dup'
+            body << "route = self[#{i}]"
+            body << 'routing_args = route.defaults.dup'
 
-            m << matchers = MetaMethod::Condition.new do |body|
-              body << "env[#{@parameters_key.inspect}] = routing_args"
-              body << "response = route.app.call(env)"
-              body << "return response unless response[0].to_i == 417"
-            end
-
+            conditions = []
             route.conditions.each do |method, condition|
-              matchers << MetaMethod::Block.new do |matcher|
-                matcher << c = MetaMethod::Condition.new("m = req.#{method}.match(#{condition.inspect})") do |b|
-                  b << "matches = m.captures" if route.named_captures[method].any?
-                  route.named_captures[method].each do |k, j|
-                    b << MetaMethod::Condition.new("p = matches[#{j}]") do |c2|
-                      c2 << "routing_args[#{k.inspect}] = Utils.unescape_uri(p)"
-                    end
-                  end
-                  b << "true"
-                end
-                c.else = MetaMethod::Block.new("false")
-              end
+              b = []
+              b << "if m = req.#{method}.match(#{condition.inspect})"
+              b << 'matches = m.captures' if route.named_captures[method].any?
+              b << 'p = nil' if route.named_captures[method].any?
+              b << route.named_captures[method].map { |k, j| "routing_args[#{k.inspect}] = Utils.unescape_uri(p) if p = matches[#{j}]" }.join('; ')
+              b << 'true'
+              b << 'end'
+              conditions << "(#{b.join('; ')})"
             end
+
+            body << <<-RUBY
+              if #{conditions.join(' && ')}
+                env[#{@parameters_key.inspect}] = routing_args
+                response = route.app.call(env)
+                return response unless response[0].to_i == 417
+              end
+            RUBY
           }
 
-          m << 'nil'
-          # puts "\n#{m.inspect}"
-          container.instance_eval(m, __FILE__, __LINE__)
+          container.instance_eval(<<-RUBY, __FILE__, __LINE__)
+            def optimized_each(req)
+              env = req.env
+              #{body.join("\n")}
+              nil
+            end
+          RUBY
         end
 
         def optimize_call!
-          method = MetaMethod.new(:call, :env)
-
-          method << 'begin'
-          method << 'set_expectation = env[EXPECT] != \'100-continue\''
-          method << 'env[EXPECT] = \'100-continue\' if set_expectation'
-
-          method << 'env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])'
-          method << "req = #{@request_class.name}.new(env)"
           cache = false
           keys = @recognition_keys.map { |key|
             if key.is_a?(Array)
@@ -75,17 +67,27 @@ module Rack::Mount
               "req.#{key}"
             end
           }.join(', ')
-          method << 'cache = {}' if cache
-          method << "container = @recognition_graph[#{keys}]"
-          method << 'optimize_container_iterator(container) unless container.respond_to?(:optimized_each)'
-          method << 'container.optimized_each(req) || (set_expectation ? [404, {\'Content-Type\' => \'text/html\'}, [\'Not Found\']] : [417, {\'Content-Type\' => \'text/html\'}, [\'Expectation failed\']])'
-          method << 'ensure'
-          method << 'env.delete(EXPECT) if set_expectation'
-          method << 'end'
 
-          # puts "\n#{method.inspect}"
-          class << self; undef :call; end
-          instance_eval(method, __FILE__, __LINE__)
+          instance_eval(<<-RUBY, __FILE__, __LINE__)
+            undef :call
+            def call(env)
+              set_expectation = env[EXPECT] != '100-continue'
+              env[EXPECT] = '100-continue' if set_expectation
+              env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])
+
+              req = #{@request_class.name}.new(env)
+              #{'cache = {}' if cache}
+
+              container = @recognition_graph[#{keys}]
+              optimize_container_iterator(container) unless container.respond_to?(:optimized_each)
+              container.optimized_each(req) ||
+                (set_expectation ?
+                  [404, {'Content-Type' => 'text/html'}, ['Not Found']] :
+                  [417, {'Content-Type' => 'text/html'}, ['Expectation failed']])
+            ensure
+              env.delete(EXPECT) if set_expectation
+            end
+          RUBY
         end
     end
   end
