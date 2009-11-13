@@ -21,7 +21,7 @@ The API is extremely minimal and only 3 methods are exposed as the public API.
     # add_route takes a rack application and conditions to match with
     # conditions may be strings or regexps
     # See Rack::Mount::RouteSet#add_route for more options.
-    set.add_route FooApp, :method => 'get' :path => %{/foo}
+    set.add_route FooApp, :method => 'get', :path => %{/foo}
   end
 
   # The route set itself is a simple rack app you mount
