@@ -1,4 +1,4 @@
-require 'rack/mount/prefix'
+require 'rack/mount/utils'
 
 module Rack::Mount
   module Recognition

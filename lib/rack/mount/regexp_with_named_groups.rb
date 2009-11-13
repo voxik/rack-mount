@@ -1,5 +1,3 @@
-require 'rack/mount/utils'
-
 module Rack::Mount
   begin
     eval('/(?<foo>.*)/').named_captures

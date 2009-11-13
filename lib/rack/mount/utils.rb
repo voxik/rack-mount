@@ -5,7 +5,6 @@ rescue LoadError
   require 'reginald'
 end
 
-require 'rack/mount/regexp_with_named_groups'
 require 'uri'
 
 module Rack::Mount

@@ -1,4 +1,3 @@
-require 'strscan'
 require 'rack/mount/strexp/parser'
 
 module Rack::Mount
@@ -28,7 +27,7 @@ module Rack::Mount
       requirements = requirements ? requirements.dup : {}
       normalize_requirements!(requirements, separators)
 
-      parser = Rack::Mount::StrexpParser.new
+      parser = StrexpParser.new
       parser.requirements = requirements
 
       begin
