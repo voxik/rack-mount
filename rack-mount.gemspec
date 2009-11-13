@@ -4,11 +4,9 @@ Gem::Specification.new do |s|
   s.date     = '2009-10-21'
   s.summary  = 'Stackable dynamic tree based Rack router'
   s.description = s.summary
-  s.email    = 'josh@joshpeek.com'
-  s.homepage = 'http://github.com/josh/rack-mount'
-  s.rubyforge_project = 'rack-mount'
-  s.has_rdoc = true
-  s.authors  = ['Joshua Peek']
+
+  s.add_dependency 'rack', '>= 1.0.0'
+
   s.files    = [
     'lib/rack/mount/analysis/frequency.rb',
     'lib/rack/mount/analysis/histogram.rb',
@@ -45,7 +43,11 @@ Gem::Specification.new do |s|
     'lib/rack/mount/vendor/reginald/reginald.rb',
     'lib/rack/mount.rb'
   ]
+
+  s.has_rdoc = true
   s.extra_rdoc_files = %w[README.rdoc LICENSE]
-  s.require_paths = %w[lib]
-  s.add_dependency 'rack', '>= 1.0.0'
+
+  s.author   = 'Joshua Peek'
+  s.email    = 'josh@joshpeek.com'
+  s.homepage = 'http://github.com/josh/rack-mount'
 end
