@@ -53,7 +53,8 @@ class Test::Unit::TestCase
 
     def assert_recognizes(params, path)
       req = Rack::Request.new(Rack::MockRequest.env_for(path))
-      assert_equal(params, @app.recognize(req))
+      _, actual_params = @app.recognize(req)
+      assert_equal(params, actual_params)
     end
 
     def get(path, options = {})

@@ -33,11 +33,11 @@ module Rack::Mount
           end
         }
         @recognition_graph[*keys].each do |route|
-          if result = route.recognize(obj)
+          if params = route.recognize(obj)
             if block_given?
-              yield result
+              yield route, params
             else
-              return result
+              return route, params
             end
           end
         end
@@ -62,19 +62,16 @@ module Rack::Mount
 
         env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])
 
-        cache = {}
         req = @request_class.new(env)
-        keys = @recognition_keys.map { |key|
-          if key.is_a?(Array)
-            key.call(cache, req)
-          else
-            req.send(key)
-          end
-        }
-        @recognition_graph[*keys].each do |route|
-          result = route.call(req)
+        recognize(req) do |route, params|
+          # TODO: We only want to unescape params from uri related methods
+          params.each { |k, v| params[k] = Utils.unescape_uri(v) if v.is_a?(String) }
+
+          env[@parameters_key] = params
+          result = route.app.call(env)
           return result unless result[0].to_i == 417
         end
+
         set_expectation ? [404, {'Content-Type' => 'text/html'}, ['Not Found']] : [417, {'Content-Type' => 'text/html'}, ['Expectation failed']]
       ensure
         env.delete(EXPECT) if set_expectation
