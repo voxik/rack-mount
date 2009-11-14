@@ -33,19 +33,18 @@ module Rack::Mount
       #   url(:controller => "people", :action => "show", :id => "1")
       #     # => "/people/1"
       def url(*args)
-        named_route, params, recall = extract_params!(*args)
+        named_route, params, recall, options = extract_params!(*args)
 
-        params = URISegment.wrap_values(params)
-        recall = URISegment.wrap_values(recall)
+        options[:parameterize] ||= lambda { |param| Utils.escape_uri(param) }
 
-        unless result = generate(:path_info, named_route, params, recall)
+        unless result = generate(:path_info, named_route, params, recall, options)
           return
         end
 
         uri, params = result
         params.each do |k, v|
-          if v._value
-            params[k] = v._value
+          if v
+            params[k] = v
           else
             params.delete(k)
           end
@@ -58,14 +57,14 @@ module Rack::Mount
       def generate(method, *args) #:nodoc:
         raise 'route set not finalized' unless @generation_graph
 
-        named_route, params, recall = extract_params!(*args)
+        named_route, params, recall, options = extract_params!(*args)
         merged = recall.merge(params)
         route = nil
 
         if named_route
           if route = @named_routes[named_route.to_sym]
             recall = route.defaults.merge(recall)
-            url = route.generate(method, params, recall)
+            url = route.generate(method, params, recall, options)
             [url, params]
           else
             raise RoutingError, "#{named_route} failed to generate from #{params.inspect}"
@@ -80,7 +79,7 @@ module Rack::Mount
           }
           @generation_graph[*keys].each do |r|
             next unless r.significant_params?
-            if url = r.generate(method, params, recall)
+            if url = r.generate(method, params, recall, options)
               return [url, params]
             end
           end
@@ -120,10 +119,16 @@ module Rack::Mount
 
         def extract_params!(*args)
           case args.length
+          when 4
+            named_route, params, recall, options = args
           when 3
-            named_route, params, recall = args
+            if args[0].is_a?(Hash)
+              params, recall, options = args
+            else
+              named_route, params, recall = args
+            end
           when 2
-            if args[0].is_a?(Hash) && args[1].is_a?(Hash)
+            if args[0].is_a?(Hash)
               params, recall = args
             else
               named_route, params = args
@@ -139,27 +144,11 @@ module Rack::Mount
           end
 
           named_route ||= nil
-          params ||= {}
-          recall ||= {}
+          params  ||= {}
+          recall  ||= {}
+          options ||= {}
 
-          [named_route, params.dup, recall.dup]
-        end
-
-        class URISegment < Struct.new(:_value)
-          def self.wrap_values(hash)
-            hash.inject({}) { |h, (k, v)| h[k] = new(v); h }
-          end
-
-          extend Forwardable
-          def_delegators :_value, :==, :eql?, :hash
-
-          def to_param
-            @to_param ||= begin
-              v = _value.respond_to?(:to_param) ? _value.to_param : _value
-              Utils.escape_uri(v)
-            end
-          end
-          alias_method :to_s, :to_param
+          [named_route, params.dup, recall.dup, options.dup]
         end
     end
   end

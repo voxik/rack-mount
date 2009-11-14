@@ -7,8 +7,6 @@ class TestGeneration < Test::Unit::TestCase
     assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
 
-  Person = Struct.new(:to_param)
-
   def test_url_with_named_route
     assert_equal '/login', @app.url(:login)
     assert_equal '/logout', @app.url(:logout)
@@ -16,7 +14,6 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/', @app.url(:root)
 
     assert_equal '/people/1', @app.url(:person, :id => '1')
-    assert_equal '/people/1', @app.url(:person, :id => Person.new('1'))
     assert_equal '/people/%231', @app.url(:person, :id => '#1')
     assert_equal '/people/number%20one', @app.url(:person, :id => 'number one')
 

@@ -36,9 +36,9 @@ module Rack::Mount
         segments.any?
       end
 
-      def generate(params = {}, recall = {}, defaults = {})
+      def generate(params = {}, recall = {}, defaults = {}, options = {})
         merged = recall.merge(params)
-        generate_from_segments(segments, params, merged, defaults)
+        generate_from_segments(segments, params, merged, defaults, options)
       end
 
       def segments
@@ -91,7 +91,7 @@ module Rack::Mount
 
         EMPTY_STRING = ''.freeze
 
-        def generate_from_segments(segments, params, merged, defaults, optional = false)
+        def generate_from_segments(segments, params, merged, defaults, options, optional = false)
           if optional
             return EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
             return EMPTY_STRING unless segments.flatten.any? { |s|
@@ -100,13 +100,10 @@ module Rack::Mount
             return EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
                 value = merged[segment.name] || defaults[segment.name]
-                value = value.to_param if value.respond_to?(:to_param)
+                value = parameterize(value, options)
 
-                merged_value = merged[segment.name]
-                merged_value = merged_value.to_param if merged_value.respond_to?(:to_param)
-
-                default_value = defaults[segment.name]
-                default_value = default_value.to_param if default_value.respond_to?(:to_param)
+                merged_value  = parameterize(merged[segment.name], options)
+                default_value = parameterize(defaults[segment.name], options)
 
                 if value.nil? || segment !~ value
                   true
@@ -126,14 +123,14 @@ module Rack::Mount
               segment
             when DynamicSegment
               value = params[segment.name] || merged[segment.name] || defaults[segment.name]
-              value = value.to_param if value.respond_to?(:to_param)
+              value = parameterize(value, options)
               if value && segment =~ value.to_s
                 value
               else
                 return
               end
             when Array
-              value = generate_from_segments(segment, params, merged, defaults, true)
+              value = generate_from_segments(segment, params, merged, defaults, options, true)
               if value == :clear_remaining_segments
                 segment.each { |s| params.delete(s.name) if s.is_a?(DynamicSegment) }
                 EMPTY_STRING
@@ -149,6 +146,15 @@ module Rack::Mount
           segments.each { |s| params.delete(s.name) if s.is_a?(DynamicSegment) }
 
           generated.join
+        end
+
+        def parameterize(value, options)
+          if block = options[:parameterize]
+            options[:_parameterize_cache] ||= {}
+            options[:_parameterize_cache][value] ||= block.call(value)
+          else
+            value
+          end
         end
     end
     include InstanceMethods
