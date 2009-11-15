@@ -95,7 +95,7 @@ module Rack::Mount
           if optional
             return EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
             return EMPTY_STRING unless segments.flatten.any? { |s|
-              params[s.name] if s.is_a?(DynamicSegment)
+              params.has_key?(s.name) if s.is_a?(DynamicSegment)
             }
             return EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
