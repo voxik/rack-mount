@@ -21,6 +21,12 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/global/hide_notice', @app.url(:hide_notice)
     assert_equal '/export/1/file.txt', @app.url(:export_download, :id => '1', :file => 'file.txt')
 
+    assert_equal '/pages/1/posts', @app.url(:page, :page_id => '1', :controller => 'posts')
+    assert_equal '/pages/1/posts/show', @app.url(:page, :page_id => '1', :controller => 'posts', :action => 'show')
+    assert_equal '/pages/1/posts/show/2', @app.url(:page, :page_id => '1', :controller => 'posts', :action => 'show', :id => '2')
+    assert_equal '/pages/1/posts/show/2.xml', @app.url(:page, :page_id => '1', :controller => 'posts', :action => 'show', :id => '2', :format => 'xml')
+    assert_equal nil, @app.url(:page, :page_id => '1')
+
     assert_equal '/regexp/bar/abc/123', @app.url(:complex_regexp, :action => 'abc', :id => '123')
     assert_equal nil, @app.url(:complex_regexp_fail)
 

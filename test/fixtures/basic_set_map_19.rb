@@ -82,7 +82,7 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(EchoApp, { :path_info => %r{^/files/(?<files>.*)$} }, { :controller => 'files', :action => 'index' })
 
-  set.add_route(EchoApp, :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
+  set.add_route(EchoApp, { :path_info => %r{^/pages/(?<page_id>[0-9]+)/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$} }, {}, :page)
   set.add_route(EchoApp, { :path_info => %r{^/params_with_defaults(/(?<controller>[a-z0-9]+))?$} }, { :params_with_defaults => true, :controller => 'foo' })
   set.add_route(EchoApp, :path_info => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :request_method => 'DELETE' }, { :controller => 'global', :action => 'destroy' })
