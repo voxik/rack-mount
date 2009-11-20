@@ -35,7 +35,7 @@ module Rack::Mount
       def url(*args)
         named_route, params, recall, options = extract_params!(*args)
 
-        options[:parameterize] ||= lambda { |param| Utils.escape_uri(param) }
+        options[:parameterize] ||= lambda { |name, value| Utils.escape_uri(value) }
 
         unless result = generate(:path_info, named_route, params, recall, options)
           return

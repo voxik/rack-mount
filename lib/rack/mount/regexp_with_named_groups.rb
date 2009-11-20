@@ -45,6 +45,8 @@ module Rack::Mount
         while scanner.skip_until(/\(/)
           if scanner.scan(/\?:<([^>]+)>/)
             @names << scanner[1]
+          elsif scanner.scan(/\?:/)
+            # ignore
           else
             @names << nil
           end

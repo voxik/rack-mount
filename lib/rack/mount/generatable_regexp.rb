@@ -95,15 +95,15 @@ module Rack::Mount
           if optional
             return EMPTY_STRING if segments.all? { |s| s.is_a?(String) }
             return EMPTY_STRING unless segments.flatten.any? { |s|
-              params[s.name] if s.is_a?(DynamicSegment)
+              params.has_key?(s.name) if s.is_a?(DynamicSegment)
             }
             return EMPTY_STRING if segments.any? { |segment|
               if segment.is_a?(DynamicSegment)
                 value = merged[segment.name] || defaults[segment.name]
-                value = parameterize(value, options)
+                value = parameterize(segment.name, value, options)
 
-                merged_value  = parameterize(merged[segment.name], options)
-                default_value = parameterize(defaults[segment.name], options)
+                merged_value  = parameterize(segment.name, merged[segment.name], options)
+                default_value = parameterize(segment.name, defaults[segment.name], options)
 
                 if value.nil? || segment !~ value
                   true
@@ -123,7 +123,7 @@ module Rack::Mount
               segment
             when DynamicSegment
               value = params[segment.name] || merged[segment.name] || defaults[segment.name]
-              value = parameterize(value, options)
+              value = parameterize(segment.name, value, options)
               if value && segment =~ value.to_s
                 value
               else
@@ -148,10 +148,9 @@ module Rack::Mount
           generated.join
         end
 
-        def parameterize(value, options)
+        def parameterize(name, value, options)
           if block = options[:parameterize]
-            options[:_parameterize_cache] ||= {}
-            options[:_parameterize_cache][value] ||= block.call(value)
+            block.call(name, value)
           else
             value
           end
