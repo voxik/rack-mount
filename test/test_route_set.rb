@@ -72,7 +72,7 @@ class TestRouteSet < Test::Unit::TestCase
     # This will probably change wildly, but still an interesting
     # statistic to track
     assert_equal 4, @app.instance_variable_get('@recognition_graph').average_height.to_i
-    assert_equal 5, @app.instance_variable_get('@generation_graph').average_height.to_i
+    assert_equal 6, @app.instance_variable_get('@generation_graph').average_height.to_i
   end
 end
 

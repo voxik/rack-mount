@@ -73,6 +73,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/regexp/bar/(?<action>[a-z]+)/(?<id>[0-9]+)$} }, { :controller => 'foo' }, :complex_regexp)
   set.add_route(EchoApp, { :path_info => %r{^/regexp/baz/[a-z]+/[0-9]+$} }, { :controller => 'foo' }, :complex_regexp_fail)
   set.add_route(EchoApp, { :path_info => %r{^/escaped/\(foo\)$} }, { :controller => 'escaped/foo' }, :escaped_optional_capture)
+  set.add_route(EchoApp, { :path_info => %r{^/ignorecase/(?<name>(?i-mx:josh))$} }, { :controller => 'ignorecase' }, :ignore)
   set.add_route(EchoApp, { :path_info => %r{^/ignorecase/foo$}i }, { :controller => 'ignorecase' })
   set.add_route(EchoApp, { :path_info => (/^\/extended\/ # comment
                                             foo # bar

@@ -21,6 +21,8 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/global/hide_notice', @app.url(:hide_notice)
     assert_equal '/export/1/file.txt', @app.url(:export_download, :id => '1', :file => 'file.txt')
 
+    assert_equal '/ignorecase/josh', @app.url(:ignore, :name => 'josh')
+
     assert_equal '/regexp/bar/abc/123', @app.url(:complex_regexp, :action => 'abc', :id => '123')
     assert_equal nil, @app.url(:complex_regexp_fail)
 
