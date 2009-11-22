@@ -1,6 +1,21 @@
 module Reginald
-  class CharacterClass < Struct.new(:value)
-    attr_accessor :negate, :quantifier
+  class CharacterClass < Character
+    ALNUM = new(':alnum:').freeze
+    ALPHA = new(':alpha:').freeze
+    ASCII = new(':ascii:').freeze
+    BLANK = new(':blank:').freeze
+    CNTRL = new(':cntrl:').freeze
+    DIGIT = new(':digit:').freeze
+    GRAPH = new(':graph:').freeze
+    LOWER = new(':lower:').freeze
+    PRINT = new(':print:').freeze
+    PUNCT = new(':punct:').freeze
+    SPACE = new(':space:').freeze
+    UPPER = new(':upper:').freeze
+    WORD = new(':word:').freeze
+    XDIGIT = new(':xdigit:').freeze
+
+    attr_accessor :negate
 
     def negated?
       negate ? true : false
@@ -11,23 +26,11 @@ module Reginald
     end
 
     def to_s
-      if value == '.' || value == '\d'
-        "#{value}#{quantifier}"
+      if value == '.' || value =~ /^\\[dDsSwW]$/
+        super
       else
         "[#{negate && '^'}#{value}]#{quantifier}"
       end
-    end
-
-    def to_regexp
-      Regexp.compile("\\A#{to_s}\\Z")
-    end
-
-    def inspect
-      to_s.inspect
-    end
-
-    def match(char)
-      to_regexp.match(char)
     end
 
     def include?(char)
@@ -35,26 +38,14 @@ module Reginald
       Regexp.compile("\\A#{re}\\Z").match(char)
     end
 
-    def ==(other)
-      case other
-      when String
-        other == to_s
-      else
-        eql?(other)
-      end
-    end
-
     def eql?(other)
       other.is_a?(self.class) &&
-        self.value == other.value &&
-        self.negate == other.negate &&
-        self.quantifier == other.quantifier
+        negate == other.negate &&
+        super
     end
 
     def freeze
-      value.freeze
       negate.freeze
-      quantifier.freeze
       super
     end
   end

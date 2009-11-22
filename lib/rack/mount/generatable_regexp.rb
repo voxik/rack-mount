@@ -68,10 +68,12 @@ module Rack::Mount
             when Reginald::Anchor
               # ignore
             when Reginald::Character
+              throw :halt unless part.literal?
+
               if s.last.is_a?(String)
-                s.last << part.dup
+                s.last << part.value.dup
               else
-                s << part.dup
+                s << part.value.dup
               end
             when Reginald::Group
               if part.name
