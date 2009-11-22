@@ -116,29 +116,30 @@ class TestAnalyzer < Test::Unit::TestCase
       {:controller => 'people', :action => 'show'},
       {:controller => 'posts', :action => 'index'}
     )
+
+    assert_report(:best,
+      {:foo => 'bar'},
+      {:foo => 'bar'}
+    )
+
+    assert_report(:best,
+      {:foo => 'bar'},
+      {:foo => 'bar'},
+      {:foo => 'bar'},
+      {:foo => 'bar'},
+      {:foo => 'bar'}
+    )
+
+    assert_report(:best,
+      {:controller => 'people'},
+      {:controller => 'people', :action => 'show'},
+      {:controller => 'posts', :action => 'show'}
+    )
   end
 
   # TODO: Try to improve the analyzer so we can promote these
   # test cases to "best"
   def test_reports_are_better
-    assert_report(:better,
-      {:foo => 'bar'},
-      {:foo => 'bar'}
-    )
-
-    assert_report(:better,
-      {:foo => 'bar'},
-      {:foo => 'bar'},
-      {:foo => 'bar'},
-      {:foo => 'bar'},
-      {:foo => 'bar'}
-    )
-
-    assert_report(:better,
-      {:controller => 'people'},
-      {:controller => 'people', :action => 'show'},
-      {:controller => 'posts', :action => 'show'}
-    )
   end
 
   # TODO: Try to improve the analyzer so we can promote these
