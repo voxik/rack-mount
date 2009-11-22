@@ -126,7 +126,7 @@ module Rack::Mount
       end
 
       expression
-    rescue Racc::ParseError
+    rescue Racc::ParseError, Reginald::Parser::ScanError
       []
     end
     module_function :parse_regexp
