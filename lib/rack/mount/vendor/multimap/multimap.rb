@@ -164,7 +164,7 @@ class Multimap < Hash
   # Ignore alias_method since the definition above serves
   # as its documentation.
   #++
-  undef :each_association
+  remove_method :each_association
   module_eval "alias_method :each_association, :each_pair"
 
   # call-seq:
