@@ -63,20 +63,20 @@ module Rack::Mount
               if index > 0
                 previous = parts[index-1]
                 if previous.literal?
-                  boundaries << previous.value
+                  boundaries << previous.to_s
                 end
               end
 
               if inside = part[0][0]
                 if inside.literal?
-                  boundaries << inside.value
+                  boundaries << inside.to_s
                 end
               end
 
               if index < parts.length
                 following = parts[index+1]
                 if following.literal?
-                  boundaries << following.value
+                  boundaries << following.to_s
                 end
               end
             end
