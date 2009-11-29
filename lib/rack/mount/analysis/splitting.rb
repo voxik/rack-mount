@@ -62,20 +62,20 @@ module Rack::Mount
             if part.is_a?(Reginald::Group)
               if index > 0
                 previous = parts[index-1]
-                if previous.literal?
+                if previous.is_a?(Reginald::Character) && previous.literal?
                   boundaries << previous.to_s
                 end
               end
 
               if inside = part[0][0]
-                if inside.literal?
+                if inside.is_a?(Reginald::Character) && inside.literal?
                   boundaries << inside.to_s
                 end
               end
 
               if index < parts.length
                 following = parts[index+1]
-                if following.literal?
+                if following.is_a?(Reginald::Character) && following.literal?
                   boundaries << following.to_s
                 end
               end
