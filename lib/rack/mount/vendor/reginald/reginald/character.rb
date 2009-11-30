@@ -1,26 +1,17 @@
 module Reginald
-  class Character < String
+  class Character < Atom
     attr_accessor :quantifier
-
-    def initialize(char)
-      raise ArgumentError if char.length != 1
-      super
-    end
 
     def literal?
       quantifier.nil?
     end
 
     def to_s
-      "#{super}#{quantifier}"
+      "#{value}#{quantifier}"
     end
 
     def to_regexp
       Regexp.compile("\\A#{to_s}\\Z")
-    end
-
-    def inspect
-      to_s.inspect
     end
 
     def match(char)
@@ -28,7 +19,7 @@ module Reginald
     end
 
     def include?(char)
-      to_str == char
+      value == char
     end
 
     def ==(other)
@@ -41,8 +32,9 @@ module Reginald
     end
 
     def eql?(other)
-      other.is_a?(self.class) && super &&
-        self.quantifier == other.quantifier
+      other.is_a?(self.class) &&
+        value.eql?(other.value) &&
+        quantifier.eql?(other.quantifier)
     end
 
     def freeze

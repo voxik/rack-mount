@@ -12,8 +12,9 @@ module Rack::Mount
 
       private
         def expire!
+          remove_metaclass_method :recognize
+
           class << self
-            undef :recognize
             alias_method :recognize, :_expired_recognize
           end
 
@@ -63,8 +64,9 @@ module Rack::Mount
             end
           }.join(', ')
 
+          remove_metaclass_method :recognize
+
           instance_eval(<<-RUBY, __FILE__, __LINE__)
-            undef :recognize
             def recognize(obj, &block)
               cache = {}
               container = @recognition_graph[#{keys}]
@@ -83,6 +85,16 @@ module Rack::Mount
               nil
             end
           RUBY
+        end
+
+        # method_defined? can't distinguish between instance
+        # and meta methods. So we have to rescue if the method
+        # has not been defined in the metaclass yet.
+        def remove_metaclass_method(symbol)
+          metaclass = class << self; self; end
+          metaclass.send(:remove_method, symbol)
+        rescue NameError => e
+          nil
         end
     end
   end

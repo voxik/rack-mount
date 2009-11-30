@@ -37,10 +37,10 @@ module Rack::Mount
       if key.is_a?(Regexp)
         @fuzz[value] = key
         if keys.empty?
-          hash_each_pair { |k, l| l << value if k =~ key }
+          @hash.each_pair { |k, l| l << value if k =~ key }
           self.default << value
         else
-          hash_each_pair { |k, _|
+          @hash.each_pair { |k, _|
             if k =~ key
               args[0] = k
               super(*args)

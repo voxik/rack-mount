@@ -132,6 +132,25 @@ class TestMultimap < Test::Unit::TestCase
     assert_equal 3, set.height
   end
 
+  def test_default_bucket_is_cleared_and_copied
+    set[] = 'a'
+    set['b'] = 'b'
+    set['b', 'c'] = 'bc'
+    set['c', /d/, 'e'] = 'cde'
+    set[/c/, 'd', 'e'] = 'ce'
+
+    assert_equal ['a'], set['a']
+    assert_equal ['a', 'b'], set['b']
+    assert_equal ['a'], set['c']
+    assert_equal ['a', 'b', 'bc'], set['b', 'c']
+    assert_equal ['a', 'b'], set['b', 'd']
+    assert_equal ['a'], set['c', 'd']
+    assert_equal ['a', 'cde', 'ce'], set['c', 'd', 'e']
+
+    assert_equal 9, set.containers_with_default.length
+    assert_equal 3, set.height
+  end
+
   private
     def set
       @set ||= Rack::Mount::Multimap.new

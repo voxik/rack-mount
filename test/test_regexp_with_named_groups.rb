@@ -29,7 +29,14 @@ unless supports_named_captures?
       regexp = RegexpWithNamedGroups.new(/(?:<foo>bar|baz)/)
       assert_equal(/(bar|baz)/, regexp)
       assert_equal(['foo'], regexp.names)
-      assert_equal({ 'foo' => [1]}, regexp.named_captures)
+      assert_equal({'foo' => [1]}, regexp.named_captures)
+    end
+
+    def test_regexp_with_non_captures
+      regexp = RegexpWithNamedGroups.new(/(?:foo)(?:<bar>baz)/)
+      assert_equal(/(?:foo)(baz)/, regexp)
+      assert_equal(['bar'], regexp.names)
+      assert_equal({'bar' => [1]}, regexp.named_captures)
     end
 
     def test_ignores_noncapture_indexes

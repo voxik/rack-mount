@@ -62,21 +62,21 @@ module Rack::Mount
             if part.is_a?(Reginald::Group)
               if index > 0
                 previous = parts[index-1]
-                if previous.is_a?(Reginald::Character)
-                  boundaries << previous.to_str
+                if previous.is_a?(Reginald::Character) && previous.literal?
+                  boundaries << previous.to_s
                 end
               end
 
               if inside = part[0][0]
-                if inside.is_a?(Reginald::Character)
-                  boundaries << inside.to_str
+                if inside.is_a?(Reginald::Character) && inside.literal?
+                  boundaries << inside.to_s
                 end
               end
 
               if index < parts.length
                 following = parts[index+1]
-                if following.is_a?(Reginald::Character)
-                  boundaries << following.to_str
+                if following.is_a?(Reginald::Character) && following.literal?
+                  boundaries << following.to_s
                 end
               end
             end
@@ -99,11 +99,15 @@ module Rack::Mount
                 buf = nil
                 break
               end
+            when Reginald::CharacterClass
+              break if separators.any? { |s| part.include?(s) }
+              buf = nil
+              segments << part.to_regexp
             when Reginald::Character
               if separators.any? { |s| part.include?(s) }
                 segments << join_buffer(buf, regexp) if buf
                 peek = parts[index+1]
-                if peek.is_a?(Reginald::Character) && separators.include?(peek)
+                if peek.is_a?(Reginald::Character) && separators.include?(peek.value)
                   segments << ''
                 end
                 buf = nil
@@ -126,10 +130,6 @@ module Rack::Mount
               else
                 break
               end
-            when Reginald::CharacterClass
-              break if separators.any? { |s| part.include?(s) }
-              buf = nil
-              segments << part.to_regexp
             else
               break
             end

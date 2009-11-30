@@ -36,7 +36,7 @@ module Rack::Mount
       end
       @app = app
 
-      @name = name.to_sym if name
+      @name = name ? name.to_sym : nil
       @defaults = (defaults || {}).freeze
 
       unless conditions.is_a?(Hash)

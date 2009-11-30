@@ -1,22 +1,13 @@
+require 'forwardable'
 require 'multiset'
 
 # Multimap is a generalization of a map or associative array
 # abstract data type in which more than one value may be associated
 # with and returned for a given key.
-class Multimap < Hash
-  #--
-  # Ignore protected aliases back to the original Hash methods
-  #++
-  module_eval %{
-    alias_method :hash_aref, :[]
-    protected :hash_aref
+class Multimap
+  extend Forwardable
 
-    alias_method :hash_aset, :[]=
-    protected :hash_aset
-
-    alias_method :hash_each_pair, :each_pair
-    protected :hash_each_pair
-  }
+  include Enumerable
 
   # call-seq:
   #   Multimap[ [key =>|, value]* ]   => multimap
@@ -53,7 +44,8 @@ class Multimap < Hash
       }
     end
 
-    map = super
+    map = new
+    map.instance_variable_set(:@hash, Hash[*args])
     map.default = default
     map
   end
@@ -70,20 +62,24 @@ class Multimap < Hash
   #   h["a"]           #=> [100].to_set
   #   h["c"]           #=> [].to_set
   def initialize(default = [])
-    super
+    @hash = Hash.new(default)
   end
 
   def initialize_copy(original) #:nodoc:
-    super
-    clear
-    original.each_pair { |key, container| self[key] = container }
-    self.default = original.default.dup
+    @hash = Hash.new(original.default.dup)
+    original._internal_hash.each_pair do |key, container|
+      @hash[key] = container.dup
+    end
   end
 
-  #--
-  # Setting a default proc is not supported
-  #++
-  undef :default_proc
+  def_delegators :@hash, :clear, :default, :default=, :empty?,
+                         :fetch, :has_key?, :key?
+
+  # Retrieves the <i>value</i> object corresponding to the
+  # <i>*keys</i> object.
+  def [](key)
+    @hash[key]
+  end
 
   # call-seq:
   #   map[key] = value        => value
@@ -118,9 +114,9 @@ class Multimap < Hash
   #   map.delete("a")      #=> [100]
   def delete(key, value = nil)
     if value
-      hash_aref(key).delete(value)
+      @hash[key].delete(value)
     else
-      super(key)
+      @hash.delete(key)
     end
   end
 
@@ -157,15 +153,9 @@ class Multimap < Hash
   #
   #   a is [100]
   #   b is [200, 300]
-  def each_association
-    # each_pair
+  def each_association(&block)
+    @hash.each_pair(&block)
   end
-  #--
-  # Ignore alias_method since the definition above serves
-  # as its documentation.
-  #++
-  undef :each_association
-  module_eval "alias_method :each_association, :each_pair"
 
   # call-seq:
   #   map.each_container { |container| block } => map
@@ -248,6 +238,24 @@ class Multimap < Hash
     end
   end
 
+  def ==(other) #:nodoc:
+    case other
+    when Multimap
+      @hash == other._internal_hash
+    else
+      @hash == other
+    end
+  end
+
+  def eql?(other) #:nodoc:
+    case other
+    when Multimap
+      @hash.eql?(other._internal_hash)
+    else
+      @hash.eql?(other)
+    end
+  end
+
   def freeze #:nodoc:
     each_container { |container| container.freeze }
     default.freeze
@@ -283,6 +291,21 @@ class Multimap < Hash
     invert[value]
   end
 
+  def delete_if(&block) #:nodoc:
+    @hash.delete_if(&block)
+    self
+  end
+
+  def reject(&block) #:nodoc:
+    dup.delete_if(&block)
+  end
+
+  def reject!(&block) #:nodoc:
+    old_size = size
+    delete_if(&block)
+    old_size == size ? nil : self
+  end
+
   # call-seq:
   #   map.replace(other_map) => map
   #
@@ -295,11 +318,11 @@ class Multimap < Hash
   def replace(other)
     case other
     when Array
-      super(self.class[self.default, *other])
+      @hash.replace(self.class[self.default, *other])
     when Hash
-      super(self.class[self.default, other])
+      @hash.replace(self.class[self.default, other])
     when self.class
-      super
+      @hash.replace(other)
     else
       raise ArgumentError
     end
@@ -332,6 +355,12 @@ class Multimap < Hash
     each_key { |key| keys << key }
     keys
   end
+
+  # Returns true if the given key is present in Multimap.
+  def include?(key)
+    keys.include?(key)
+  end
+  alias_method :member?, :include?
 
   # call-seq:
   #   map.length    =>  fixnum
@@ -426,7 +455,7 @@ class Multimap < Hash
   #   map = Multimap["a" => 100, "b" => [200, 300]]
   #   map.to_hash   #=> { "a" => [100], "b" => [200, 300] }
   def to_hash
-    dup
+    @hash.dup
   end
 
   # call-seq:
@@ -457,11 +486,20 @@ class Multimap < Hash
     values
   end
 
+  # Return an array containing the values associated with the given keys.
+  def values_at(*keys)
+    @hash.values_at(*keys)
+  end
+
   protected
+    def _internal_hash #:nodoc:
+      @hash
+    end
+
     def update_container(key) #:nodoc:
-      container = hash_aref(key)
+      container = @hash[key]
       container = container.dup if container.equal?(default)
       container = yield(container)
-      hash_aset(key, container)
+      @hash[key] = container
     end
 end

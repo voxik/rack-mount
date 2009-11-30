@@ -336,6 +336,11 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'extended' }, routing_args)
   end
 
+  def test_static_group
+    get '/static_group/foobar'
+    assert_success
+  end
+
   def test_uri_escaping
     get '/uri_escaping/foo'
     assert_success

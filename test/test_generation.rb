@@ -27,6 +27,8 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/pages/1/posts/show/2.xml', @app.url(:page, :page_id => '1', :controller => 'posts', :action => 'show', :id => '2', :format => 'xml')
     assert_equal nil, @app.url(:page, :page_id => '1')
 
+    assert_equal '/ignorecase/josh', @app.url(:ignore, :name => 'josh')
+
     assert_equal '/regexp/bar/abc/123', @app.url(:complex_regexp, :action => 'abc', :id => '123')
     assert_equal nil, @app.url(:complex_regexp_fail)
 
