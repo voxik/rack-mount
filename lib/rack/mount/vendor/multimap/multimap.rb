@@ -291,16 +291,43 @@ class Multimap
     invert[value]
   end
 
-  def delete_if(&block) #:nodoc:
-    @hash.delete_if(&block)
+  # call-seq:
+  #   map.delete_if {| key, value | block }  -> map
+  #
+  # Deletes every key-value pair from <i>map</i> for which <i>block</i>
+  # evaluates to <code>true</code>.
+  #
+  #   map = Multimap["a" => 100, "b" => [200, 300]]
+  #   map.delete_if {|key, value| value >= 300 }
+  #     #=> Multimap["a" => 100, "b" => 200]
+  #
+  def delete_if
+    each_association do |key, container|
+      container.delete_if do |value|
+        yield [key, value]
+      end
+    end
     self
   end
 
-  def reject(&block) #:nodoc:
+  # call-seq:
+  #   map.reject {| key, value | block }  -> map
+  #
+  # Same as <code>Multimap#delete_if</code>, but works on (and returns) a
+  # copy of the <i>map</i>. Equivalent to
+  # <code><i>map</i>.dup.delete_if</code>.
+  #
+  def reject(&block)
     dup.delete_if(&block)
   end
 
-  def reject!(&block) #:nodoc:
+  # call-seq:
+  #   map.reject! {| key, value | block }  -> map or nil
+  #
+  # Equivalent to <code>Multimap#delete_if</code>, but returns
+  # <code>nil</code> if no changes were made.
+  #
+  def reject!(&block)
     old_size = size
     delete_if(&block)
     old_size == size ? nil : self
