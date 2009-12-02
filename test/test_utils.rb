@@ -23,9 +23,9 @@ class TestUtils < Test::Unit::TestCase
     assert_equal 'foo=1&bar=2', build_nested_query('foo' => '1', 'bar' => '2')
     assert_equal 'my+weird+field=q1%212%22%27w%245%267%2Fz8%29%3F',
       build_nested_query('my weird field' => 'q1!2"\'w$5&7/z8)?')
-    assert_equal 'foo%5B%5D', build_nested_query('foo' => [nil])
-    assert_equal 'foo%5B%5D=', build_nested_query('foo' => [''])
-    assert_equal 'foo%5B%5D=bar', build_nested_query('foo' => ['bar'])
+    assert_equal 'foo[]', build_nested_query('foo' => [nil])
+    assert_equal 'foo[]=', build_nested_query('foo' => [''])
+    assert_equal 'foo[]=bar', build_nested_query('foo' => ['bar'])
   end
 
   def test_normalize_extended_expression

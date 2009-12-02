@@ -77,19 +77,13 @@ module Rack::Mount
         }.join("&")
       when Hash
         value.map { |k, v|
-          build_nested_query(v, prefix ? "#{prefix}[#{k}]" : k)
+          build_nested_query(v, prefix ? "#{prefix}[#{Rack::Utils.escape(k)}]" : Rack::Utils.escape(k))
         }.join("&")
       when String
         raise ArgumentError, "value must be a Hash" if prefix.nil?
-        "#{Rack::Utils.escape(prefix)}=#{Rack::Utils.escape(value)}"
-      when NilClass
-        Rack::Utils.escape(prefix)
+        "#{prefix}=#{Rack::Utils.escape(value)}"
       else
-        if value.respond_to?(:to_param)
-          build_nested_query(value.to_param.to_s, prefix)
-        else
-          Rack::Utils.escape(prefix)
-        end
+        prefix
       end
     end
     module_function :build_nested_query
