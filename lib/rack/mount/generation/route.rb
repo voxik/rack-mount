@@ -8,25 +8,18 @@ module Rack::Mount
       def initialize(*args)
         super
 
-        required_params = {}
-        required_defaults = {}
+        # TODO: build this from conditional helpers
         @generation_keys = @defaults.dup
-
         @conditions.each do |method, condition|
-          # TODO: don't track required_params
-          required_params[method] = @conditions[method].required_params
-
-          # TODO: don't track required_defaults
-          required_defaults[method] = @defaults.dup
           @conditions[method].captures.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
-            required_defaults[method].delete(name)
             @generation_keys.delete(name) if @defaults.include?(name)
           }
-          required_defaults[method]
         end
-        @has_significant_params = (required_params.any? { |k, v| v.any? } || required_defaults.any? { |k, v| v.any? }) ? true : false
-
         @generation_keys.freeze
+
+        @has_significant_params = @conditions.any? { |method, condition|
+          condition.required_params.any? || condition.required_defaults.any?
+        }
       end
 
       def significant_params?
