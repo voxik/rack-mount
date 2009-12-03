@@ -17,8 +17,8 @@ class TestGeneratableRegexp < Test::Unit::TestCase
   end
 
   def test_without_capture_is_ungeneratable
-    # regexp = GeneratableRegexp.compile(%r{^GET|POST$})
-    # assert !regexp.generatable?
+    regexp = GeneratableRegexp.compile(%r{^GET|POST$})
+    assert !regexp.generatable?
 
     regexp = GeneratableRegexp.compile(%r{^.*$})
     assert !regexp.generatable?
