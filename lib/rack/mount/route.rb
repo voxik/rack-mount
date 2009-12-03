@@ -54,8 +54,11 @@ module Rack::Mount
 
         pattern = Regexp.compile("\\A#{Regexp.escape(pattern)}\\Z") if pattern.is_a?(String)
         pattern = Utils.normalize_extended_expression(pattern)
+
         pattern = RegexpWithNamedGroups.new(pattern)
         pattern.extend(GeneratableRegexp::InstanceMethods)
+        pattern.defaults = @defaults
+
         @conditions[method] = pattern.freeze
       end
 

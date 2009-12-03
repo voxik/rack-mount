@@ -34,9 +34,9 @@ module Rack::Mount
 
       def generate(methods, params = {}, recall = {}, options = {})
         if methods.is_a?(Array)
-          result = methods.map { |m| generate_method(m, params, recall, @defaults, options) || (return nil) }
+          result = methods.map { |m| generate_method(m, params, recall, options) || (return nil) }
         else
-          result = generate_method(methods, params, recall, @defaults, options)
+          result = generate_method(methods, params, recall, options)
         end
 
         if result
@@ -49,13 +49,13 @@ module Rack::Mount
       end
 
       private
-        def generate_method(method, params, recall, defaults, options)
+        def generate_method(method, params, recall, options)
           merged = recall.merge(params)
           return nil unless condition = @conditions[method]
           return nil if condition.segments.empty?
           return nil unless @required_params[method].all? { |p| merged.include?(p) }
           return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
-          condition.generate(params, recall, defaults, options)
+          condition.generate(params, recall, options)
         end
     end
   end
