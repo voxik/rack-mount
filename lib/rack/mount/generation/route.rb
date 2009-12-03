@@ -3,22 +3,17 @@ require 'rack/mount/utils'
 module Rack::Mount
   module Generation
     module Route #:nodoc:
-      attr_reader :generation_keys
-
       def initialize(*args)
         super
 
-        # TODO: build this from conditional helpers
-        @generation_keys = @defaults.dup
-        @conditions.each do |method, condition|
-          @conditions[method].captures.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
-            @generation_keys.delete(name) if @defaults.include?(name)
-          }
-        end
-        @generation_keys.freeze
-
         @has_significant_params = @conditions.any? { |method, condition|
           condition.required_params.any? || condition.required_defaults.any?
+        }
+      end
+
+      def generation_keys
+        @conditions.inject({}) { |keys, (method, condition)|
+          keys.merge!(condition.required_defaults)
         }
       end
 
