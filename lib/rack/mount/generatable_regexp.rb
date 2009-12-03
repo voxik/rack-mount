@@ -35,6 +35,7 @@ module Rack::Mount
       def defaults=(defaults)
         @required_captures = nil
         @required_params = nil
+        @required_defaults = nil
         @defaults = defaults
       end
 
@@ -51,6 +52,7 @@ module Rack::Mount
 
         merged = recall.merge(params)
         return nil unless required_params.all? { |p| merged.include?(p) }
+        return nil unless required_defaults.all? { |k, v| merged[k] == v }
 
         generate_from_segments(segments, params, merged, options)
       end
@@ -81,11 +83,22 @@ module Rack::Mount
         @required_params ||= required_captures.map { |s| s.name }.freeze
       end
 
+      def required_defaults
+        @required_defaults ||= begin
+          required_defaults = @defaults.dup
+          captures.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
+            required_defaults.delete(name)
+          }
+          required_defaults
+        end
+      end
+
       def freeze
         segments
         captures
         required_captures
         required_params
+        required_defaults
         super
       end
 

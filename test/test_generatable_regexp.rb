@@ -121,6 +121,7 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     assert_equal(['/foo/bar', ['.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})]], regexp.segments)
     assert_equal [DynamicSegment.new(:format, %r{\A[a-z]+\Z})], regexp.captures
     assert_equal [], regexp.required_captures
+    assert_equal({}, regexp.required_defaults)
 
     assert_equal '/foo/bar.xml', regexp.generate(:format => 'xml')
     assert_equal '/foo/bar', regexp.generate
@@ -136,10 +137,25 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     assert_equal(['/foo/bar.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})], regexp.segments)
     assert_equal [DynamicSegment.new(:format, %r{\A[a-z]+\Z})], regexp.captures
     assert_equal [], regexp.required_captures
+    assert_equal({}, regexp.required_defaults)
 
     assert_equal '/foo/bar.json', regexp.generate(:format => 'json')
     assert_equal '/foo/bar.xml', regexp.generate(:format => 'xml')
     assert_equal '/foo/bar.xml', regexp.generate
+  end
+
+  def test_capture_with_required_default
+    regexp = GeneratableRegexp.compile(%r{^/foo$})
+    regexp.defaults[:controller] = 'foo'
+    regexp.defaults[:action] = 'index'
+
+    assert_equal(['/foo'], regexp.segments)
+    assert_equal [], regexp.captures
+    assert_equal [], regexp.required_captures
+    assert_equal({:controller => 'foo', :action => 'index'}, regexp.required_defaults)
+
+    assert_equal nil, regexp.generate
+    assert_equal '/foo', regexp.generate(:controller => 'foo', :action => 'index')
   end
 
   def test_multiple_optional_captures
