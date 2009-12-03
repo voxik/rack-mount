@@ -26,7 +26,7 @@ end
 Object.extend(ControllerConstants)
 
 def supports_named_captures?
-  Rack::Mount::RegexpWithNamedGroups.supports_named_captures?
+  Reginald.regexp_supports_named_captures?
 end
 
 class Test::Unit::TestCase

@@ -23,7 +23,7 @@ require 'rack/mount/strexp/tokenizer'
 
 ---- inner
 
-if RegexpWithNamedGroups.supports_named_captures?
+if Reginald.regexp_supports_named_captures?
   REGEXP_NAMED_CAPTURE = '(?<%s>%s)'.freeze
 else
   REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze

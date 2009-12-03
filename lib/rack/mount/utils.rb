@@ -105,7 +105,7 @@ module Rack::Mount
 
       expression = Reginald.parse(regexp)
 
-      unless RegexpWithNamedGroups.supports_named_captures?
+      unless Reginald.regexp_supports_named_captures?
         tag_captures = Proc.new do |group|
           group.each do |child|
             if child.is_a?(Reginald::Group)
