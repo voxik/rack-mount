@@ -92,9 +92,9 @@ class TestGeneration < Test::Unit::TestCase
   def test_uri_escaping
     assert_equal '/uri_escaping/foo', @app.url(:controller => 'uri_escaping', :value => 'foo')
     assert_equal '/uri_escaping/foo%20bar', @app.url(:controller => 'uri_escaping', :value => 'foo bar')
-    # assert_equal '/uri_escaping/foo%20bar', @app.url(:controller => 'uri_escaping', :value => 'foo%20bar')
+    assert_equal '/uri_escaping/foo%20bar', @app.url(:controller => 'uri_escaping', :value => 'foo%20bar')
     assert_equal '/uri_escaping/%E2%88%9E', @app.url(:controller => 'uri_escaping', :value => '∞')
-    # assert_equal '/uri_escaping/%E2%88%9E', @app.url(:controller => 'uri_escaping', :value => '%E2%88%9E')
+    assert_equal '/uri_escaping/%E2%88%9E', @app.url(:controller => 'uri_escaping', :value => '%E2%88%9E')
   end
 end
 
