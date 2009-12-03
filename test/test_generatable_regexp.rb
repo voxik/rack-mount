@@ -126,6 +126,22 @@ class TestGeneratableRegexp < Test::Unit::TestCase
     assert_equal '/foo/bar', regexp.generate
   end
 
+  def test_capture_with_default
+    if supports_named_captures?
+      regexp = GeneratableRegexp.compile(eval('%r{^/foo/bar\.(?<format>[a-z]+)$}'))
+    else
+      regexp = GeneratableRegexp.compile(%r{^/foo/bar\.(?:<format>[a-z]+)$})
+    end
+    regexp.defaults[:format] = 'xml'
+    assert_equal(['/foo/bar.', DynamicSegment.new(:format, %r{\A[a-z]+\Z})], regexp.segments)
+    assert_equal [DynamicSegment.new(:format, %r{\A[a-z]+\Z})], regexp.captures
+    assert_equal [], regexp.required_captures
+
+    assert_equal '/foo/bar.json', regexp.generate(:format => 'json')
+    assert_equal '/foo/bar.xml', regexp.generate(:format => 'xml')
+    assert_equal '/foo/bar.xml', regexp.generate
+  end
+
   def test_multiple_optional_captures
     if supports_named_captures?
       regexp = GeneratableRegexp.compile(eval('%r{^/(?<foo>[a-z]+)(/(?<bar>[a-z]+))?(/(?<baz>[a-z]+))?$}'))

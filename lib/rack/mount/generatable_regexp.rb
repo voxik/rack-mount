@@ -33,6 +33,8 @@ module Rack::Mount
       end
 
       def defaults=(defaults)
+        @required_captures = nil
+        @required_params = nil
         @defaults = defaults
       end
 
@@ -45,7 +47,11 @@ module Rack::Mount
       end
 
       def generate(params = {}, recall = {}, options = {})
+        return nil unless generatable?
+
         merged = recall.merge(params)
+        return nil unless required_params.all? { |p| merged.include?(p) }
+
         generate_from_segments(segments, params, merged, options)
       end
 
@@ -66,7 +72,21 @@ module Rack::Mount
       end
 
       def required_captures
-        segments.find_all { |s| s.is_a?(DynamicSegment) }
+        @required_captures ||= segments.find_all { |s|
+          s.is_a?(DynamicSegment) && !@defaults.include?(s.name)
+        }.freeze
+      end
+
+      def required_params
+        @required_params ||= required_captures.map { |s| s.name }.freeze
+      end
+
+      def freeze
+        segments
+        captures
+        required_captures
+        required_params
+        super
       end
 
       private

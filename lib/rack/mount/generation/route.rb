@@ -8,12 +8,13 @@ module Rack::Mount
       def initialize(*args)
         super
 
-        @required_params = {}
+        required_params = {}
         @required_defaults = {}
         @generation_keys = @defaults.dup
 
         @conditions.each do |method, condition|
-          @required_params[method] = @conditions[method].required_captures.map { |s| s.name }.reject { |s| @defaults.include?(s) }.freeze
+          # TODO: don't track required_params
+          required_params[method] = @conditions[method].required_params
           @required_defaults[method] = @defaults.dup
           @conditions[method].captures.inject({}) { |h, s| h.merge!(s.to_hash) }.keys.each { |name|
             @required_defaults[method].delete(name)
@@ -21,9 +22,8 @@ module Rack::Mount
           }
           @required_defaults[method].freeze
         end
-        @has_significant_params = (@required_params.any? { |k, v| v.any? } || @required_defaults.any? { |k, v| v.any? }) ? true : false
+        @has_significant_params = (required_params.any? { |k, v| v.any? } || @required_defaults.any? { |k, v| v.any? }) ? true : false
 
-        @required_params.freeze
         @required_defaults.freeze
         @generation_keys.freeze
       end
@@ -52,8 +52,6 @@ module Rack::Mount
         def generate_method(method, params, recall, options)
           merged = recall.merge(params)
           return nil unless condition = @conditions[method]
-          return nil if condition.segments.empty?
-          return nil unless @required_params[method].all? { |p| merged.include?(p) }
           return nil unless @required_defaults[method].all? { |k, v| merged[k] == v }
           condition.generate(params, recall, options)
         end
