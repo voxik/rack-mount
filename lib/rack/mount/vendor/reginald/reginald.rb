@@ -4,6 +4,7 @@ module Reginald
   autoload :Atom, 'reginald/atom'
   autoload :Character, 'reginald/character'
   autoload :CharacterClass, 'reginald/character_class'
+  autoload :Collection, 'reginald/collection'
   autoload :Expression, 'reginald/expression'
   autoload :Group, 'reginald/group'
   autoload :Parser, 'reginald/parser'
@@ -29,7 +30,7 @@ module Reginald
       parser.capture_index_stack = []
       expression = parser.scan_str(regexp.source)
 
-      expression.ignorecase = regexp.casefold?
+      expression.options = regexp.options
 
       expression
     end
@@ -37,7 +38,7 @@ module Reginald
     def compile(source)
       regexp = Regexp.compile(source)
       expression = parse(regexp)
-      Regexp.compile(expression.to_s_without_options, expression.options)
+      Regexp.compile(expression.to_s(true), expression.options)
     end
 
     private
@@ -49,7 +50,7 @@ module Reginald
           source.gsub!(/#.+$/, '')
           source.gsub!(/\s+/, '')
           source.gsub!(/\\\//, '/')
-          regexp = Regexp.compile(source)
+          regexp = Regexp.compile(source, regexp.options)
         else
           regexp
         end

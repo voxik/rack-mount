@@ -88,7 +88,6 @@ module Rack::Mount
         def generate_split_keys(regexp, separators) #:nodoc:
           segments = []
           buf = nil
-          casefold = regexp.casefold?
           parts = parse_regexp(regexp)
           parts.each_with_index do |part, index|
             case part
@@ -151,7 +150,7 @@ module Rack::Mount
         end
 
         def join_buffer(parts, regexp)
-          if parts.literal? && !regexp.casefold?
+          if parts.literal?
             parts.to_s
           else
             parts.to_regexp
