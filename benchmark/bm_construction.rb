@@ -6,7 +6,7 @@ Benchmark.bmbm do |x|
 end
 
 #     user     system      total        real
-# 0.290000   0.010000   0.300000 (  0.295858)
+# 0.170000   0.000000   0.170000 (  0.178076)
 
 puts
 
@@ -14,4 +14,4 @@ profile_memory_usage do
   Rack::Mount::RouteSet.new(&BasicSetMap)
 end
 
-# 27181.19 KB     805099 alloc         -3 obj    300.0 ms  0 KB RSS
+# 17248.56 KB     520719 alloc         -3 obj    200.5 ms  0 KB RSS
