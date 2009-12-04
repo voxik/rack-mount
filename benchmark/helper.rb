@@ -1,5 +1,11 @@
+$: << 'lib'
+
+require 'rubygems'
 require 'rack/mount'
 require 'benchmark'
+
+$: << 'test'
+require 'fixtures'
 
 class Rack::Mount::UsherMapper
   def self.map(&block)
@@ -90,8 +96,8 @@ def profile_memory_usage
   after = GC.allocated_size
   usage = (after - before) / 1024.0
 
-  puts "%10.2f KB %10d obj %8.1f ms  %d KB RSS" %
-    [usage, after_live_objects - before_live_objects, elapsed * 1000, after_rss - before_rss]
+  puts "%10.2f KB %10d alloc %10d obj %8.1f ms  %d KB RSS" %
+    [usage, GC.num_allocations, after_live_objects - before_live_objects, elapsed * 1000, after_rss - before_rss]
 
   nil
 end
@@ -99,7 +105,7 @@ end
 begin
   require 'ruby-prof'
 
-  OUTPUT = File.join(File.dirname(__FILE__), '..', '..', 'tmp', 'performance')
+  OUTPUT = File.join(File.dirname(__FILE__), '..', 'tmp', 'performance')
 
   PRINTERS = {
     :flat => RubyProf::FlatPrinter,
