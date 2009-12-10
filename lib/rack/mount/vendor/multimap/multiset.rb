@@ -1,7 +1,16 @@
 require 'set'
 
 # Multiset implements a collection of unordered values and
-# allows duplicate values.
+# allows duplicates.
+#
+# == Example
+#
+#   require 'multiset'
+#   s1 = Multiset.new [1, 2]              # -> #<Multiset: {1, 2}>
+#   s1.add(2)                             # -> #<Multiset: {1, 2, 2}>
+#   s1.merge([2, 6])                      # -> #<Multiset: {1, 2, 2, 2, 3}>
+#   s1.multiplicity(2)                    # -> 3
+#   s1.multiplicity(3)                    # -> 1
 class Multiset < Set
   def initialize(*args, &block) #:nodoc:
     @hash = Hash.new(0)

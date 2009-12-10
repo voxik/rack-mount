@@ -1,6 +1,6 @@
 module Reginald
   class Alternation < Collection
-    def self.reduce(alternation_or_expression, expression)
+    def self.reduce(alternation_or_expression, expression) #:nodoc:
       if alternation_or_expression.first.is_a?(Alternation)
         alternation_or_expression = alternation_or_expression.first
         alternation_or_expression << expression
@@ -18,6 +18,9 @@ module Reginald
       end
     end
 
+    # Returns true if expression could be treated as a literal string.
+    #
+    # Alternation groups are never literal.
     def literal?
       false
     end
@@ -30,7 +33,7 @@ module Reginald
       map { |e| e.to_s(parent) }.join('|')
     end
 
-    def inspect
+    def inspect #:nodoc:
       to_s.inspect
     end
   end

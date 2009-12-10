@@ -3,7 +3,7 @@ module Reginald
     attr_reader :ignorecase
     attr_accessor :multiline, :extended
 
-    def self.reduce(expression_or_atom, atom = nil)
+    def self.reduce(expression_or_atom, atom = nil) #:nodoc:
       if expression_or_atom.is_a?(Expression)
         expression_or_atom << atom if atom
         new(*expression_or_atom)
@@ -34,6 +34,9 @@ module Reginald
       end
     end
 
+    # Returns true if expression could be treated as a literal string.
+    #
+    # A Expression is literal if all its elements are literal.
     def literal?
       !ignorecase && all? { |e| e.literal? }
     end
@@ -69,7 +72,7 @@ module Reginald
       end
     end
 
-    def inspect
+    def inspect #:nodoc:
       "#<Expression #{to_s.inspect}>"
     end
 
@@ -77,7 +80,7 @@ module Reginald
       ignorecase
     end
 
-    def eql?(other)
+    def eql?(other) #:nodoc:
       super &&
         !!self.multiline == !!other.multiline &&
         !!self.ignorecase == !!other.ignorecase &&

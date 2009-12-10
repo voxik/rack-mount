@@ -2,6 +2,9 @@ module Reginald
   class Character < Atom
     attr_accessor :quantifier
 
+    # Returns true if expression could be treated as a literal string.
+    #
+    # A Character is literal is there is no quantifier attached to it.
     def literal?
       quantifier.nil? && !ignorecase
     end
@@ -30,11 +33,11 @@ module Reginald
       end
     end
 
-    def eql?(other)
+    def eql?(other) #:nodoc:
       super && quantifier.eql?(other.quantifier)
     end
 
-    def freeze
+    def freeze #:nodoc:
       quantifier.freeze
       super
     end

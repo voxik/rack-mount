@@ -11,6 +11,9 @@ module Reginald
       expression.ignorecase = ignorecase
     end
 
+    # Returns true if expression could be treated as a literal string.
+    #
+    # A Group is literal if its expression is literal and it has no quantifier.
     def literal?
       quantifier.nil? && expression.literal?
     end
@@ -29,7 +32,7 @@ module Reginald
       Regexp.compile("\\A#{to_s}\\Z")
     end
 
-    def inspect
+    def inspect #:nodoc:
       to_s.inspect
     end
 
@@ -45,7 +48,7 @@ module Reginald
       capture
     end
 
-    def ==(other)
+    def ==(other) #:nodoc:
       case other
       when String
         other == to_s
@@ -54,7 +57,7 @@ module Reginald
       end
     end
 
-    def eql?(other)
+    def eql?(other) #:nodoc:
       other.is_a?(self.class) &&
         self.expression == other.expression &&
         self.quantifier == other.quantifier &&
@@ -63,7 +66,7 @@ module Reginald
         self.name == other.name
     end
 
-    def freeze
+    def freeze #:nodoc:
       expression.freeze
       super
     end

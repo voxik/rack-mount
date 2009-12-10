@@ -45,7 +45,7 @@ class NestedMultimap < Multimap
   #   map["a"] #=> [100, 300]
   #   map["c"] #=> [300]
   def <<(value)
-    @hash.each_pair { |_, container| container << value }
+    @hash.each_value { |container| container << value }
     self.default << value
     self
   end
@@ -111,20 +111,11 @@ class NestedMultimap < Multimap
   #   [100, 101, 102]
   #   [100, 102]
   #   []
-  def each_container_with_default
-    each_container = Proc.new do |container|
-      if container.respond_to?(:each_container_with_default)
-        container.each_container_with_default do |value|
-          yield value
-        end
-      else
-        yield container
-      end
+  def each_container_with_default(&block)
+    @hash.each_value do |container|
+      iterate_over_container(container, &block)
     end
-
-    @hash.each_pair { |_, container| each_container.call(container) }
-    each_container.call(default)
-
+    iterate_over_container(default, &block)
     self
   end
 
@@ -148,6 +139,17 @@ class NestedMultimap < Multimap
   def inspect #:nodoc:
     super.gsub(/\}$/, ", default => #{default.inspect}}")
   end
+
+  private
+    def iterate_over_container(container)
+      if container.respond_to?(:each_container_with_default)
+        container.each_container_with_default do |value|
+          yield value
+        end
+      else
+        yield container
+      end
+    end
 end
 
 begin

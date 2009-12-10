@@ -4,6 +4,17 @@ require 'multiset'
 # Multimap is a generalization of a map or associative array
 # abstract data type in which more than one value may be associated
 # with and returned for a given key.
+#
+# == Example
+#
+#   require 'multimap'
+#   map = Multimap.new
+#   map["a"] = 100
+#   map["b"] = 200
+#   map["a"] = 300
+#   map["a"]                              # -> [100, 300]
+#   map["b"]                              # -> [200]
+#   map.keys                              # -> #<Multiset: {a, a, b}>
 class Multimap
   extend Forwardable
 

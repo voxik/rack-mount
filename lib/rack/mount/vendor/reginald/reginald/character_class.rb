@@ -27,6 +27,9 @@ module Reginald
       negate ? true : false
     end
 
+    # Returns true if expression could be treated as a literal string.
+    #
+    # A CharacterClass is never literal.
     def literal?
       false
     end
@@ -52,11 +55,11 @@ module Reginald
       Regexp.compile("\\A#{re}\\Z").match(char)
     end
 
-    def eql?(other)
+    def eql?(other) #:nodoc:
       super && negate == other.negate
     end
 
-    def freeze
+    def freeze #:nodoc:
       negate.freeze
       super
     end
