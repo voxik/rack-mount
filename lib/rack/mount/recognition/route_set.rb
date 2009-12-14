@@ -98,6 +98,11 @@ module Rack::Mount
           super
         end
 
+        def flush!
+          @recognition_key_analyzer = @valid_conditions = nil
+          super
+        end
+
         def build_recognition_graph
           build_nested_route_set(@recognition_keys) { |k, i|
             @recognition_key_analyzer.possible_keys[i][k]

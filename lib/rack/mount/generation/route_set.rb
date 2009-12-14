@@ -101,6 +101,11 @@ module Rack::Mount
           super
         end
 
+        def flush!
+          @generation_key_analyzer = nil
+          super
+        end
+
         def build_generation_graph
           build_nested_route_set(@generation_keys) { |k, i|
             throw :skip unless @routes[i].significant_params?

@@ -78,6 +78,7 @@ module Rack::Mount
     def freeze
       unless frozen?
         rehash
+        flush!
         @routes.each { |route| route.freeze }
         @routes.freeze
       end
@@ -87,6 +88,9 @@ module Rack::Mount
 
     private
       def expire! #:nodoc:
+      end
+
+      def flush! #:nodoc:
       end
 
       # An internal helper method for constructing a nested set from
