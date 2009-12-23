@@ -7,22 +7,6 @@ end
 
 module Rack::Mount
   class Multimap < NestedMultimap #:nodoc:
-    def self.[](*args)
-      map = super
-      map.instance_variable_set('@fuzz', {})
-      map
-    end
-
-    def initialize(default = [])
-      @fuzz = {}
-      super
-    end
-
-    def initialize_copy(original)
-      @fuzz = original.instance_variable_get('@fuzz').dup
-      super
-    end
-
     def store(*args)
       keys  = args.dup
       value = keys.pop
@@ -35,7 +19,6 @@ module Rack::Mount
       end
 
       if key.is_a?(Regexp)
-        @fuzz[value] = key
         if keys.empty?
           @hash.each_pair { |k, l| l << value if k =~ key }
           self.default << value
@@ -56,12 +39,6 @@ module Rack::Mount
     end
     alias_method :[]=, :store
 
-    def freeze
-      @fuzz.clear
-      @fuzz = nil
-      super
-    end
-
     undef :index, :invert
 
     def height
@@ -72,23 +49,5 @@ module Rack::Mount
       lengths = containers_with_default.map { |e| e.length }
       lengths.inject(0) { |sum, len| sum += len }.to_f / lengths.size
     end
-
-    protected
-      def update_container(key) #:nodoc:
-        super do |container|
-          if container.is_a?(self.class)
-            container.each_container_with_default do |c|
-              c.delete_if do |value|
-                (requirement = @fuzz[value]) && key !~ requirement
-              end
-            end
-          else
-            container.delete_if do |value|
-              (requirement = @fuzz[value]) && key !~ requirement
-            end
-          end
-          yield container
-        end
-      end
   end
 end
