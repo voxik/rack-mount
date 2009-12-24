@@ -1,11 +1,4 @@
 begin
-  require 'mg'
-  MG.new('rack-mount.gemspec')
-rescue LoadError
-end
-
-
-begin
   require 'hanna/rdoctask'
 rescue LoadError
   require 'rake/rdoctask'
