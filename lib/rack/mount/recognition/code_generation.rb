@@ -1,6 +1,11 @@
 module Rack::Mount
   module Recognition
     module CodeGeneration #:nodoc:
+      def initialize(*args)
+        @optimized_recognize_defined = false
+        super
+      end
+
       def _expired_recognize(env) #:nodoc:
         raise 'route set not finalized'
       end
@@ -12,10 +17,14 @@ module Rack::Mount
 
       private
         def expire!
-          remove_metaclass_method :recognize
+          if @optimized_recognize_defined
+            remove_metaclass_method :recognize
 
-          class << self
-            alias_method :recognize, :_expired_recognize
+            class << self
+              alias_method :recognize, :_expired_recognize
+            end
+
+            @optimized_recognize_defined = false
           end
 
           super
@@ -63,6 +72,8 @@ module Rack::Mount
               "obj.#{key}"
             end
           }.join(', ')
+
+          @optimized_recognize_defined = true
 
           remove_metaclass_method :recognize
 
