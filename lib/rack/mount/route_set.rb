@@ -100,6 +100,10 @@ module Rack::Mount
         hash[ivar] = instance_variable_get(ivar)
       end
 
+      if graph = hash[:@recognition_graph]
+        hash[:@recognition_graph] = graph.dup
+      end
+
       included_modules = (class << self; included_modules; end)
       included_modules.reject! { |mod| mod == Kernel }
       hash[:included_modules] = included_modules
@@ -124,7 +128,7 @@ module Rack::Mount
       end
 
       def instance_variables_to_serialize
-        instance_variables
+        instance_variables.map { |ivar| ivar.to_sym }
       end
 
       def validate_conditions!(conditions)

@@ -115,18 +115,19 @@ class TestRouteSet < Test::Unit::TestCase
     assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 
-  # def test_marshaling_route_set_after_calling
-  #   set = new_route_set
-  #   set.add_route(EchoApp)
-  #   set.rehash
-  #   set.call({})
-  #
-  #   data = Marshal.dump(set)
-  #
-  #   set = Marshal.load(data)
-  #   assert_kind_of Rack::Mount::RouteSet, set
-  #   assert_nothing_raised(RuntimeError) { set.call({}) }
-  # end
+  def test_marshaling_route_set_after_calling
+    set = new_route_set
+    set.add_route(EchoApp)
+    set.rehash
+    set.call({})
+
+    data = Marshal.dump(set)
+
+    set = Marshal.load(data)
+    assert_kind_of Rack::Mount::RouteSet, set
+
+    assert_nothing_raised(RuntimeError) { set.call({}) }
+  end
 
   def test_worst_case
     # Make sure we aren't making the tree less efficient. Its okay if

@@ -17,7 +17,7 @@ module Rack::Mount
 
       private
         def instance_variables_to_serialize
-          super - ['@optimized_recognize_defined']
+          super - [:@optimized_recognize_defined]
         end
 
         def expire!
