@@ -71,7 +71,9 @@ class TestRouteSet < Test::Unit::TestCase
 
     set = Marshal.load(data)
     assert_kind_of Rack::Mount::RouteSet, set
-    # assert_nothing_raised(RuntimeError) { set.call({}) }
+
+    set.rehash
+    assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 
   def test_marshaling_provisional_route_set
@@ -82,7 +84,9 @@ class TestRouteSet < Test::Unit::TestCase
 
     set = Marshal.load(data)
     assert_kind_of Rack::Mount::RouteSet, set
-    # assert_nothing_raised(RuntimeError) { set.call({}) }
+
+    set.rehash
+    assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 
   def test_marshaling_rehashed_route_set
@@ -94,7 +98,8 @@ class TestRouteSet < Test::Unit::TestCase
 
     set = Marshal.load(data)
     assert_kind_of Rack::Mount::RouteSet, set
-    # assert_nothing_raised(RuntimeError) { set.call({}) }
+
+    assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 
   def test_marshaling_frozen_route_set
@@ -106,7 +111,8 @@ class TestRouteSet < Test::Unit::TestCase
 
     set = Marshal.load(data)
     assert_kind_of Rack::Mount::RouteSet, set
-    # assert_nothing_raised(RuntimeError) { set.call({}) }
+
+    assert_nothing_raised(RuntimeError) { set.call({}) }
   end
 
   # def test_marshaling_route_set_after_calling

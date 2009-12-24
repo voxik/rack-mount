@@ -94,13 +94,22 @@ module Rack::Mount
     end
 
     def marshal_dump #:nodoc:
-      instance_variables_to_serialize.inject({}) do |hash, ivar|
+      hash = {}
+
+      instance_variables_to_serialize.each do |ivar|
         hash[ivar] = instance_variable_get(ivar)
-        hash
       end
+
+      included_modules = (class << self; included_modules; end)
+      included_modules.reject! { |mod| mod == Kernel }
+      hash[:included_modules] = included_modules
+
+      hash
     end
 
     def marshal_load(hash) #:nodoc:
+      hash.delete(:included_modules).reverse.each { |mod| extend(mod) }
+
       hash.each do |ivar, value|
         instance_variable_set(ivar, value)
       end
