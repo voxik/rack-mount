@@ -71,7 +71,7 @@ module Rack::Mount
           return result unless result[1][X_CASCADE] == PASS
         end
 
-        request
+        request || [404, {'Content-Type' => 'text/html'}, ['Not Found']]
       end
 
       def rehash #:nodoc:

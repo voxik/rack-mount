@@ -93,6 +93,4 @@ BasicSetMap = Proc.new do |set|
   set.add_route(Rack::Mount::Prefix.new(DefaultSet, '/prefix'), { :path_info => %r{^/prefix} }, {}, :prefix)
 
   set.add_route(EchoApp, { :path_info => %r{^/(.*)/star$} }, { :controller => 'star' })
-
-  set.add_route(lambda { |env| [404, {'Content-Type' => 'text/html'}, ['Not Found']] }, {}, { :not_found => true })
 end
