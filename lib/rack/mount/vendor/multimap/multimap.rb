@@ -529,6 +529,32 @@ class Multimap
     @hash.values_at(*keys)
   end
 
+  def marshal_dump #:nodoc:
+    @hash
+  end
+
+  def marshal_load(hash) #:nodoc:
+    @hash = hash
+  end
+
+  def to_yaml(opts = {}) #:nodoc:
+    YAML::quick_emit(self, opts) do |out|
+      out.map(taguri, to_yaml_style) do |map|
+        @hash.each do |k, v|
+          map.add(k, v)
+        end
+        map.add('__default__', @hash.default)
+      end
+    end
+  end
+
+  def yaml_initialize(tag, val) #:nodoc:
+    default = val.delete('__default__')
+    @hash = val
+    @hash.default = default
+    self
+  end
+
   protected
     def _internal_hash #:nodoc:
       @hash
