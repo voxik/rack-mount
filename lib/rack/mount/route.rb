@@ -27,9 +27,7 @@ module Rack::Mount
     # Symbol identifier for the route used with named route generations
     attr_reader :name
 
-    def initialize(set, app, conditions, defaults, name)
-      @set = set
-
+    def initialize(app, conditions, defaults, name)
       unless app.respond_to?(:call)
         raise ArgumentError, 'app must be a valid rack application' \
           ' and respond to call'
@@ -39,18 +37,10 @@ module Rack::Mount
       @name = name ? name.to_sym : nil
       @defaults = (defaults || {}).freeze
 
-      unless conditions.is_a?(Hash)
-        raise ArgumentError, 'conditions must be a Hash'
-      end
       @conditions = {}
 
       conditions.each do |method, pattern|
         next unless method && pattern
-
-        unless @set.valid_conditions.include?(method)
-          raise ArgumentError, 'conditions may only include ' +
-            @set.valid_conditions.inspect
-        end
 
         pattern = Regexp.compile("\\A#{Regexp.escape(pattern)}\\Z") if pattern.is_a?(String)
         pattern = Utils.normalize_extended_expression(pattern)

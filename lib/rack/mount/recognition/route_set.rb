@@ -81,14 +81,6 @@ module Rack::Mount
         super
       end
 
-      def valid_conditions #:nodoc:
-        @valid_conditions ||= begin
-          conditions = @request_class.instance_methods(false)
-          conditions.map! { |m| m.to_sym }
-          conditions.freeze
-        end
-      end
-
       private
         def expire!
           @recognition_keys = @recognition_graph = nil
@@ -97,7 +89,7 @@ module Rack::Mount
         end
 
         def flush!
-          @recognition_key_analyzer = @valid_conditions = nil
+          @recognition_key_analyzer = nil
           super
         end
 

@@ -24,6 +24,12 @@ module Rack::Mount
     # - <tt>Recognition::RouteSet.new</tt>
     def initialize(options = {}, &block)
       @request_class = options.delete(:request_class) || Rack::Request
+      @valid_conditions = begin
+        conditions = @request_class.instance_methods(false)
+        conditions.map! { |m| m.to_sym }
+        conditions
+      end
+
       @routes = []
       expire!
 
@@ -43,7 +49,8 @@ module Rack::Mount
     # <tt>name</tt>:: Symbol identifier for the route used with named
     #                 route generations
     def add_route(app, conditions = {}, defaults = {}, name = nil)
-      route = Route.new(self, app, conditions, defaults, name)
+      validate_conditions!(conditions)
+      route = Route.new(app, conditions, defaults, name)
       @routes << route
       expire!
       route
@@ -91,6 +98,20 @@ module Rack::Mount
       end
 
       def flush! #:nodoc:
+        @valid_conditions = nil
+      end
+
+      def validate_conditions!(conditions)
+        unless conditions.is_a?(Hash)
+          raise ArgumentError, 'conditions must be a Hash'
+        end
+
+        unless conditions.all? { |method, pattern|
+            @valid_conditions.include?(method)
+          }
+          raise ArgumentError, 'conditions may only include ' +
+            @valid_conditions.inspect
+        end
       end
 
       # An internal helper method for constructing a nested set from
