@@ -64,13 +64,13 @@ class TestRouteSet < Test::Unit::TestCase
       (class << cloned; included_modules; end))
   end
 
-  # def test_marshaling
-  #   set = new_route_set
-  #   set.add_route(EchoApp)
-  #
-  #   data = Marshal.dump(set)
-  #   assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
-  # end
+  def test_marshaling
+    set = new_route_set
+    set.add_route(EchoApp)
+
+    data = Marshal.dump(set)
+    assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
+  end
 
   def test_worst_case
     # Make sure we aren't making the tree less efficient. Its okay if
