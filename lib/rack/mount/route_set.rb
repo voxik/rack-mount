@@ -93,12 +93,29 @@ module Rack::Mount
       super
     end
 
+    def marshal_dump #:nodoc:
+      instance_variables_to_serialize.inject({}) do |hash, ivar|
+        hash[ivar] = instance_variable_get(ivar)
+        hash
+      end
+    end
+
+    def marshal_load(hash) #:nodoc:
+      hash.each do |ivar, value|
+        instance_variable_set(ivar, value)
+      end
+    end
+
     private
       def expire! #:nodoc:
       end
 
       def flush! #:nodoc:
         @valid_conditions = nil
+      end
+
+      def instance_variables_to_serialize
+        instance_variables
       end
 
       def validate_conditions!(conditions)

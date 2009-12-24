@@ -64,9 +64,34 @@ class TestRouteSet < Test::Unit::TestCase
       (class << cloned; included_modules; end))
   end
 
-  def test_marshaling
+  def test_marshaling_empty_route_set
+    set = new_route_set
+
+    data = Marshal.dump(set)
+    assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
+  end
+
+  def test_marshaling_provisional_route_set
     set = new_route_set
     set.add_route(EchoApp)
+
+    data = Marshal.dump(set)
+    assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
+  end
+
+  def test_marshaling_rehashed_route_set
+    set = new_route_set
+    set.add_route(EchoApp)
+    set.rehash
+
+    data = Marshal.dump(set)
+    assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
+  end
+
+  def test_marshaling_frozen_route_set
+    set = new_route_set
+    set.add_route(EchoApp)
+    set.freeze
 
     data = Marshal.dump(set)
     assert_kind_of Rack::Mount::RouteSet, Marshal.load(data)
