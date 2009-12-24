@@ -7,7 +7,7 @@ class TestRouteSet < Test::Unit::TestCase
   end
 
   def test_rehash_builds_graph
-    set = Rack::Mount::RouteSet.new
+    set = new_route_set
     assert_raise(RuntimeError) { set.call({}) }
     assert_raise(RuntimeError) { set.url(:foo) }
 
@@ -17,7 +17,7 @@ class TestRouteSet < Test::Unit::TestCase
   end
 
   def test_add_additional_routes_and_manually_rehash
-    set = Rack::Mount::RouteSet.new
+    set = new_route_set
     set.add_route(EchoApp, :path_info => '/foo')
 
     set.rehash
@@ -29,7 +29,7 @@ class TestRouteSet < Test::Unit::TestCase
   end
 
   def test_ensure_routeset_needs_to_be_frozen
-    set = Rack::Mount::RouteSet.new
+    set = new_route_set
     assert_raise(RuntimeError) { set.call({}) }
     assert_raise(RuntimeError) { set.url(:foo) }
 
@@ -39,14 +39,14 @@ class TestRouteSet < Test::Unit::TestCase
   end
 
   def test_ensure_each_route_requires_a_valid_rack_app
-    set = Rack::Mount::RouteSet.new
+    set = new_route_set
     assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path_info => '/foo') }
     assert_raise(ArgumentError) { set.add_route({}) }
     assert_raise(ArgumentError) { set.add_route('invalid app') }
   end
 
   def test_ensure_route_has_valid_conditions
-    set = Rack::Mount::RouteSet.new
+    set = new_route_set
     assert_nothing_raised(ArgumentError) { set.add_route(EchoApp, :path_info => '/foo') }
     assert_raise(ArgumentError) { set.add_route(EchoApp, nil) }
     assert_raise(ArgumentError) { set.add_route(EchoApp, :foo => '/bar') }
@@ -65,7 +65,7 @@ class TestRouteSet < Test::Unit::TestCase
   end
 
   # def test_marshaling
-  #   set = Rack::Mount::RouteSet.new
+  #   set = new_route_set
   #   set.add_route(EchoApp)
   #
   #   data = Marshal.dump(set)
@@ -86,6 +86,11 @@ class TestRouteSet < Test::Unit::TestCase
     assert_equal 3, @app.instance_variable_get('@recognition_graph').average_height.to_i
     assert_equal 6, @app.instance_variable_get('@generation_graph').average_height.to_i
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
+    end
 end
 
 class TestOptimizedRouteSet < TestRouteSet
@@ -93,6 +98,11 @@ class TestOptimizedRouteSet < TestRouteSet
     @app = OptimizedBasicSet
     assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new(*args, &block)
+    end
 end
 
 class TestLinearRouteSet < TestRouteSet
@@ -109,4 +119,9 @@ class TestLinearRouteSet < TestRouteSet
     assert_equal @app.length, @app.instance_variable_get('@recognition_graph').average_height.to_i
     assert_equal @app.length, @app.instance_variable_get('@generation_graph').average_height.to_i
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_with_linear_graph(*args, &block)
+    end
 end
