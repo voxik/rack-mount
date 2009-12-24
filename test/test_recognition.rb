@@ -14,7 +14,7 @@ class TestRecognition < Test::Unit::TestCase
     assert_recognizes({ :controller => 'homepage' }, '/')
     assert_recognizes({ :controller => 'sessions', :action => 'new' }, '/login')
     assert_recognizes({ :controller => 'people', :action => 'show', :id => '1' }, '/people/1')
-    assert_recognizes(nil, '/admin/widgets/show/random')
+    assert_recognizes({ :not_found => true }, '/admin/widgets/show/random')
   end
 
   def test_recognize_with_block
@@ -24,7 +24,8 @@ class TestRecognition < Test::Unit::TestCase
 
     assert_equal([
       { :controller => 'foo', :action => 'index' },
-      { :controller => 'foo', :action => 'shadowed' }
+      { :controller => 'foo', :action => 'shadowed' },
+      { :not_found => true }
     ], results)
   end
 

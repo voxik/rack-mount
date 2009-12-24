@@ -45,7 +45,8 @@ module Rack::Mount
         nil
       end
 
-      EXPECT    = 'Expect'.freeze
+      X_CASCADE = 'X-Cascade'.freeze
+      PASS      = 'pass'.freeze
       PATH_INFO = 'PATH_INFO'.freeze
 
       # Rack compatible recognition and dispatching method. Routes are
@@ -57,11 +58,9 @@ module Rack::Mount
       def call(env)
         raise 'route set not finalized' unless @recognition_graph
 
-        set_expectation = env[EXPECT] != '100-continue'
-        env[EXPECT] = '100-continue' if set_expectation
-
         env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO])
 
+        request = nil
         req = @request_class.new(env)
         recognize(req) do |route, params|
           # TODO: We only want to unescape params from uri related methods
@@ -69,12 +68,10 @@ module Rack::Mount
 
           env[@parameters_key] = params
           result = route.app.call(env)
-          return result unless result[0].to_i == 417
+          return result unless result[1][X_CASCADE] == PASS
         end
 
-        set_expectation ? [404, {'Content-Type' => 'text/html'}, ['Not Found']] : [417, {'Content-Type' => 'text/html'}, ['Expectation failed']]
-      ensure
-        env.delete(EXPECT) if set_expectation
+        request
       end
 
       def rehash #:nodoc:
