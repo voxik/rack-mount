@@ -67,7 +67,7 @@ module Rack::Mount
           remove_metaclass_method :recognize
 
           instance_eval(<<-RUBY, __FILE__, __LINE__)
-            def recognize(obj, &block)
+            def recognize(obj)
               cache = {}
               container = @recognition_graph[#{keys}]
               optimize_container_iterator(container) unless container.respond_to?(:optimized_each)
