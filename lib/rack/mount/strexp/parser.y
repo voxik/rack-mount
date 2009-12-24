@@ -19,6 +19,7 @@ rule
 end
 
 ---- header ----
+require 'rack/mount/utils'
 require 'rack/mount/strexp/tokenizer'
 
 ---- inner

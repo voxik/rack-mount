@@ -6,6 +6,7 @@
 
 require 'racc/parser.rb'
 
+require 'rack/mount/utils'
 require 'rack/mount/strexp/tokenizer'
 
 module Rack

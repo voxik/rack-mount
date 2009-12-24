@@ -26,6 +26,7 @@ end
 Object.extend(ControllerConstants)
 
 def supports_named_captures?
+  require 'rack/mount/utils'
   Reginald.regexp_supports_named_captures?
 end
 

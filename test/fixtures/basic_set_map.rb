@@ -1,6 +1,6 @@
 file = File.join(File.dirname(__FILE__), 'basic_set_map_19.rb')
 
-if Reginald.regexp_supports_named_captures?
+if supports_named_captures?
   load(file)
 else
   src = File.read(file)
