@@ -92,6 +92,7 @@ module Rack::Mount
       private
         def expire!
           @recognition_keys = @recognition_graph = nil
+          @recognition_key_analyzer.expire!
           super
         end
 

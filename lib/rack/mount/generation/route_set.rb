@@ -98,6 +98,7 @@ module Rack::Mount
       private
         def expire!
           @generation_keys = @generation_graph = nil
+          @generation_key_analyzer.expire!
           super
         end
 

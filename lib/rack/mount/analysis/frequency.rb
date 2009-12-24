@@ -54,6 +54,10 @@ module Rack::Mount
         end
       end
 
+      def expire!
+        @possible_keys = @report = nil
+      end
+
       private
         def parse_regexp(regexp)
           @parse_regexp_cache ||= {}

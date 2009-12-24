@@ -16,6 +16,18 @@ class TestRouteSet < Test::Unit::TestCase
     assert_raise(Rack::Mount::RoutingError) { set.url(:foo) }
   end
 
+  def test_add_additional_routes_and_manually_rehash
+    set = Rack::Mount::RouteSet.new
+    set.add_route(EchoApp, :path_info => '/foo')
+
+    set.rehash
+    assert_nothing_raised(RuntimeError) { assert set.call({'PATH_INFO' => '/foo'}) }
+
+    set.add_route(EchoApp, :path_info => '/bar')
+    set.rehash
+    assert_nothing_raised(RuntimeError) { assert set.call({'PATH_INFO' => '/bar'}) }
+  end
+
   def test_ensure_routeset_needs_to_be_frozen
     set = Rack::Mount::RouteSet.new
     assert_raise(RuntimeError) { set.call({}) }
