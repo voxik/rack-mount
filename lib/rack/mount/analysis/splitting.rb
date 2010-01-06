@@ -57,7 +57,7 @@ module Rack::Mount
         def analyze_capture_boundaries(regexp, boundaries) #:nodoc:
           return boundaries unless regexp.is_a?(Regexp)
 
-          parts = parse_regexp(regexp)
+          parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
             if part.is_a?(Reginald::Group)
               if index > 0
@@ -88,7 +88,7 @@ module Rack::Mount
         def generate_split_keys(regexp, separators) #:nodoc:
           segments = []
           buf = nil
-          parts = parse_regexp(regexp)
+          parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
             case part
             when Reginald::Anchor

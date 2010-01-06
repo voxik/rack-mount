@@ -99,6 +99,12 @@ module Rack::Mount
     module_function :normalize_extended_expression
 
     def parse_regexp(regexp)
+      cache = Thread.current[:rack_mount_utils_parse_regexp_cache] ||= {}
+
+      if expression = cache[regexp]
+        return expression
+      end
+
       unless regexp.is_a?(RegexpWithNamedGroups)
         regexp = RegexpWithNamedGroups.new(regexp)
       end
@@ -119,6 +125,7 @@ module Rack::Mount
         tag_captures.call(expression)
       end
 
+      cache[regexp] = expression.freeze
       expression
     rescue Racc::ParseError, Reginald::Parser::ScanError
       []

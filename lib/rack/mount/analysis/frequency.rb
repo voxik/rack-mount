@@ -35,7 +35,7 @@ module Rack::Mount
 
       def process_key(requirements, method, requirement)
         if requirement.is_a?(Regexp)
-          expression = parse_regexp(requirement)
+          expression = Utils.parse_regexp(requirement)
           expression = expression.reject { |e| e.is_a?(Reginald::Anchor) }
 
           if expression.is_a?(Reginald::Expression) && expression.literal?
@@ -57,12 +57,6 @@ module Rack::Mount
       def expire!
         @possible_keys = @report = nil
       end
-
-      private
-        def parse_regexp(regexp)
-          @parse_regexp_cache ||= {}
-          @parse_regexp_cache[regexp] ||= Utils.parse_regexp(regexp).freeze
-        end
     end
   end
 end
