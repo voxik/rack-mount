@@ -96,6 +96,16 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/uri_escaping/%E2%88%9E', @app.url(:controller => 'uri_escaping', :value => '∞')
     assert_equal '/uri_escaping/%E2%88%9E', @app.url(:controller => 'uri_escaping', :value => '%E2%88%9E')
   end
+
+  def test_regexp_parse_caching
+    @app = Rack::Mount::RouteSet.new do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo/:bar'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo/:baz'))
+    end
+
+    assert_equal '/foo/1', @app.url(:bar => '1')
+    assert_equal '/foo/1', @app.url(:baz => '1')
+  end
 end
 
 class TestOptimizedGeneration < TestGeneration

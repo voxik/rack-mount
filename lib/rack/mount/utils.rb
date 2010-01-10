@@ -99,7 +99,7 @@ module Rack::Mount
     module_function :normalize_extended_expression
 
     def parse_regexp(regexp)
-      cache = Thread.current[:rack_mount_utils_parse_regexp_cache] ||= {}
+      cache = @@_parse_regexp_cache ||= {}
 
       if expression = cache[regexp]
         return expression

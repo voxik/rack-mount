@@ -60,6 +60,10 @@ module Rack::Mount
         }
         named_captures
       end
+
+      def eql?(other)
+        super && @names.eql?(other.names)
+      end
     end
   end
 end
