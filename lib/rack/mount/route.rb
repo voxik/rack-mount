@@ -43,11 +43,13 @@ module Rack::Mount
         next unless method && pattern
 
         pattern = Regexp.compile("\\A#{Regexp.escape(pattern)}\\Z") if pattern.is_a?(String)
-        pattern = Utils.normalize_extended_expression(pattern)
 
-        pattern = RegexpWithNamedGroups.new(pattern)
-        pattern.extend(GeneratableRegexp::InstanceMethods)
-        pattern.defaults = @defaults
+        if pattern.is_a?(Regexp)
+          pattern = Utils.normalize_extended_expression(pattern)
+          pattern = RegexpWithNamedGroups.new(pattern)
+          pattern.extend(GeneratableRegexp::InstanceMethods)
+          pattern.defaults = @defaults
+        end
 
         @conditions[method] = pattern.freeze
       end

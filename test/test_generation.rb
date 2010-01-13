@@ -49,6 +49,8 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal '/foo/bar', @app.url(:controller => 'foo_bar', :action => 'index')
     assert_equal '/baz', @app.url(:controller => 'baz', :action => 'index')
 
+    assert_equal '/xhr', @app.url(:controller => 'xhr')
+
     assert_equal '/ws/foo', @app.url(:ws => true, :controller => 'foo')
     assert_equal '/ws/foo/list', @app.url(:ws => true, :controller => 'foo', :action => 'list')
 

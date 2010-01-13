@@ -7,13 +7,18 @@ module Rack::Mount
         super
 
         @has_significant_params = @conditions.any? { |method, condition|
-          condition.required_params.any? || condition.required_defaults.any?
+          (condition.respond_to?(:required_params) && condition.required_params.any?) ||
+            (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
         }
       end
 
       def generation_keys
         @conditions.inject({}) { |keys, (method, condition)|
-          keys.merge!(condition.required_defaults)
+          if condition.respond_to?(:required_defaults)
+            keys.merge!(condition.required_defaults)
+          else
+            keys
+          end
         }
       end
 

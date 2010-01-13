@@ -10,6 +10,7 @@ module Rack::Mount
 
         @named_captures = {}
         @conditions.map { |method, condition|
+          next unless condition.respond_to?(:named_captures)
           @named_captures[method] = condition.named_captures.inject({}) { |named_captures, (k, v)|
             named_captures[k.to_sym] = v.last - 1
             named_captures
@@ -22,13 +23,15 @@ module Rack::Mount
         params = @defaults.dup
         if @conditions.all? { |method, condition|
           value = obj.send(method)
-          if m = value.match(condition)
+          if condition.is_a?(Regexp) && (m = value.match(condition))
             matches = m.captures
             @named_captures[method].each { |k, i|
               if v = matches[i]
                 params[k] = v
               end
             }
+            true
+          elsif value == condition
             true
           else
             false

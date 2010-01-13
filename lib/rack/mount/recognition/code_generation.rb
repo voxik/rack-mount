@@ -44,10 +44,16 @@ module Rack::Mount
             conditions = []
             route.conditions.each do |method, condition|
               b = []
-              b << "if m = obj.#{method}.match(#{condition.inspect})"
-              b << 'matches = m.captures' if route.named_captures[method].any?
-              b << 'p = nil' if route.named_captures[method].any?
-              b << route.named_captures[method].map { |k, j| "params[#{k.inspect}] = p if p = matches[#{j}]" }.join('; ')
+              if condition.is_a?(Regexp)
+                b << "if m = obj.#{method}.match(#{condition.inspect})"
+                if (named_captures = route.named_captures[method]) && named_captures.any?
+                  b << 'matches = m.captures'
+                  b << 'p = nil'
+                  b << named_captures.map { |k, j| "params[#{k.inspect}] = p if p = matches[#{j}]" }.join('; ')
+                end
+              else
+                b << "if m = obj.#{method} == route.conditions[:#{method}]"
+              end
               b << 'true'
               b << 'end'
               conditions << "(#{b.join('; ')})"

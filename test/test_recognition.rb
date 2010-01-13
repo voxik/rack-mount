@@ -120,6 +120,15 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'account', :account => 'josh' }, routing_args)
   end
 
+  def test_xhr_boolean_condition
+    get '/xhr', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
+    assert_success
+    assert_equal({ :controller => 'xhr' }, routing_args)
+
+    get '/xhr'
+    assert_not_found
+  end
+
   def test_slashes
     get '/slashes/trailing/'
     assert_success
