@@ -39,6 +39,7 @@ module Rack::Mount
 
           container.each_with_index { |route, i|
             body << "route = self[#{i}]"
+            body << 'matches = {}'
             body << 'params = route.defaults.dup'
 
             conditions = []
@@ -46,10 +47,11 @@ module Rack::Mount
               b = []
               if condition.is_a?(Regexp)
                 b << "if m = obj.#{method}.match(#{condition.inspect})"
+                b << "matches[:#{method}] = m"
                 if (named_captures = route.named_captures[method]) && named_captures.any?
-                  b << 'matches = m.captures'
+                  b << 'captures = m.captures'
                   b << 'p = nil'
-                  b << named_captures.map { |k, j| "params[#{k.inspect}] = p if p = matches[#{j}]" }.join('; ')
+                  b << named_captures.map { |k, j| "params[#{k.inspect}] = p if p = captures[#{j}]" }.join('; ')
                 end
               else
                 b << "if m = obj.#{method} == route.conditions[:#{method}]"
@@ -61,7 +63,7 @@ module Rack::Mount
 
             body << <<-RUBY
               if #{conditions.join(' && ')}
-                yield route, params
+                yield route, matches, params
               end
             RUBY
           }
@@ -94,12 +96,12 @@ module Rack::Mount
               optimize_container_iterator(container) unless container.respond_to?(:optimized_each)
 
               if block_given?
-                container.optimized_each(obj) do |route, params|
-                  yield route, params
+                container.optimized_each(obj) do |route, matches, params|
+                  yield route, matches, params
                 end
               else
-                container.optimized_each(obj) do |route, params|
-                  return route, params
+                container.optimized_each(obj) do |route, matches, params|
+                  return route, matches, params
                 end
               end
 

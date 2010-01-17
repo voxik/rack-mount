@@ -33,11 +33,12 @@ module Rack::Mount
           end
         }
         @recognition_graph[*keys].each do |route|
-          if params = route.recognize(obj)
+          matches, params = route.recognize(obj)
+          if matches && params
             if block_given?
-              yield route, params
+              yield route, matches, params
             else
-              return route, params
+              return route, matches, params
             end
           end
         end
@@ -62,7 +63,7 @@ module Rack::Mount
 
         request = nil
         req = @request_class.new(env)
-        recognize(req) do |route, params|
+        recognize(req) do |route, matches, params|
           # TODO: We only want to unescape params from uri related methods
           params.each { |k, v| params[k] = Utils.unescape_uri(v) if v.is_a?(String) }
 

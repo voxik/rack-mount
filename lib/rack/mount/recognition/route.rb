@@ -20,13 +20,16 @@ module Rack::Mount
       end
 
       def recognize(obj)
-        params = @defaults.dup
+        matches = {}
+        params  = @defaults.dup
+
         if @conditions.all? { |method, condition|
           value = obj.send(method)
           if condition.is_a?(Regexp) && (m = value.match(condition))
-            matches = m.captures
+            matches[method] = m
+            captures = m.captures
             @named_captures[method].each { |k, i|
-              if v = matches[i]
+              if v = captures[i]
                 params[k] = v
               end
             }
@@ -37,7 +40,7 @@ module Rack::Mount
             false
           end
         }
-          params
+          return matches, params
         else
           nil
         end

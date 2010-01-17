@@ -20,7 +20,7 @@ class TestRecognition < Test::Unit::TestCase
   def test_recognize_with_block
     req = Rack::Request.new(Rack::MockRequest.env_for('/foo'))
     results = []
-    @app.recognize(req) { |route, params| results << params }
+    @app.recognize(req) { |route, matches, params| results << params }
 
     assert_equal([
       { :controller => 'foo', :action => 'index' },
