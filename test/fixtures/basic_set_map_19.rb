@@ -90,8 +90,8 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, :path_info => %r{^/default/(?<controller>[a-z0-9]+)(/(?<action>[a-z0-9]+)(/(?<id>[a-z0-9]+)(\.(?<format>[a-z]+))?)?)?$})
   set.add_route(EchoApp, { :request_method => 'DELETE' }, { :controller => 'global', :action => 'destroy' })
 
-  set.add_route(Rack::Mount::Prefix.new(lambda { |env| [404, {'X-Cascade' => 'pass'}, []] }, '/prefix'), { :path_info => %r{^/prefix} })
-  set.add_route(Rack::Mount::Prefix.new(DefaultSet, '/prefix'), { :path_info => %r{^/prefix} }, {}, :prefix)
+  set.add_route(lambda { |env| [404, {'X-Cascade' => 'pass'}, []] }, { :path_info => %r{^/prefix} })
+  set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
 
   set.add_route(EchoApp, { :path_info => %r{^/(.*)/star$} }, { :controller => 'star' })
 end

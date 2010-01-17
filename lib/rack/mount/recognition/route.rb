@@ -17,6 +17,18 @@ module Rack::Mount
           }.freeze
         }
         @named_captures.freeze
+
+        if @conditions.has_key?(:path_info) &&
+            !Utils.regexp_anchored?(@conditions[:path_info])
+          @prefix = true
+          @app = Prefix.new(@app)
+        else
+          @prefix = false
+        end
+      end
+
+      def prefix?
+        @prefix
       end
 
       def recognize(obj)

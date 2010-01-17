@@ -88,6 +88,17 @@ module Rack::Mount
     end
     module_function :build_nested_query
 
+    # Determines whether the regexp must match the entire string.
+    #
+    #   regexp_anchored?(/^foo$/) # => true
+    #   regexp_anchored?(/foo/)   # => false
+    #   regexp_anchored?(/^foo/)  # => false
+    #   regexp_anchored?(/foo$/)  # => false
+    def regexp_anchored?(regexp)
+     regexp.source =~ /\A(\\A|\^).*(\\Z|\$)\Z/ ? true : false
+    end
+    module_function :regexp_anchored?
+
     def normalize_extended_expression(regexp)
       return regexp unless regexp.options & Regexp::EXTENDED != 0
       source = regexp.source

@@ -67,6 +67,10 @@ module Rack::Mount
           # TODO: We only want to unescape params from uri related methods
           params.each { |k, v| params[k] = Utils.unescape_uri(v) if v.is_a?(String) }
 
+          if route.prefix?
+            env[Prefix::KEY] = matches[:path_info].to_s
+          end
+
           env[@parameters_key] = params
           result = route.app.call(env)
           return result unless result[1][X_CASCADE] == PASS

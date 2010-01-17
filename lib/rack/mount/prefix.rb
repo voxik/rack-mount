@@ -7,23 +7,29 @@ module Rack::Mount
     SCRIPT_NAME  = 'SCRIPT_NAME'.freeze
     SLASH        = '/'.freeze
 
-    def initialize(app, prefix)
+    KEY = 'rack.mount.prefix'.freeze
+
+    def initialize(app, prefix = nil)
       @app, @prefix = app, prefix.freeze
       freeze
     end
 
     def call(env)
-      old_path_info = env[PATH_INFO].dup
-      old_script_name = env[SCRIPT_NAME].dup
+      if prefix = env[KEY] || @prefix
+        old_path_info = env[PATH_INFO].dup
+        old_script_name = env[SCRIPT_NAME].dup
 
-      begin
-        env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO].sub(@prefix, EMPTY_STRING))
-        env[PATH_INFO] = EMPTY_STRING if env[PATH_INFO] == SLASH
-        env[SCRIPT_NAME] = Utils.normalize_path(env[SCRIPT_NAME].to_s + @prefix)
+        begin
+          env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO].sub(prefix, EMPTY_STRING))
+          env[PATH_INFO] = EMPTY_STRING if env[PATH_INFO] == SLASH
+          env[SCRIPT_NAME] = Utils.normalize_path(env[SCRIPT_NAME].to_s + prefix)
+          @app.call(env)
+        ensure
+          env[PATH_INFO] = old_path_info
+          env[SCRIPT_NAME] = old_script_name
+        end
+      else
         @app.call(env)
-      ensure
-        env[PATH_INFO] = old_path_info
-        env[SCRIPT_NAME] = old_script_name
       end
     end
   end
