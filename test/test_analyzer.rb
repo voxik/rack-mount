@@ -129,12 +129,6 @@ class TestAnalyzer < Test::Unit::TestCase
       {:foo => 'bar'},
       {:foo => 'bar'}
     )
-
-    assert_report(:best,
-      {:controller => 'people'},
-      {:controller => 'people', :action => 'show'},
-      {:controller => 'posts', :action => 'show'}
-    )
   end
 
   # TODO: Try to improve the analyzer so we can promote these
@@ -146,6 +140,12 @@ class TestAnalyzer < Test::Unit::TestCase
   # test cases to "better"
   def test_reports_are_good
     assert_report(:good, :foo => 'bar')
+
+    assert_report(:good,
+      {:controller => 'people'},
+      {:controller => 'people', :action => 'show'},
+      {:controller => 'posts', :action => 'show'}
+    )
 
     assert_report(:good,
       {:method => 'GET', :path => '/people/1'},
@@ -163,10 +163,9 @@ class TestAnalyzer < Test::Unit::TestCase
 
   def test_analysis_boundaries
     assert_equal(['/', 's'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
-      {:path => %r{^/people/([0-9]+)$}},
-      {:path => %r{^/messages(/([0-9]+))$}},
-      {:path => %r{^/comments$} }
-    ).separators(:path))
+      {:path => %r{^/posts(/([0-9]+))$}},
+      {:path => %r{^/messages(/([0-9]+))$}}
+    ).separators(:path).sort)
 
     assert_equal(['/'], Rack::Mount::Analysis::Frequency.new_with_module(Rack::Mount::Analysis::Splitting,
       {:path => %r{^/([a-z]+)/(\.([a-z]+))?$}}

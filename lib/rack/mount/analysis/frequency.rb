@@ -50,7 +50,7 @@ module Rack::Mount
         @report ||= begin
           possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
           return [] if @key_frequency.count <= 1
-          @key_frequency.keys_above_mean
+          @key_frequency.keys_in_upper_quartile
         end
       end
 

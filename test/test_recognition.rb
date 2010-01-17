@@ -367,35 +367,24 @@ class TestRecognition < Test::Unit::TestCase
   def test_small_set_with_ambiguous_splitting
     @app = new_route_set do |set|
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/signin'))
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts(.:format)'))
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts/:id(.:format)'))
     end
 
     if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
-      assert_equal %r{\.|/|s}, recognition_keys[-1]
+      assert_equal %w( / \. s ), recognition_keys[-1].source.split('|').sort
     end
 
-    get '/messages'
-    assert_success
-
-    get '/messages.xml'
+    get '/signin'
     assert_success
 
     get '/messages/1'
-    assert_success
-
-    get '/messages/1.xml'
     assert_success
 
     get '/posts'
     assert_success
 
     get '/posts.xml'
-    assert_success
-
-    get '/signin'
     assert_success
   end
 

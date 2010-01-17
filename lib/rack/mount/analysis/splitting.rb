@@ -39,7 +39,7 @@ module Rack::Mount
       end
 
       def separators(key)
-        @boundaries[key].keys_above_mean
+        @boundaries[key].keys_in_upper_quartile
       end
 
       def process_key(requirements, method, requirement)
