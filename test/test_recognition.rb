@@ -365,11 +365,16 @@ class TestRecognition < Test::Unit::TestCase
   end
 
   def test_small_set_with_ambiguous_splitting
-    @app = Rack::Mount::RouteSet.new do |set|
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/signin'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages(.:format)'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id(.:format)'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts(.:format)'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts/:id(.:format)'))
+    end
+
+    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
+      assert_equal %r{\.|/|s}, recognition_keys[-1]
     end
 
     get '/messages'
@@ -389,7 +394,15 @@ class TestRecognition < Test::Unit::TestCase
 
     get '/posts.xml'
     assert_success
+
+    get '/signin'
+    assert_success
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
+    end
 end
 
 class TestOptimizedRecognition < TestRecognition
@@ -397,10 +410,20 @@ class TestOptimizedRecognition < TestRecognition
     @app = OptimizedBasicSet
     assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new(*args, &block)
+    end
 end
 
 class TestLinearRecognition < TestRecognition
   def setup
     @app = LinearBasicSet
   end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_with_linear_graph(*args, &block)
+    end
 end

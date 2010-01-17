@@ -144,8 +144,6 @@ module Rack::Mount
             segments.pop
           end
 
-          segments.shift if segments[0].nil? || segments[0] == ''
-
           segments
         end
 
