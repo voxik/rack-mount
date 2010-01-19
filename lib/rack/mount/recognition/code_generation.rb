@@ -78,7 +78,7 @@ module Rack::Mount
 
         def optimize_recognize!
           keys = @recognition_keys.map { |key|
-            if key.is_a?(Array)
+            if key.respond_to?(:call_source)
               key.call_source(:cache, :obj)
             else
               "obj.#{key}"

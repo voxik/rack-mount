@@ -26,7 +26,7 @@ module Rack::Mount
 
         cache = {}
         keys = @recognition_keys.map { |key|
-          if key.is_a?(Array)
+          if key.respond_to?(:call_source)
             key.call(cache, obj)
           else
             obj.send(key)

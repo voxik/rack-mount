@@ -5,11 +5,7 @@ module Rack::Mount
     module Splitting
       NULL = "\0".freeze
 
-      class Key < Array
-        def initialize(method, index, separators)
-          replace([method, index, separators])
-        end
-
+      class Key < Struct.new(:method, :index, :separators)
         def self.split(value, separator_pattern)
           keys = value.split(separator_pattern)
           keys.shift if keys[0] == ''
@@ -18,11 +14,11 @@ module Rack::Mount
         end
 
         def call(cache, obj)
-          (cache[self[0]] ||= self.class.split(obj.send(self[0]), self[2]))[self[1]]
+          (cache[method] ||= self.class.split(obj.send(method), separators))[index]
         end
 
         def call_source(cache, obj)
-          "(#{cache}[:#{self[0]}] ||= Analysis::Splitting::Key.split(#{obj}.#{self[0]}, #{self[2].inspect}))[#{self[1]}]"
+          "(#{cache}[:#{method}] ||= Analysis::Splitting::Key.split(#{obj}.#{method}, #{separators.inspect}))[#{index}]"
         end
       end
 
