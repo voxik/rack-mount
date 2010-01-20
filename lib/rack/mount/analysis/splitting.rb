@@ -20,6 +20,10 @@ module Rack::Mount
         def call_source(cache, obj)
           "(#{cache}[:#{method}] ||= Analysis::Splitting::Key.split(#{obj}.#{method}, #{separators.inspect}))[#{index}]"
         end
+
+        def inspect
+          "#{method}[#{index}]"
+        end
       end
 
       def clear
