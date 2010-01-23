@@ -1,10 +1,31 @@
 require 'rack/mount'
 
 class Array
-  def all_permutations
-    a = []
-    (0..size).each { |n| _each_permutation(n) { |e| a << e } }
-    a
+  class PermutationIterator
+    include Enumerable
+
+    def initialize(ary)
+      @ary = ary
+    end
+
+    def each
+      @ary.each_permutation do |e|
+        yield e
+      end
+    end
+  end
+
+  def each_permutation
+    if block_given?
+      (0..size).each do |n|
+        _each_permutation(n) do |e|
+          yield e
+        end
+      end
+      self
+    else
+      PermutationIterator.new(self)
+    end
   end
 
   def _each_permutation(n)
@@ -101,12 +122,12 @@ class GraphReport
       job.initial = {}
 
       job.map = lambda do |permutation|
-        self.route_set_stats(@routes, permutation)
+        self.class.route_set_stats(@routes, permutation)
       end
 
       job.threads = 8
 
-      job.process key_set.to_a.all_permutations
+      job.process key_set.to_a.each_permutation
     end
   end
 
