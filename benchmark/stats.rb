@@ -1,17 +1,5 @@
 require 'rack/mount'
 
-EchoApp = lambda { |env| [200, {'Content-Type' => 'text/html'}, ['OK']] }
-
-module GraphRecognitionKeys
-  attr_accessor :_recognition_keys
-
-  private
-    def build_recognition_keys
-      @_recognition_keys
-    end
-end
-
-
 class Array
   def all_permutations
     a = []
@@ -90,6 +78,18 @@ end
 
 
 class GraphReport
+  def self.route_set_stats(routes, keys)
+    routes = routes.dup
+    routes.instance_variable_set('@_recognition_keys', keys)
+    routes.instance_eval do
+      def build_recognition_keys
+        @_recognition_keys
+      end
+    end
+    routes.rehash
+    routes.send(:recognition_stats)
+  end
+
   def initialize(routes)
     @routes = routes
   end
@@ -101,8 +101,7 @@ class GraphReport
       job.initial = {}
 
       job.map = lambda do |permutation|
-        $stderr.write "Permutation: #{permutation.inspect}" if $VERBOSE
-        routes(permutation).send(:recognition_stats)
+        self.route_set_stats(@routes, permutation)
       end
 
       job.threads = 8
@@ -167,13 +166,5 @@ class GraphReport
 
     def key_set
       @key_set ||= Set.new(analyzer.possible_keys.map(&:keys).flatten)
-    end
-
-    def routes(keys)
-      routes = @routes.dup
-      routes.extend(GraphRecognitionKeys)
-      routes._recognition_keys = keys
-      routes.rehash
-      routes
     end
 end
