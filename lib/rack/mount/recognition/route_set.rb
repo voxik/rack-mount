@@ -86,6 +86,15 @@ module Rack::Mount
         super
       end
 
+      protected
+        def recognition_stats
+          { :keys => @recognition_keys,
+            :keys_size => @recognition_keys.size,
+            :graph_size => @recognition_graph.size,
+            :graph_height => @recognition_graph.height,
+            :graph_average_height => @recognition_graph.average_height }
+        end
+
       private
         def expire!
           @recognition_keys = @recognition_graph = nil

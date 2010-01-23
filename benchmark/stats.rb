@@ -102,14 +102,7 @@ class GraphReport
 
       job.map = lambda do |permutation|
         $stderr.write "Permutation: #{permutation.inspect}" if $VERBOSE
-
-        graph = routes(permutation).instance_variable_get('@recognition_graph')
-
-        {
-          :key_count => permutation.size,
-          :graph_height => graph.height,
-          :graph_average => graph.average_height
-        }
+        routes(permutation).send(:recognition_stats)
       end
 
       job.threads = 8
@@ -123,11 +116,11 @@ class GraphReport
   end
 
   def filtered_by_avg_height
-    @filtered_by_avg_height ||= select_minimum_statistic(filtered_by_max_height.last, :graph_average)
+    @filtered_by_avg_height ||= select_minimum_statistic(filtered_by_max_height.last, :graph_average_height)
   end
 
   def filtered_by_key_count
-    @filtered_by_key_count ||= select_minimum_statistic(filtered_by_max_height.last, :key_count)
+    @filtered_by_key_count ||= select_minimum_statistic(filtered_by_max_height.last, :keys_size)
   end
 
   def good_choices
