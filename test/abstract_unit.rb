@@ -9,27 +9,6 @@ require 'test/unit'
 require 'rack/mount'
 require 'fixtures'
 
-module ControllerConstants
-  def const_missing(name)
-    if name.to_s =~ /Controller$/
-      const_set(name, EchoApp)
-    else
-      super
-    end
-  end
-end
-
-module Account
-  extend ControllerConstants
-end
-
-Object.extend(ControllerConstants)
-
-def supports_named_captures?
-  require 'rack/mount/utils'
-  Reginald.regexp_supports_named_captures?
-end
-
 class Test::Unit::TestCase
   private
     def set_included_modules
