@@ -7,6 +7,10 @@ class TestStrexp < Test::Unit::TestCase
     assert_equal %r{foo}, Strexp.compile(%r{foo})
   end
 
+  def test_unanchored_segment
+    assert_equal %r{\A/foo(?:/bar)?}, Strexp.compile('/foo(/bar)', {}, [], false)
+  end
+
   def test_does_mutate_args
     str = 'foo/:bar'.freeze
     requirements = { :bar  => /[a-z]+/.freeze }.freeze

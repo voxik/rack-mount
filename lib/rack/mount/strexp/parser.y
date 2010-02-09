@@ -1,6 +1,6 @@
 class Rack::Mount::StrexpParser
 rule
-  target: expr { result = "\\A#{val.join}\\Z" }
+  target: expr { result = anchor ? "\\A#{val.join}\\Z" : "\\A#{val.join}" }
 
   expr: expr token { result = val.join }
       | token
@@ -30,4 +30,4 @@ else
   REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
 end
 
-attr_accessor :requirements
+attr_accessor :anchor, :requirements

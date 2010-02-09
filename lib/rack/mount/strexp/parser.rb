@@ -20,7 +20,7 @@ else
   REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
 end
 
-attr_accessor :requirements
+attr_accessor :anchor, :requirements
 ##### State transition tables begin ###
 
 racc_action_table = [
@@ -114,7 +114,7 @@ Racc_debug_parser = false
 # reduce 0 omitted
 
 def _reduce_1(val, _values, result)
- result = "\\A#{val.join}\\Z" 
+ result = anchor ? "\\A#{val.join}\\Z" : "\\A#{val.join}" 
     result
 end
 

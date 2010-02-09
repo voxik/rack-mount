@@ -21,13 +21,14 @@ module Rack::Mount
     #
     #   Strexp.compile('src/*files')
     #     # => %r{\Asrc/(?<files>.+)\Z}
-    def initialize(str, requirements = {}, separators = [])
+    def initialize(str, requirements = {}, separators = [], anchor = true)
       return super(str) if str.is_a?(Regexp)
 
       requirements = requirements ? requirements.dup : {}
       normalize_requirements!(requirements, separators)
 
       parser = StrexpParser.new
+      parser.anchor = anchor
       parser.requirements = requirements
 
       begin
