@@ -95,7 +95,7 @@ module Rack::Mount
     #   regexp_anchored?(/^foo/)  # => false
     #   regexp_anchored?(/foo$/)  # => false
     def regexp_anchored?(regexp)
-     regexp.source =~ /\A(\\A|\^).*(\\Z|\$)\Z/ ? true : false
+     regexp.source =~ /\A(\\A|\^).*(\\Z|\$)\Z/m ? true : false
     end
     module_function :regexp_anchored?
 
