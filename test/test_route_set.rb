@@ -2,6 +2,7 @@ require 'abstract_unit'
 
 class TestRouteSet < Test::Unit::TestCase
   def setup
+    @env = Rack::MockRequest.env_for('/')
     @app = BasicSet
     assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
@@ -9,11 +10,11 @@ class TestRouteSet < Test::Unit::TestCase
   def test_rehash_builds_graph
     set = new_route_set
     assert_raise(RuntimeError) { set.call({}) }
-    assert_raise(RuntimeError) { set.url(:foo) }
+    assert_raise(RuntimeError) { set.url(@env, :foo) }
 
     set.rehash
     assert_nothing_raised(RuntimeError) { set.call({}) }
-    assert_raise(Rack::Mount::RoutingError) { set.url(:foo) }
+    assert_raise(Rack::Mount::RoutingError) { set.url(@env, :foo) }
   end
 
   def test_add_additional_routes_and_manually_rehash
@@ -31,11 +32,11 @@ class TestRouteSet < Test::Unit::TestCase
   def test_ensure_routeset_needs_to_be_frozen
     set = new_route_set
     assert_raise(RuntimeError) { set.call({}) }
-    assert_raise(RuntimeError) { set.url(:foo) }
+    assert_raise(RuntimeError) { set.url(@env, :foo) }
 
     set.freeze
     assert_nothing_raised(RuntimeError) { set.call({}) }
-    assert_raise(Rack::Mount::RoutingError) { set.url(:foo) }
+    assert_raise(Rack::Mount::RoutingError) { set.url(@env, :foo) }
   end
 
   def test_ensure_each_route_requires_a_valid_rack_app
@@ -152,6 +153,7 @@ end
 
 class TestOptimizedRouteSet < TestRouteSet
   def setup
+    @env = Rack::MockRequest.env_for('/')
     @app = OptimizedBasicSet
     assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
   end
@@ -164,6 +166,7 @@ end
 
 class TestLinearRouteSet < TestRouteSet
   def setup
+    @env = Rack::MockRequest.env_for('/')
     @app = LinearBasicSet
   end
 

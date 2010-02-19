@@ -20,28 +20,45 @@ module Rack::Mount
         route
       end
 
-      # Generates path from identifiers or significant keys.
+      # Generates a url from Rack env and identifiers or significant keys.
       #
       # To generate a url by named route, pass the name in as a +Symbol+.
-      #   url(:dashboard) # => "/dashboard"
+      #   url(env, :dashboard) # => "/dashboard"
       #
       # Additional parameters can be passed in as a hash
-      #   url(:people, :id => "1") # => "/people/1"
+      #   url(env, :people, :id => "1") # => "/people/1"
       #
       # If no name route is given, it will fall back to a slower
       # generation search.
-      #   url(:controller => "people", :action => "show", :id => "1")
+      #   url(env, :controller => "people", :action => "show", :id => "1")
       #     # => "/people/1"
-      def url(*args)
-        named_route, params, recall, options = extract_params!(*args)
+      def url(env, *args)
+        named_route, params = nil, {}
 
-        options[:parameterize] ||= lambda { |name, param| Utils.escape_uri(param) }
+        case args.length
+        when 2
+          named_route, params = args[0], args[1].dup
+        when 1
+          if args[0].is_a?(Hash)
+            params = args[0].dup
+          else
+            named_route = args[0]
+          end
+        else
+          raise ArgumentError
+        end
 
-        unless result = generate(:path_info, named_route, params, recall, options)
+        only_path = params.delete(:only_path)
+        recall = env[@parameters_key] || {}
+
+        unless result = generate([:host, :path_info], named_route, params, recall,
+            :parameterize => lambda { |name, param| Utils.escape_uri(param) })
           return
         end
 
-        uri, params = result
+        parts, params = result
+        return unless parts
+
         params.each do |k, v|
           if v
             params[k] = v
@@ -50,7 +67,10 @@ module Rack::Mount
           end
         end
 
-        uri << "?#{Utils.build_nested_query(params)}" if uri && params.any?
+        req = @request_class.new(env)
+        uri = only_path ? '' : "#{req.scheme}://#{parts[0] || req.host}"
+        uri = "#{uri}#{req.script_name}#{parts[1]}"
+        uri << "?#{Utils.build_nested_query(params)}" if params.any?
         uri
       end
 

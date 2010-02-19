@@ -28,7 +28,8 @@ module Rack::Mount
 
       def generate(methods, params = {}, recall = {}, options = {})
         if methods.is_a?(Array)
-          result = methods.map { |m| generate_method(m, params, recall, options) || (return nil) }
+          result = methods.map { |m| generate_method(m, params, recall, options) }
+          return nil if result.all? { |e| e.nil? }
         else
           result = generate_method(methods, params, recall, options)
         end
