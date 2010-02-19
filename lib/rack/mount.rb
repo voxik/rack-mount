@@ -1,7 +1,16 @@
 require 'rack'
 
 module Rack #:nodoc:
-  module Mount #:nodoc:
+  # A stackable dynamic tree based Rack router.
+  #
+  # Rack::Mount supports Rack's Cascade style of trying several routes until
+  # it finds one that is not a 404. This allows multiple routes to be nested
+  # or stacked on top of each other. Since the application endpoint can
+  # trigger the router to continue matching, middleware can be used to add
+  # arbitrary conditions to any route. This allows you to route based on
+  # other request attributes, session information, or even data dynamically
+  # pulled from a database.
+  module Mount
     autoload :GeneratableRegexp, 'rack/mount/generatable_regexp'
     autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
