@@ -1,21 +1,3 @@
-begin
-  require 'hanna/rdoctask'
-rescue LoadError
-  require 'rake/rdoctask'
-end
-
-Rake::RDocTask.new { |rdoc|
-  rdoc.rdoc_dir = 'doc'
-  rdoc.title    = 'Rack::Mount'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.options << '--charset' << 'utf-8'
-
-  rdoc.rdoc_files.include('README.rdoc')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-  rdoc.rdoc_files.exclude('lib/rack/mount/mappers/*.rb')
-}
-
-
 require 'rake/testtask'
 
 task :default => :test
