@@ -67,11 +67,12 @@ module Rack::Mount
           end
         end
 
-        req = @request_class.new(env)
-        uri = only_path ? '' : "#{req.scheme}://#{parts[0] || req.host}"
-        uri = "#{uri}#{req.script_name}#{parts[1]}"
-        uri << "?#{Utils.build_nested_query(params)}" if params.any?
-        uri
+        req = RequestProxy.new(@request_class.new(env), {
+          :host => parts[0],
+          :path_info => parts[1],
+          :query_string => Utils.build_nested_query(params)
+        })
+        only_path ? reconstruct_path(req) : reconstruct_url(req)
       end
 
       def generate(method, *args) #:nodoc:
@@ -175,6 +176,39 @@ module Rack::Mount
           options ||= {}
 
           [named_route, params.dup, recall.dup, options.dup]
+        end
+
+        class RequestProxy
+          def initialize(request, params)
+            @_request, @_params = request, params
+          end
+
+          def method_missing(sym, *args, &block)
+            @_params[sym] || @_request.send(sym, *args, &block)
+          end
+        end
+
+        # TODO: Make this block configurable
+        def reconstruct_path(req)
+          url = "#{req.script_name}#{req.path_info}"
+          url << "?#{req.query_string}" unless req.query_string.empty?
+          url
+        end
+
+        # TODO: Make this block configurable
+        def reconstruct_url(req)
+          url = "#{req.scheme}://#{req.host}"
+
+          scheme, port = req.scheme, req.port
+          if scheme == "https" && port != 443 ||
+              scheme == "http" && port != 80
+            url << ":#{port}"
+          end
+
+          url << req.script_name + req.path_info
+          url << "?#{req.query_string}" unless req.query_string.empty?
+
+          url
         end
     end
   end
