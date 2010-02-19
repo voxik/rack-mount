@@ -67,12 +67,13 @@ module Rack::Mount
           end
         end
 
-        req = RequestProxy.new(@request_class.new(env), {
+        req = stubbed_request_class.new(env)
+        req._stubbed_values = {
           :host => parts[0],
           :path_info => parts[1],
           :query_string => Utils.build_nested_query(params)
-        })
-        only_path ? reconstruct_path(req) : reconstruct_url(req)
+        }
+        only_path ? req.fullpath : req.url
       end
 
       def generate(method, *args) #:nodoc:
@@ -178,37 +179,24 @@ module Rack::Mount
           [named_route, params.dup, recall.dup, options.dup]
         end
 
-        class RequestProxy
-          def initialize(request, params)
-            @_request, @_params = request, params
-          end
-
-          def method_missing(sym, *args, &block)
-            @_params[sym] || @_request.send(sym, *args, &block)
-          end
+        def instance_variables_to_serialize
+          super - [:@stubbed_request_class]
         end
 
-        # TODO: Make this block configurable
-        def reconstruct_path(req)
-          url = "#{req.script_name}#{req.path_info}"
-          url << "?#{req.query_string}" unless req.query_string.empty?
-          url
-        end
-
-        # TODO: Make this block configurable
-        def reconstruct_url(req)
-          url = "#{req.scheme}://#{req.host}"
-
-          scheme, port = req.scheme, req.port
-          if scheme == "https" && port != 443 ||
-              scheme == "http" && port != 80
-            url << ":#{port}"
+        def stubbed_request_class
+          @stubbed_request_class ||= begin
+            klass = Class.new(@request_class)
+            klass.public_instance_methods.each do |method|
+              next if method =~ /^__/
+              klass.class_eval <<-RUBY
+                def #{method}(*args, &block)
+                  @_stubbed_values[:#{method}] || super
+                end
+              RUBY
+            end
+            klass.class_eval { attr_accessor :_stubbed_values }
+            klass
           end
-
-          url << req.script_name + req.path_info
-          url << "?#{req.query_string}" unless req.query_string.empty?
-
-          url
         end
     end
   end
