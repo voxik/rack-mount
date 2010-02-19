@@ -187,7 +187,7 @@ module Rack::Mount
           @stubbed_request_class ||= begin
             klass = Class.new(@request_class)
             klass.public_instance_methods.each do |method|
-              next if method =~ /^__/
+              next if method =~ /^__|object_id/
               klass.class_eval <<-RUBY
                 def #{method}(*args, &block)
                   @_stubbed_values[:#{method}] || super
