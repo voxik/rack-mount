@@ -51,7 +51,7 @@ module Rack::Mount
         only_path = params.delete(:only_path)
         recall = env[@parameters_key] || {}
 
-        unless result = generate([:host, :path_info], named_route, params, recall,
+        unless result = generate(:all, named_route, params, recall,
             :parameterize => lambda { |name, param| Utils.escape_uri(param) })
           return
         end
@@ -77,6 +77,7 @@ module Rack::Mount
       def generate(method, *args) #:nodoc:
         raise 'route set not finalized' unless @generation_graph
 
+        method = nil if method == :all
         named_route, params, recall, options = extract_params!(*args)
         merged = recall.merge(params)
         route = nil

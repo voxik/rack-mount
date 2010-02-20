@@ -68,9 +68,7 @@ class TestGeneration < Test::Unit::TestCase
 
   def test_generate_host
     assert_equal ['josh.backpackit.com', {}], @app.generate(:host, :controller => 'account', :account => 'josh')
-    assert_equal [{:host => 'josh.backpackit.com', :path_info => '/host'}, {}], @app.generate([:host, :path_info], :controller => 'account', :account => 'josh')
     assert_equal [{:host => 'josh.backpackit.com', :path_info => '/host'}, {}], @app.generate(:all, :controller => 'account', :account => 'josh')
-    assert_equal [{:host => nil, :path_info => '/login'}, {}], @app.generate([:host, :path_info], :login)
     assert_equal [{:request_method => 'GET', :path_info => '/login'}, {}], @app.generate(:all, :login)
     assert_equal 'http://josh.backpackit.com/host', @app.url(@env, :controller => 'account', :account => 'josh')
   end

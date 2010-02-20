@@ -26,21 +26,17 @@ module Rack::Mount
         @has_significant_params
       end
 
-      def generate(methods, params = {}, recall = {}, options = {})
-        if methods == :all
+      def generate(method, params = {}, recall = {}, options = {})
+        if method.nil?
           result = @conditions.inject({}) { |h, (method, condition)|
-            h[method] = condition.generate(params, recall, options)
-            h
-          }
-          return nil if result.values.compact.empty?
-        elsif methods.is_a?(Array)
-          result = methods.inject({}) { |h, m|
-            h[m] = generate_method(m, params, recall, options)
+            if condition.respond_to?(:generate)
+              h[method] = condition.generate(params, recall, options)
+            end
             h
           }
           return nil if result.values.compact.empty?
         else
-          result = generate_method(methods, params, recall, options)
+          result = generate_method(method, params, recall, options)
         end
 
         if result
