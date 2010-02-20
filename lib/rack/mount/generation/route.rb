@@ -27,9 +27,18 @@ module Rack::Mount
       end
 
       def generate(methods, params = {}, recall = {}, options = {})
-        if methods.is_a?(Array)
-          result = methods.map { |m| generate_method(m, params, recall, options) }
-          return nil if result.all? { |e| e.nil? }
+        if methods == :all
+          result = @conditions.inject({}) { |h, (method, condition)|
+            h[method] = condition.generate(params, recall, options)
+            h
+          }
+          return nil if result.values.compact.empty?
+        elsif methods.is_a?(Array)
+          result = methods.inject({}) { |h, m|
+            h[m] = generate_method(m, params, recall, options)
+            h
+          }
+          return nil if result.values.compact.empty?
         else
           result = generate_method(methods, params, recall, options)
         end

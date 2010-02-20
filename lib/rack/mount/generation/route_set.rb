@@ -68,11 +68,9 @@ module Rack::Mount
         end
 
         req = stubbed_request_class.new(env)
-        req._stubbed_values = {
-          :host => parts[0],
-          :path_info => parts[1],
+        req._stubbed_values = parts.merge({
           :query_string => Utils.build_nested_query(params)
-        }
+        })
         only_path ? req.fullpath : req.url
       end
 
