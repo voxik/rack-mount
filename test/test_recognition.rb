@@ -120,6 +120,12 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'account', :account => 'josh' }, routing_args)
   end
 
+  def test_full_uri_condition
+    get '/full/foo'
+    assert_success
+    assert_equal({ :scheme => 'http', :host => 'example.org', :foo => 'foo' }, routing_args)
+  end
+
   def test_xhr_boolean_condition
     get '/xhr', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'
     assert_success

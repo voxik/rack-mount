@@ -67,6 +67,7 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => '/method', :request_method => /get|post/i }, { :controller => 'method', :action => 'index' })
   set.add_route(EchoApp, { :path_info => '/host', :host => %r{^(?<account>[0-9a-z]+)\.backpackit\.com$} }, { :controller => 'account' })
   set.add_route(EchoApp, { :path_info => '/xhr', :xhr? => true }, { :controller => 'xhr' })
+  set.add_route(EchoApp, { :url => %r{^(?<scheme>.+)://(?<host>.+)/full/(?<foo>.+)$} }, {}, :full_url)
 
   set.add_route(EchoApp, { :path_info => %r{^/static_group/(foo)(bar)$} })
   set.add_route(EchoApp, { :path_info => %r{^/optional/index(\.(?<format>[a-z]+))?$} }, { :controller => 'optional', :action => 'index' })

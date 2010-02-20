@@ -73,6 +73,10 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal 'http://josh.backpackit.com/host', @app.url(@env, :controller => 'account', :account => 'josh')
   end
 
+  def test_generate_full_url
+    assert_equal ['http://example.com/full/bar', {}], @app.generate(:url, :full_url, :scheme => 'http', :host => 'example.com', :foo => 'bar')
+  end
+
   def test_does_not_mutuate_params
     assert_equal 'http://example.org/login', @app.url(@env, {:controller => 'sessions', :action => 'new'}.freeze)
     assert_equal ['josh.backpackit.com', {}], @app.generate(:host, {:controller => 'account', :account => 'josh'}.freeze)
