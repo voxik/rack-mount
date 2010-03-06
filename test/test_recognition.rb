@@ -394,6 +394,19 @@ class TestRecognition < Test::Unit::TestCase
     assert_success
   end
 
+  def test_small_set_with_unbound_path
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => %r{^/foo})
+      set.add_route(EchoApp, :path_info => %r{^/bar})
+    end
+
+    get '/foo'
+    assert_success
+
+    get '/foo/bar'
+    assert_success
+  end
+
   private
     def new_route_set(*args, &block)
       Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
