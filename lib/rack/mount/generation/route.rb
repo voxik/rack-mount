@@ -28,9 +28,9 @@ module Rack::Mount
 
       def generate(method, params = {}, recall = {}, options = {})
         if method.nil?
-          result = @conditions.inject({}) { |h, (method, condition)|
+          result = @conditions.inject({}) { |h, (m, condition)|
             if condition.respond_to?(:generate)
-              h[method] = condition.generate(params, recall, options)
+              h[m] = condition.generate(params, recall, options)
             end
             h
           }
