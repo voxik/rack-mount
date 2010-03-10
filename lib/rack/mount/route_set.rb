@@ -57,7 +57,17 @@ module Rack::Mount
     # <tt>name</tt>:: Symbol identifier for the route used with named
     #                 route generations
     def add_route(app, conditions = {}, defaults = {}, name = nil)
-      validate_conditions!(conditions)
+      unless conditions.is_a?(Hash)
+        raise ArgumentError, 'conditions must be a Hash'
+      end
+
+      unless conditions.all? { |method, pattern|
+          @valid_conditions.include?(method)
+        }
+        raise ArgumentError, 'conditions may only include ' +
+          @valid_conditions.inspect
+      end
+
       route = Route.new(app, conditions, defaults, name)
       @routes << route
 
@@ -291,19 +301,6 @@ module Rack::Mount
 
       def instance_variables_to_serialize
         instance_variables.map { |ivar| ivar.to_sym } - [:@stubbed_request_class, :@optimized_recognize_defined]
-      end
-
-      def validate_conditions!(conditions)
-        unless conditions.is_a?(Hash)
-          raise ArgumentError, 'conditions must be a Hash'
-        end
-
-        unless conditions.all? { |method, pattern|
-            @valid_conditions.include?(method)
-          }
-          raise ArgumentError, 'conditions may only include ' +
-            @valid_conditions.inspect
-        end
       end
 
       # An internal helper method for constructing a nested set from
