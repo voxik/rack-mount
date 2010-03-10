@@ -233,7 +233,11 @@ module Rack::Mount
     def freeze
       unless frozen?
         rehash
-        flush!
+
+        @recognition_key_analyzer = nil
+        @generation_key_analyzer  = nil
+        @valid_conditions         = nil
+
         @routes.each { |route| route.freeze }
         @routes.freeze
       end
@@ -283,12 +287,6 @@ module Rack::Mount
 
         @generation_keys = @generation_graph = nil
         @generation_key_analyzer.expire!
-      end
-
-      def flush! #:nodoc:
-        @recognition_key_analyzer = nil
-        @generation_key_analyzer  = nil
-        @valid_conditions         = nil
       end
 
       def instance_variables_to_serialize
