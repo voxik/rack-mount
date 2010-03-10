@@ -3,6 +3,8 @@ require 'rack/mount/route'
 require 'rack/mount/utils'
 
 module Rack::Mount
+  class RoutingError < StandardError; end
+
   class RouteSet
     extend Mixover
 

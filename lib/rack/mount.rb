@@ -18,7 +18,7 @@ module Rack #:nodoc:
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'
     autoload :Route, 'rack/mount/route'
     autoload :RouteSet, 'rack/mount/route_set'
-    autoload :RoutingError, 'rack/mount/exceptions'
+    autoload :RoutingError, 'rack/mount/route_set'
     autoload :Strexp, 'rack/mount/strexp'
     autoload :Utils, 'rack/mount/utils'
 
