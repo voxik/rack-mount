@@ -8,11 +8,11 @@ module Rack::Mount
   class RouteSet
     extend Mixover
 
-    include Recognition::CodeGeneration
+    include CodeGeneration
 
     # Initialize a new RouteSet without optimizations
     def self.new_without_optimizations(*args, &block)
-      new_without_module(Recognition::CodeGeneration, *args, &block)
+      new_without_module(CodeGeneration, *args, &block)
     end
 
     # Basic RouteSet initializer.

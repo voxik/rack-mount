@@ -11,6 +11,7 @@ module Rack #:nodoc:
   # other request attributes, session information, or even data dynamically
   # pulled from a database.
   module Mount
+    autoload :CodeGeneration, 'rack/mount/code_generation'
     autoload :GeneratableRegexp, 'rack/mount/generatable_regexp'
     autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
@@ -27,10 +28,6 @@ module Rack #:nodoc:
       autoload :Frequency, 'rack/mount/analysis/frequency'
       autoload :Histogram, 'rack/mount/analysis/histogram'
       autoload :Splitting, 'rack/mount/analysis/splitting'
-    end
-
-    module Recognition #:nodoc:
-      autoload :CodeGeneration, 'rack/mount/recognition/code_generation'
     end
   end
 end

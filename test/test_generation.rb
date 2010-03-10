@@ -5,7 +5,7 @@ class TestGeneration < Test::Unit::TestCase
   def setup
     @env = Rack::MockRequest.env_for('/')
     @app = BasicSet
-    assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert !set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
   def test_url_with_named_route
@@ -126,7 +126,7 @@ class TestOptimizedGeneration < TestGeneration
   def setup
     @env = Rack::MockRequest.env_for('/')
     @app = OptimizedBasicSet
-    assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 end
 

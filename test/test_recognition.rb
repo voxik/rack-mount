@@ -5,7 +5,7 @@ require 'abstract_unit'
 class TestRecognition < Test::Unit::TestCase
   def setup
     @app = BasicSet
-    assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert !set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
   def test_raw_recognize
@@ -416,7 +416,7 @@ end
 class TestOptimizedRecognition < TestRecognition
   def setup
     @app = OptimizedBasicSet
-    assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
   private

@@ -4,7 +4,7 @@ class TestRouteSet < Test::Unit::TestCase
   def setup
     @env = Rack::MockRequest.env_for('/')
     @app = BasicSet
-    assert !set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert !set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
   def test_rehash_builds_graph
@@ -155,7 +155,7 @@ class TestOptimizedRouteSet < TestRouteSet
   def setup
     @env = Rack::MockRequest.env_for('/')
     @app = OptimizedBasicSet
-    assert set_included_modules.include?(Rack::Mount::Recognition::CodeGeneration)
+    assert set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
   private
