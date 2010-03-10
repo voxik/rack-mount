@@ -21,6 +21,7 @@ module Rack #:nodoc:
     autoload :RoutingError, 'rack/mount/route_set'
     autoload :Strexp, 'rack/mount/strexp'
     autoload :Utils, 'rack/mount/utils'
+    autoload :Version, 'rack/mount/version'
 
     module Analysis #:nodoc:
       autoload :Frequency, 'rack/mount/analysis/frequency'
