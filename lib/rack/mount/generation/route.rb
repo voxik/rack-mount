@@ -36,7 +36,11 @@ module Rack::Mount
           }
           return nil if result.values.compact.empty?
         else
-          result = generate_method(method, params, recall, options)
+          if condition = @conditions[method]
+            if condition.respond_to?(:generate)
+              result = condition.generate(params, recall, options)
+            end
+          end
         end
 
         if result
@@ -47,13 +51,6 @@ module Rack::Mount
 
         result
       end
-
-      private
-        def generate_method(method, params, recall, options)
-          if condition = @conditions[method]
-            condition.generate(params, recall, options)
-          end
-        end
     end
   end
 end
