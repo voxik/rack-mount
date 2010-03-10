@@ -290,7 +290,7 @@ module Rack::Mount
       end
 
       def instance_variables_to_serialize
-        instance_variables.map { |ivar| ivar.to_sym } - [:@stubbed_request_class]
+        instance_variables.map { |ivar| ivar.to_sym } - [:@stubbed_request_class, :@optimized_recognize_defined]
       end
 
       def validate_conditions!(conditions)

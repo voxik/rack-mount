@@ -10,10 +10,6 @@ module Rack::Mount
     end
 
     private
-      def instance_variables_to_serialize
-        super - [:@optimized_recognize_defined]
-      end
-
       def expire!
         if @optimized_recognize_defined
           remove_metaclass_method :recognize
