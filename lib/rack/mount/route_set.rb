@@ -7,7 +7,6 @@ module Rack::Mount
 
   class RouteSet
     extend Mixover
-
     include CodeGeneration
 
     # Initialize a new RouteSet without optimizations
@@ -25,7 +24,9 @@ module Rack::Mount
     def initialize(options = {}, &block)
       @parameters_key = options.delete(:parameters_key) || 'rack.routing_args'
       @parameters_key.freeze
-      @recognition_key_analyzer = Analysis::Frequency.new_with_module(Analysis::Splitting)
+      @recognition_key_analyzer = Analysis::Frequency.new
+      @recognition_key_analyzer.extend(Analysis::Splitting)
+      @recognition_key_analyzer.clear
 
       @named_routes = {}
       @generation_key_analyzer = Analysis::Frequency.new

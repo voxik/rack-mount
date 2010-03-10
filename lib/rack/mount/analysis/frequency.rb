@@ -3,8 +3,6 @@ require 'rack/mount/utils'
 module Rack::Mount
   module Analysis
     class Frequency #:nodoc:
-      extend Mixover
-
       def initialize(*keys)
         clear
         keys.each { |key| self << key }
