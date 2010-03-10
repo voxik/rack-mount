@@ -3,8 +3,6 @@ require 'rack/mount/utils'
 module Rack::Mount
   module Recognition
     module RouteSet
-      attr_reader :parameters_key
-
       # Adds recognition related concerns to RouteSet.new.
       def initialize(options = {})
         @parameters_key = options.delete(:parameters_key) || 'rack.routing_args'
