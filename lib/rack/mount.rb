@@ -28,13 +28,8 @@ module Rack #:nodoc:
       autoload :Splitting, 'rack/mount/analysis/splitting'
     end
 
-    module Generation #:nodoc:
-      autoload :RouteSet, 'rack/mount/generation/route_set'
-    end
-
     module Recognition #:nodoc:
       autoload :CodeGeneration, 'rack/mount/recognition/code_generation'
-      autoload :RouteSet, 'rack/mount/recognition/route_set'
     end
   end
 end
