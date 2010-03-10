@@ -29,13 +29,11 @@ module Rack #:nodoc:
     end
 
     module Generation #:nodoc:
-      autoload :Route, 'rack/mount/generation/route'
       autoload :RouteSet, 'rack/mount/generation/route_set'
     end
 
     module Recognition #:nodoc:
       autoload :CodeGeneration, 'rack/mount/recognition/code_generation'
-      autoload :Route, 'rack/mount/recognition/route'
       autoload :RouteSet, 'rack/mount/recognition/route_set'
     end
   end

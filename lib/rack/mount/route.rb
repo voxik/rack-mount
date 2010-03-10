@@ -9,11 +9,6 @@ module Rack::Mount
   # new Route objects. Instead use the factory method, RouteSet#add_route
   # to create new routes and add them to the set.
   class Route
-    extend Mixover
-
-    # Include generation and recognition concerns
-    include Generation::Route, Recognition::Route
-
     # Valid rack application to call if conditions are met
     attr_reader :app
 
@@ -54,8 +49,103 @@ module Rack::Mount
         @conditions[method] = pattern.freeze
       end
 
+      @named_captures = {}
+      @conditions.map { |method, condition|
+        next unless condition.respond_to?(:named_captures)
+        @named_captures[method] = condition.named_captures.inject({}) { |named_captures, (k, v)|
+          named_captures[k.to_sym] = v.last - 1
+          named_captures
+        }.freeze
+      }
+      @named_captures.freeze
+
+      if @conditions.has_key?(:path_info) &&
+          !Utils.regexp_anchored?(@conditions[:path_info])
+        @prefix = true
+        @app = Prefix.new(@app)
+      else
+        @prefix = false
+      end
+
       @conditions.freeze
     end
+
+
+    def prefix?
+      @prefix
+    end
+
+    def recognize(obj)
+      matches = {}
+      params  = @defaults.dup
+
+      if @conditions.all? { |method, condition|
+        value = obj.send(method)
+        if condition.is_a?(Regexp) && (m = value.match(condition))
+          matches[method] = m
+          captures = m.captures
+          @named_captures[method].each { |k, i|
+            if v = captures[i]
+              params[k] = v
+            end
+          }
+          true
+        elsif value == condition
+          true
+        else
+          false
+        end
+      }
+        return matches, params
+      else
+        nil
+      end
+    end
+
+
+    def generation_keys
+      @conditions.inject({}) { |keys, (method, condition)|
+        if condition.respond_to?(:required_defaults)
+          keys.merge!(condition.required_defaults)
+        else
+          keys
+        end
+      }
+    end
+
+    def significant_params?
+      @has_significant_params ||= @conditions.any? { |method, condition|
+        (condition.respond_to?(:required_params) && condition.required_params.any?) ||
+          (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
+      }
+    end
+
+    def generate(method, params = {}, recall = {}, options = {})
+      if method.nil?
+        result = @conditions.inject({}) { |h, (m, condition)|
+          if condition.respond_to?(:generate)
+            h[m] = condition.generate(params, recall, options)
+          end
+          h
+        }
+        return nil if result.values.compact.empty?
+      else
+        if condition = @conditions[method]
+          if condition.respond_to?(:generate)
+            result = condition.generate(params, recall, options)
+          end
+        end
+      end
+
+      if result
+        @defaults.each do |key, value|
+          params.delete(key) if params[key] == value
+        end
+      end
+
+      result
+    end
+
 
     def inspect #:nodoc:
       "#<#{self.class.name} @app=#{@app.inspect} @conditions=#{@conditions.inspect} @defaults=#{@defaults.inspect} @name=#{@name.inspect}>"

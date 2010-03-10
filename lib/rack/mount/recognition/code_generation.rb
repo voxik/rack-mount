@@ -48,7 +48,7 @@ module Rack::Mount
               if condition.is_a?(Regexp)
                 b << "if m = obj.#{method}.match(#{condition.inspect})"
                 b << "matches[:#{method}] = m"
-                if (named_captures = route.named_captures[method]) && named_captures.any?
+                if (named_captures = route.instance_variable_get('@named_captures')[method]) && named_captures.any?
                   b << 'captures = m.captures'
                   b << 'p = nil'
                   b << named_captures.map { |k, j| "params[#{k.inspect}] = p if p = captures[#{j}]" }.join('; ')
