@@ -2,7 +2,7 @@ require 'rack/mount/utils'
 
 module Rack::Mount
   module Analysis
-    module Splitting
+    class Splitting < Frequency
       NULL = "\0".freeze
 
       class Key < Struct.new(:method, :index, :separators)

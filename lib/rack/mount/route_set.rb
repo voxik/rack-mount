@@ -21,12 +21,11 @@ module Rack::Mount
     def initialize(options = {}, &block)
       @parameters_key = options.delete(:parameters_key) || 'rack.routing_args'
       @parameters_key.freeze
-      @recognition_key_analyzer = Analysis::Frequency.new
-      @recognition_key_analyzer.extend(Analysis::Splitting)
-      @recognition_key_analyzer.clear
 
       @named_routes = {}
-      @generation_key_analyzer = Analysis::Frequency.new
+
+      @recognition_key_analyzer = Analysis::Splitting.new
+      @generation_key_analyzer  = Analysis::Frequency.new
 
       @request_class = options.delete(:request_class) || Rack::Request
       @valid_conditions = begin
