@@ -1,10 +1,5 @@
 module Rack::Mount
   module CodeGeneration #:nodoc:
-    def initialize(*args)
-      @optimized_recognize_defined = false
-      super
-    end
-
     def _expired_recognize(env) #:nodoc:
       raise 'route set not finalized'
     end

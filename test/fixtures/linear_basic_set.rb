@@ -10,8 +10,11 @@ module ForceLinearGraph
 end
 
 class << Rack::Mount::RouteSet
-  def new_with_linear_graph(*args, &block)
-    new_with_module(ForceLinearGraph, *args, &block)
+  def new_with_linear_graph(options = {}, &block)
+    set = new_without_optimizations(options, &block)
+    set.extend(ForceLinearGraph)
+    set.rehash
+    set
   end
 end
 

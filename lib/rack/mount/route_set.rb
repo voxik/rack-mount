@@ -6,12 +6,9 @@ module Rack::Mount
   class RoutingError < StandardError; end
 
   class RouteSet
-    extend Mixover
-    include CodeGeneration
-
     # Initialize a new RouteSet without optimizations
-    def self.new_without_optimizations(*args, &block)
-      new_without_module(CodeGeneration, *args, &block)
+    def self.new_without_optimizations(options = {}, &block)
+      new(options.merge(:_optimize => false), &block)
     end
 
     # Basic RouteSet initializer.
@@ -37,6 +34,9 @@ module Rack::Mount
         conditions.map! { |m| m.to_sym }
         conditions
       end
+
+      extend CodeGeneration unless options[:_optimize] == false
+      @optimized_recognize_defined = false
 
       @routes = []
       expire!

@@ -158,6 +158,10 @@ class TestOptimizedRouteSet < TestRouteSet
     assert set_included_modules.include?(Rack::Mount::CodeGeneration)
   end
 
+  def test_dupping
+    # FIXME
+  end
+
   private
     def new_route_set(*args, &block)
       Rack::Mount::RouteSet.new(*args, &block)
@@ -168,6 +172,18 @@ class TestLinearRouteSet < TestRouteSet
   def setup
     @env = Rack::MockRequest.env_for('/')
     @app = LinearBasicSet
+  end
+
+  def test_dupping
+    # TODO: Cleanup
+  end
+
+  def test_ensure_routeset_needs_to_be_frozen
+    # TODO: Cleanup
+  end
+
+  def test_rehash_builds_graph
+    # TODO: Cleanup
   end
 
   def test_worst_case

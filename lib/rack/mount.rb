@@ -13,7 +13,6 @@ module Rack #:nodoc:
   module Mount
     autoload :CodeGeneration, 'rack/mount/code_generation'
     autoload :GeneratableRegexp, 'rack/mount/generatable_regexp'
-    autoload :Mixover, 'rack/mount/mixover'
     autoload :Multimap, 'rack/mount/multimap'
     autoload :Prefix, 'rack/mount/prefix'
     autoload :RegexpWithNamedGroups, 'rack/mount/regexp_with_named_groups'
