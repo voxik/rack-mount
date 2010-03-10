@@ -3,15 +3,6 @@ require 'rack/mount/utils'
 module Rack::Mount
   module Generation
     module Route #:nodoc:
-      def initialize(*args)
-        super
-
-        @has_significant_params = @conditions.any? { |method, condition|
-          (condition.respond_to?(:required_params) && condition.required_params.any?) ||
-            (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
-        }
-      end
-
       def generation_keys
         @conditions.inject({}) { |keys, (method, condition)|
           if condition.respond_to?(:required_defaults)
@@ -23,7 +14,10 @@ module Rack::Mount
       end
 
       def significant_params?
-        @has_significant_params
+        @has_significant_params ||= @conditions.any? { |method, condition|
+          (condition.respond_to?(:required_params) && condition.required_params.any?) ||
+            (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
+        }
       end
 
       def generate(method, params = {}, recall = {}, options = {})
