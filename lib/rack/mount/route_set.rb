@@ -261,16 +261,10 @@ module Rack::Mount
         hash[:@recognition_graph] = graph.dup
       end
 
-      included_modules = (class << self; included_modules; end)
-      included_modules.reject! { |mod| mod == Kernel }
-      hash[:included_modules] = included_modules
-
       hash
     end
 
     def marshal_load(hash) #:nodoc:
-      hash.delete(:included_modules).reverse.each { |mod| extend(mod) }
-
       hash.each do |ivar, value|
         instance_variable_set(ivar, value)
       end
