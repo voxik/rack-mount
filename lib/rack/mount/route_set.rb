@@ -80,15 +80,34 @@ module Rack::Mount
 
       cache = {}
       keys = @recognition_keys.map { |key|
-        if key.respond_to?(:call_source)
+        if key.respond_to?(:call)
           key.call(cache, obj)
         else
           obj.send(key)
         end
       }
+
       @recognition_graph[*keys].each do |route|
-        matches, params = route.recognize(obj)
-        if matches && params
+        matches = {}
+        params  = route.defaults.dup
+
+        if route.conditions.all? { |method, condition|
+            value = obj.send(method)
+            if condition.is_a?(Regexp) && (m = value.match(condition))
+              matches[method] = m
+              captures = m.captures
+              route.named_captures[method].each do |k, i|
+                if v = captures[i]
+                  params[k] = v
+                end
+              end
+              true
+            elsif value == condition
+              true
+            else
+              false
+            end
+          }
           if block_given?
             yield route, matches, params
           else

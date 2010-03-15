@@ -22,6 +22,8 @@ module Rack::Mount
     # Symbol identifier for the route used with named route generations
     attr_reader :name
 
+    attr_reader :named_captures
+
     def initialize(app, conditions, defaults, name)
       unless app.respond_to?(:call)
         raise ArgumentError, 'app must be a valid rack application' \
@@ -70,36 +72,8 @@ module Rack::Mount
       @conditions.freeze
     end
 
-
     def prefix?
       @prefix
-    end
-
-    def recognize(obj)
-      matches = {}
-      params  = @defaults.dup
-
-      if @conditions.all? { |method, condition|
-        value = obj.send(method)
-        if condition.is_a?(Regexp) && (m = value.match(condition))
-          matches[method] = m
-          captures = m.captures
-          @named_captures[method].each { |k, i|
-            if v = captures[i]
-              params[k] = v
-            end
-          }
-          true
-        elsif value == condition
-          true
-        else
-          false
-        end
-      }
-        return matches, params
-      else
-        nil
-      end
     end
 
 
