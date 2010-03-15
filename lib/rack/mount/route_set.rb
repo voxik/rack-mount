@@ -28,11 +28,7 @@ module Rack::Mount
       @generation_key_analyzer  = Analysis::Frequency.new
 
       @request_class = options.delete(:request_class) || Rack::Request
-      @valid_conditions = begin
-        conditions = @request_class.public_instance_methods
-        conditions.map! { |m| m.to_sym }
-        conditions
-      end
+      @valid_conditions = @request_class.public_instance_methods.map! { |m| m.to_sym }
 
       extend CodeGeneration unless options[:_optimize] == false
       @optimized_recognize_defined = false
