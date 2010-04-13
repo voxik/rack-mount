@@ -15,6 +15,8 @@ module Reginald
     end
 
     def initialize(*args)
+      args, options = extract_options(args)
+
       @multiline = @ignorecase = @extended = nil
 
       if args.length == 1 && args.first.instance_of?(Array)
@@ -23,15 +25,10 @@ module Reginald
         args = args.map { |e| e.instance_of?(String) ? Character.new(e) : e }
         super(args)
       end
-    end
 
-    def ignorecase=(ignorecase)
-      if @ignorecase.nil?
-        super
-        @ignorecase = ignorecase
-      else
-        false
-      end
+      self.multiline  = options[:multiline] if options.key?(:multiline)
+      self.ignorecase = options[:ignorecase] if options.key?(:ignorecase)
+      self.extended   = options[:extended] if options.key?(:extended)
     end
 
     # Returns true if expression could be treated as a literal string.
@@ -65,23 +62,24 @@ module Reginald
       anchored_to_end? || (last.is_a?(Anchor) && last == '$')
     end
 
-    def options
-      flag = 0
-      flag |= Regexp::MULTILINE if multiline
-      flag |= Regexp::IGNORECASE if ignorecase
-      flag |= Regexp::EXTENDED if extended
-      flag
+    def options?
+      options.any?(true)
     end
 
-    def options=(flag)
-      self.multiline  = flag & Regexp::MULTILINE != 0
-      self.ignorecase = flag & Regexp::IGNORECASE != 0
-      self.extended   = flag & Regexp::EXTENDED != 0
-      nil
+    def flags
+      options.to_i
+    end
+
+    def dup(options = {})
+      expression = super()
+      expression.multiline  = options[:multiline] if options.key?(:multiline)
+      expression.ignorecase = options[:ignorecase] if options.key?(:ignorecase)
+      expression.extended   = options[:extended] if options.key?(:extended)
+      expression
     end
 
     def to_s(parent = false)
-      if parent || options == 0
+      if parent || !options?
         map { |e| e.to_s(parent) }.join
       else
         with, without = [], []
@@ -110,5 +108,17 @@ module Reginald
         !!self.ignorecase == !!other.ignorecase &&
         !!self.extended == !!other.extended
     end
+
+    protected
+      def options
+        Options.new(multiline, ignorecase, extended)
+      end
+
+      def ignorecase=(ignorecase)
+        if @ignorecase.nil?
+          map! { |e| e.dup(:ignorecase => ignorecase) }
+          @ignorecase = ignorecase
+        end
+      end
   end
 end

@@ -1,27 +1,15 @@
 module Reginald
   class CharacterClass < Character
-    ALNUM = new(':alnum:').freeze
-    ALPHA = new(':alpha:').freeze
-    ASCII = new(':ascii:').freeze
-    BLANK = new(':blank:').freeze
-    CNTRL = new(':cntrl:').freeze
-    DIGIT = new(':digit:').freeze
-    GRAPH = new(':graph:').freeze
-    LOWER = new(':lower:').freeze
-    PRINT = new(':print:').freeze
-    PUNCT = new(':punct:').freeze
-    SPACE = new(':space:').freeze
-    UPPER = new(':upper:').freeze
-    WORD = new(':word:').freeze
-    XDIGIT = new(':xdigit:').freeze
-
-    def ignorecase=(ignorecase)
-      if to_s !~ /\A\[:.*:\]\Z/
-        super
-      end
+    def initialize(value, options = {})
+      @negate = options[:negate]
+      super
     end
 
-    attr_accessor :negate
+    def option_names
+      %w( negate ) + super
+    end
+
+    attr_reader :negate
 
     def negated?
       negate ? true : false
@@ -60,7 +48,7 @@ module Reginald
     end
 
     def freeze #:nodoc:
-      negate.freeze
+      negate.freeze if negate
       super
     end
   end

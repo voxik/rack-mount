@@ -67,7 +67,7 @@ module Rack::Mount
                 end
               end
 
-              if inside = part[0][0]
+              if inside = part.expression[0]
                 if inside.is_a?(Reginald::Character) && inside.literal?
                   boundaries << inside.to_s
                 end

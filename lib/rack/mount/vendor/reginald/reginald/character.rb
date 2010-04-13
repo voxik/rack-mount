@@ -1,6 +1,15 @@
 module Reginald
   class Character < Atom
-    attr_accessor :quantifier
+    attr_reader :quantifier
+
+    def initialize(value, options = {})
+      @quantifier = options[:quantifier]
+      super
+    end
+
+    def option_names
+      %w( quantifier ) + super
+    end
 
     # Returns true if expression could be treated as a literal string.
     #
@@ -38,7 +47,7 @@ module Reginald
     end
 
     def freeze #:nodoc:
-      quantifier.freeze
+      quantifier.freeze if quantifier
       super
     end
   end

@@ -124,13 +124,13 @@ module Rack::Mount
 
       unless Reginald.regexp_supports_named_captures?
         tag_captures = Proc.new do |group|
-          group.each do |child|
-            if child.is_a?(Reginald::Group)
-              child.name = regexp.names[child.index] if child.index
-              tag_captures.call(child)
-            elsif child.is_a?(Reginald::Expression)
-              tag_captures.call(child)
-            end
+          case group
+          when Reginald::Group
+            # TODO: dup instead of mutating
+            group.instance_variable_set('@name', regexp.names[group.index]) if group.index
+            tag_captures.call(group.expression)
+          when Reginald::Expression
+            group.each { |child| tag_captures.call(child) }
           end
         end
         tag_captures.call(expression)

@@ -1,14 +1,20 @@
 module Reginald
-  class Group < Struct.new(:expression)
-    attr_accessor :quantifier, :capture, :index, :name
+  class Group
+    attr_reader :expression, :quantifier, :capture, :index, :name
 
-    def initialize(*args)
+    def initialize(expression, options = {})
+      @quantifier = @index = @name = nil
       @capture = true
-      super
+      @expression = expression.dup(options)
+
+      @quantifier = options[:quantifier] if options.key?(:quantifier)
+      @capture    = options[:capture] if options.key?(:capture)
+      @index      = options[:index] if options.key?(:index)
+      @name       = options[:name] if options.key?(:name)
     end
 
-    def ignorecase=(ignorecase)
-      expression.ignorecase = ignorecase
+    def option_names
+      %w( quantifier capture index name )
     end
 
     # Returns true if expression could be treated as a literal string.
@@ -19,7 +25,7 @@ module Reginald
     end
 
     def to_s(parent = false)
-      if expression.options == 0
+      if !expression.options?
         "(#{capture ? '' : '?:'}#{expression.to_s(parent)})#{quantifier}"
       elsif capture == false
         "#{expression.to_s}#{quantifier}"
@@ -30,6 +36,14 @@ module Reginald
 
     def to_regexp
       Regexp.compile("\\A#{to_s}\\Z")
+    end
+
+    def dup(options = {})
+      original_options = option_names.inject({}) do |h, m|
+        h[m.to_sym] = send(m)
+        h
+      end
+      self.class.new(expression, original_options.merge(options))
     end
 
     def inspect #:nodoc:
@@ -67,7 +81,7 @@ module Reginald
     end
 
     def freeze #:nodoc:
-      expression.freeze
+      expression.freeze if expression
       super
     end
   end

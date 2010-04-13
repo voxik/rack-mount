@@ -11,10 +11,16 @@ module Reginald
     end
 
     def initialize(*args)
+      args, options = extract_options(args)
+
       if args.length == 1 && args.first.instance_of?(Array)
         super(args.first)
       else
         super(args)
+      end
+
+      if options.key?(:ignorecase)
+        map! { |e| e.dup(:ignorecase => options[:ignorecase]) }
       end
     end
 
@@ -25,8 +31,12 @@ module Reginald
       false
     end
 
-    def options
+    def flags
       0
+    end
+
+    def dup(options = {})
+      self.class.new(to_a, options)
     end
 
     def to_s(parent = false)

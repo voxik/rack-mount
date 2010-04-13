@@ -1,10 +1,14 @@
 module Reginald
-  class Atom < Struct.new(:value)
-    attr_accessor :ignorecase
+  class Atom
+    attr_reader :value, :ignorecase
 
-    def initialize(*args)
-      @ignorecase = nil
-      super
+    def initialize(value, options = {})
+      @value = value
+      @ignorecase = options[:ignorecase]
+    end
+
+    def option_names
+      %w( ignorecase )
     end
 
     # Returns true if expression could be treated as a literal string.
@@ -14,6 +18,14 @@ module Reginald
 
     def casefold?
       ignorecase ? true : false
+    end
+
+    def dup(options = {})
+      original_options = option_names.inject({}) do |h, m|
+        h[m.to_sym] = send(m)
+        h
+      end
+      self.class.new(value, original_options.merge(options))
     end
 
     def to_s(parent = false)

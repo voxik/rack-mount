@@ -7,6 +7,7 @@ module Reginald
   autoload :Collection, 'reginald/collection'
   autoload :Expression, 'reginald/expression'
   autoload :Group, 'reginald/group'
+  autoload :Options, 'reginald/options'
   autoload :Parser, 'reginald/parser'
 
   class << self
@@ -38,7 +39,7 @@ module Reginald
     def compile(source)
       regexp = Regexp.compile(source)
       expression = parse(regexp)
-      Regexp.compile(expression.to_s(true), expression.options)
+      Regexp.compile(expression.to_s(true), expression.flags)
     end
   end
 end

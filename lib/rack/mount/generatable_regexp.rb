@@ -121,7 +121,7 @@ module Rack::Mount
               if part.name
                 s << DynamicSegment.new(part.name, part.expression.to_regexp)
               else
-                s << parse_segments(part)
+                s << parse_segments(part.expression)
               end
             when Reginald::Expression
               return parse_segments(part)

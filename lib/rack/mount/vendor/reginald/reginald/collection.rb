@@ -1,12 +1,7 @@
 module Reginald
   class Collection < Array
-    def ignorecase=(ignorecase)
-      each { |e| e.ignorecase = ignorecase }
-      ignorecase
-    end
-
     def to_regexp
-      Regexp.compile("\\A#{to_s(true)}\\Z", options)
+      Regexp.compile("\\A#{to_s(true)}\\Z", flags)
     end
 
     def match(char)
@@ -36,5 +31,14 @@ module Reginald
       each { |e| e.freeze }
       super
     end
+
+    protected
+      def extract_options(args)
+        if args.last.is_a?(Hash)
+          return args[0..-2], args.last
+        else
+          return args, {}
+        end
+      end
   end
 end
