@@ -61,6 +61,11 @@ module Rack::Mount
       }
       @named_captures.freeze
 
+      @has_significant_params = @conditions.any? { |method, condition|
+        (condition.respond_to?(:required_params) && condition.required_params.any?) ||
+          (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
+      }
+
       if @conditions.has_key?(:path_info) &&
           !Utils.regexp_anchored?(@conditions[:path_info])
         @prefix = true
@@ -88,10 +93,7 @@ module Rack::Mount
     end
 
     def significant_params?
-      @has_significant_params ||= @conditions.any? { |method, condition|
-        (condition.respond_to?(:required_params) && condition.required_params.any?) ||
-          (condition.respond_to?(:required_defaults) && condition.required_defaults.any?)
-      }
+      @has_significant_params
     end
 
     def generate(method, params = {}, recall = {}, options = {})
