@@ -52,14 +52,16 @@ module Rack::Mount
       UNSAFE_PCHAR = Regexp.new("[^#{SAFE_PCHAR}]", false, 'N').freeze
     end
 
+    Parser = URI.const_defined?(:Parser) ? URI::Parser.new : URI
+
     def escape_uri(uri)
-      URI.escape(uri.to_s, UNSAFE_PCHAR)
+      Parser.escape(uri.to_s, UNSAFE_PCHAR)
     end
     module_function :escape_uri
 
     if ''.respond_to?(:force_encoding)
       def unescape_uri(uri)
-        URI.unescape(uri).force_encoding('utf-8')
+        Parser.unescape(uri).force_encoding('utf-8')
       end
     else
       def unescape_uri(uri)
