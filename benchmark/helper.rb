@@ -1,6 +1,5 @@
 $: << 'lib'
 
-require 'rubygems'
 require 'rack/mount'
 require 'benchmark'
 
