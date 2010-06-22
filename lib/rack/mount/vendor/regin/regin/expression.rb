@@ -1,18 +1,6 @@
 module Regin
   class Expression < Collection
-    attr_reader :ignorecase
-    attr_accessor :multiline, :extended
-
-    def self.reduce(expression_or_atom, atom = nil) #:nodoc:
-      if expression_or_atom.is_a?(Expression)
-        expression_or_atom += [atom] if atom
-        new(*expression_or_atom)
-      elsif atom.nil?
-        new(expression_or_atom)
-      else
-        new(expression_or_atom, atom)
-      end
-    end
+    attr_reader :ignorecase, :multiline, :extended
 
     def initialize(*args)
       args, options = extract_options(args)
@@ -70,6 +58,12 @@ module Regin
       options.to_i
     end
 
+    def +(other)
+      ary = other.is_a?(self.class) ? other.internal_array : other
+      ary = @array + ary + [options.to_h(true)]
+      self.class.new(*ary)
+    end
+
     def dup(options = {})
       expression = super()
       expression.multiline  = options[:multiline] if options.key?(:multiline)
@@ -114,11 +108,19 @@ module Regin
         Options.new(multiline, ignorecase, extended)
       end
 
+      def multiline=(multiline)
+        @multiline = multiline
+      end
+
       def ignorecase=(ignorecase)
         if @ignorecase.nil?
           @array.map! { |e| e.dup(:ignorecase => ignorecase) }
           @ignorecase = ignorecase
         end
+      end
+
+      def extended=(extended)
+        @extended = extended
       end
   end
 end
