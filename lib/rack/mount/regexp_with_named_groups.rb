@@ -1,5 +1,5 @@
 module Rack::Mount
-  if Reginald.regexp_supports_named_captures?
+  if Regin.regexp_supports_named_captures?
     RegexpWithNamedGroups = Regexp
   else
     require 'strscan'

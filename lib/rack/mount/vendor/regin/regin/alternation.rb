@@ -1,9 +1,9 @@
-module Reginald
+module Regin
   class Alternation < Collection
     def self.reduce(alternation_or_expression, expression) #:nodoc:
       if alternation_or_expression.first.is_a?(Alternation)
         alternation_or_expression = alternation_or_expression.first
-        alternation_or_expression << expression
+        alternation_or_expression += [expression]
         new(*alternation_or_expression)
       else
         new(alternation_or_expression, expression)
@@ -20,7 +20,7 @@ module Reginald
       end
 
       if options.key?(:ignorecase)
-        map! { |e| e.dup(:ignorecase => options[:ignorecase]) }
+        @array.map! { |e| e.dup(:ignorecase => options[:ignorecase]) }
       end
     end
 

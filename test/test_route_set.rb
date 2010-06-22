@@ -1,4 +1,5 @@
 require 'abstract_unit'
+require 'fixtures/basic_set'
 
 class TestRouteSet < Test::Unit::TestCase
   def setup

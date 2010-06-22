@@ -1,11 +1,11 @@
-module Reginald
+module Regin
   class Expression < Collection
     attr_reader :ignorecase
     attr_accessor :multiline, :extended
 
     def self.reduce(expression_or_atom, atom = nil) #:nodoc:
       if expression_or_atom.is_a?(Expression)
-        expression_or_atom << atom if atom
+        expression_or_atom += [atom] if atom
         new(*expression_or_atom)
       elsif atom.nil?
         new(expression_or_atom)
@@ -116,7 +116,7 @@ module Reginald
 
       def ignorecase=(ignorecase)
         if @ignorecase.nil?
-          map! { |e| e.dup(:ignorecase => ignorecase) }
+          @array.map! { |e| e.dup(:ignorecase => ignorecase) }
           @ignorecase = ignorecase
         end
       end

@@ -59,23 +59,23 @@ module Rack::Mount
 
           parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
-            if part.is_a?(Reginald::Group)
+            if part.is_a?(Regin::Group)
               if index > 0
                 previous = parts[index-1]
-                if previous.is_a?(Reginald::Character) && previous.literal?
+                if previous.is_a?(Regin::Character) && previous.literal?
                   boundaries << previous.to_s
                 end
               end
 
               if inside = part.expression[0]
-                if inside.is_a?(Reginald::Character) && inside.literal?
+                if inside.is_a?(Regin::Character) && inside.literal?
                   boundaries << inside.to_s
                 end
               end
 
               if index < parts.length
                 following = parts[index+1]
-                if following.is_a?(Reginald::Character) && following.literal?
+                if following.is_a?(Regin::Character) && following.literal?
                   boundaries << following.to_s
                 end
               end
@@ -91,30 +91,30 @@ module Rack::Mount
           parts = Utils.parse_regexp(regexp)
           parts.each_with_index do |part, index|
             case part
-            when Reginald::Anchor
+            when Regin::Anchor
               if part.value == '$' || part.value == '\Z'
                 segments << join_buffer(buf, regexp) if buf
                 segments << NULL
                 buf = nil
                 break
               end
-            when Reginald::CharacterClass
+            when Regin::CharacterClass
               break if separators.any? { |s| part.include?(s) }
               buf = nil
               segments << part.to_regexp
-            when Reginald::Character
+            when Regin::Character
               if separators.any? { |s| part.include?(s) }
                 segments << join_buffer(buf, regexp) if buf
                 peek = parts[index+1]
-                if peek.is_a?(Reginald::Character) && separators.include?(peek.value)
+                if peek.is_a?(Regin::Character) && separators.include?(peek.value)
                   segments << ''
                 end
                 buf = nil
               else
-                buf ||= Reginald::Expression.new([])
-                buf << part
+                buf ||= Regin::Expression.new([])
+                buf += [part]
               end
-            when Reginald::Group
+            when Regin::Group
               if part.quantifier == '?'
                 value = part.expression.first
                 if separators.any? { |s| value.include?(s) }

@@ -1,8 +1,8 @@
 begin
-  require 'reginald'
+  require 'regin'
 rescue LoadError
-  $: << File.expand_path(File.join(File.dirname(__FILE__), 'vendor/reginald'))
-  require 'reginald'
+  $: << File.expand_path(File.join(File.dirname(__FILE__), 'vendor/regin'))
+  require 'regin'
 end
 
 require 'uri'
@@ -122,16 +122,16 @@ module Rack::Mount
         regexp = RegexpWithNamedGroups.new(regexp)
       end
 
-      expression = Reginald.parse(regexp)
+      expression = Regin.parse(regexp)
 
-      unless Reginald.regexp_supports_named_captures?
+      unless Regin.regexp_supports_named_captures?
         tag_captures = Proc.new do |group|
           case group
-          when Reginald::Group
+          when Regin::Group
             # TODO: dup instead of mutating
             group.instance_variable_set('@name', regexp.names[group.index]) if group.index
             tag_captures.call(group.expression)
-          when Reginald::Expression
+          when Regin::Expression
             group.each { |child| tag_captures.call(child) }
           end
         end
@@ -140,7 +140,7 @@ module Rack::Mount
 
       cache[regexp] = expression.freeze
       expression
-    rescue Racc::ParseError, Reginald::Parser::ScanError
+    rescue Racc::ParseError, Regin::Parser::ScanError
       []
     end
     module_function :parse_regexp

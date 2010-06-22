@@ -107,9 +107,9 @@ module Rack::Mount
           s = []
           segments.each_with_index do |part, index|
             case part
-            when Reginald::Anchor
+            when Regin::Anchor
               # ignore
-            when Reginald::Character
+            when Regin::Character
               throw :halt unless part.literal?
 
               if s.last.is_a?(String)
@@ -117,13 +117,13 @@ module Rack::Mount
               else
                 s << part.value.dup
               end
-            when Reginald::Group
+            when Regin::Group
               if part.name
                 s << DynamicSegment.new(part.name, part.expression.to_regexp)
               else
                 s << parse_segments(part.expression)
               end
-            when Reginald::Expression
+            when Regin::Expression
               return parse_segments(part)
             else
               throw :halt

@@ -14,7 +14,7 @@ module Rack
     class StrexpParser < Racc::Parser
 
 
-if Reginald.regexp_supports_named_captures?
+if Regin.regexp_supports_named_captures?
   REGEXP_NAMED_CAPTURE = '(?<%s>%s)'.freeze
 else
   REGEXP_NAMED_CAPTURE = '(?:<%s>%s)'.freeze
