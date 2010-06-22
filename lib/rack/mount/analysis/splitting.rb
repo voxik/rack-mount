@@ -101,7 +101,7 @@ module Rack::Mount
             when Regin::CharacterClass
               break if separators.any? { |s| part.include?(s) }
               buf = nil
-              segments << part.to_regexp
+              segments << part.to_regexp(true)
             when Regin::Character
               if separators.any? { |s| part.include?(s) }
                 segments << join_buffer(buf, regexp) if buf
@@ -125,7 +125,7 @@ module Rack::Mount
               elsif part.quantifier == nil
                 break if separators.any? { |s| part.include?(s) }
                 buf = nil
-                segments << part.to_regexp
+                segments << part.to_regexp(true)
               else
                 break
               end
@@ -151,7 +151,7 @@ module Rack::Mount
           if parts.literal?
             parts.to_s
           else
-            parts.to_regexp
+            parts.to_regexp(true)
           end
         end
     end

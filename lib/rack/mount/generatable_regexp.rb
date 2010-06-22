@@ -119,7 +119,7 @@ module Rack::Mount
               end
             when Regin::Group
               if part.name
-                s << DynamicSegment.new(part.name, part.expression.to_regexp)
+                s << DynamicSegment.new(part.name, part.expression.to_regexp(true))
               else
                 s << parse_segments(part.expression)
               end

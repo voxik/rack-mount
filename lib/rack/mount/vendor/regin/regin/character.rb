@@ -26,12 +26,14 @@ module Regin
       end
     end
 
-    def to_regexp
-      Regexp.compile("\\A#{to_s(true)}\\Z", ignorecase)
+    def to_regexp(anchored = false)
+      re = to_s(true)
+      re = "\\A#{re}\\Z" if anchored
+      Regexp.compile(re, ignorecase)
     end
 
     def match(char)
-      to_regexp.match(char)
+      to_regexp(true).match(char)
     end
 
     def include?(char)
