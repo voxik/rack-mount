@@ -135,7 +135,8 @@ end
 
 def _reduce_5(val, _values, result)
            name = val[0].to_sym
-           result = REGEXP_NAMED_CAPTURE % [name, '.+']
+           requirement = requirements[name]
+           result = REGEXP_NAMED_CAPTURE % [name, '.+' || requirement]
          
     result
 end

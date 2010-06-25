@@ -12,7 +12,8 @@ rule
          }
        | GLOB {
            name = val[0].to_sym
-           result = REGEXP_NAMED_CAPTURE % [name, '.+']
+           requirement = requirements[name]
+           result = REGEXP_NAMED_CAPTURE % [name, '.+' || requirement]
          }
        | LPAREN expr RPAREN { result = "(?:#{val[1]})?" }
        | CHAR { result = Regexp.escape(val[0]) }
