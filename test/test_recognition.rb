@@ -416,6 +416,7 @@ class TestRecognition < Test::Unit::TestCase
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/signin'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
     end
 
     if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
@@ -433,6 +434,12 @@ class TestRecognition < Test::Unit::TestCase
 
     get '/posts.xml'
     assert_success
+
+    get '/blog'
+    assert_success
+
+    get '/blog/archives'
+    assert_success
   end
 
   def test_set_without_slash_in_seperators
@@ -440,6 +447,7 @@ class TestRecognition < Test::Unit::TestCase
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
     end
 
     if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
@@ -454,6 +462,12 @@ class TestRecognition < Test::Unit::TestCase
 
     get '/baz.json'
     assert_success
+
+    get '/blog'
+    assert_success
+
+    get '/blog/archives'
+    assert_success
   end
 
   def test_set_without_split_keys
@@ -461,6 +475,7 @@ class TestRecognition < Test::Unit::TestCase
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
     end
 
     if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
@@ -474,6 +489,12 @@ class TestRecognition < Test::Unit::TestCase
     assert_success
 
     get '/baz'
+    assert_success
+
+    get '/blog'
+    assert_success
+
+    get '/blog/archives'
     assert_success
   end
 
