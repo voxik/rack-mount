@@ -399,6 +399,48 @@ class TestRecognition < Test::Unit::TestCase
     assert_success
   end
 
+  def test_set_without_slash_in_seperators
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo.:format'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
+    end
+
+    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
+      assert_equal %w( \. ), recognition_keys[-1].source.split('|').sort
+    end
+
+    get '/foo.html'
+    assert_success
+
+    get '/bar.xml'
+    assert_success
+
+    get '/baz.json'
+    assert_success
+  end
+
+  def test_set_without_split_keys
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz'))
+    end
+
+    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
+      assert_equal :path_info, recognition_keys
+    end
+
+    get '/foo'
+    assert_success
+
+    get '/bar'
+    assert_success
+
+    get '/baz'
+    assert_success
+  end
+
   def test_small_set_with_unbound_path
     @app = new_route_set do |set|
       set.add_route(EchoApp, :path_info => %r{^/foo})
