@@ -20,7 +20,7 @@ module Rack::Mount
         old_script_name = env[SCRIPT_NAME].dup
 
         begin
-          env[PATH_INFO] = Utils.normalize_path(env[PATH_INFO].sub(prefix, EMPTY_STRING))
+          env[PATH_INFO] = env[PATH_INFO].sub(prefix, EMPTY_STRING)
           env[PATH_INFO] = EMPTY_STRING if env[PATH_INFO] == SLASH
           env[SCRIPT_NAME] = Utils.normalize_path(env[SCRIPT_NAME].to_s + prefix)
           @app.call(env)

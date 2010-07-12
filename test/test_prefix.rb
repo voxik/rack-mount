@@ -19,12 +19,17 @@ class TestPrefix < Test::Unit::TestCase
     assert_equal({'PATH_INFO' => '/foo/bar', 'SCRIPT_NAME' => ''}, env)
   end
 
-  def test_path_prefix_shifting_normalizes_path
+  def test_path_prefix_shifting_doesnt_normalize_path
     @app = Prefix.new(EchoApp, '/foo')
+
+    get '/foo/bar'
+    assert_success
+    assert_equal '/bar', env['PATH_INFO']
+    assert_equal '/foo', env['SCRIPT_NAME']
 
     get '/foo/bar/'
     assert_success
-    assert_equal '/bar', env['PATH_INFO']
+    assert_equal '/bar/', env['PATH_INFO']
     assert_equal '/foo', env['SCRIPT_NAME']
   end
 

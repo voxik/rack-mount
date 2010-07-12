@@ -132,12 +132,6 @@ module Rack::Mount
             else
               break
             end
-
-            if index + 1 == parts.size
-              segments << join_buffer(buf, regexp) if buf
-              buf = nil
-              break
-            end
           end
 
           while segments.length > 0 && (segments.last.nil? || segments.last == '')

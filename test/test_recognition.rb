@@ -330,6 +330,42 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'foo', :action => 'bar', :id => '1' }, routing_args)
     assert_equal '/foo/bar/1', @env['PATH_INFO']
     assert_equal '/prefix', @env['SCRIPT_NAME']
+
+    get '/prefix2/foo/bar/1'
+    assert_success
+    assert_equal({}, routing_args)
+    assert_equal '/foo/bar/1', @env['PATH_INFO']
+    assert_equal '/prefix2', @env['SCRIPT_NAME']
+
+    get '/prefix2.foo/bar/1'
+    assert_success
+    assert_equal({}, routing_args)
+    assert_equal '.foo/bar/1', @env['PATH_INFO']
+    assert_equal '/prefix2', @env['SCRIPT_NAME']
+  end
+
+  def test_path_prefix_without_split_keys
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => %r{^/foo})
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
+    end
+
+    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
+      assert_equal %w( \. ), recognition_keys[-1].source.split('|').sort
+    end
+
+    get '/foo'
+    assert_success
+
+    get '/foo/bar'
+    assert_success
+
+    get '/bar.html'
+    assert_success
+
+    get '/baz.xml'
+    assert_success
   end
 
   def test_case_insensitive_path
