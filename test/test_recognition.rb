@@ -190,6 +190,13 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'files', :action => 'index', :files => 'images/photo.jpg' }, routing_args)
   end
 
+  def test_path_with_key_with_slash
+    get '/files2/images/photo'
+    assert_success
+
+    assert_equal({ :controller => 'files2', :action => 'show', :key => 'images/photo' }, routing_args)
+  end
+
   def test_with_controller_scope
     get '/global/index'
     assert_success
