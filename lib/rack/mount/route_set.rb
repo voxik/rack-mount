@@ -245,10 +245,14 @@ module Rack::Mount
     end
 
     def rehash #:nodoc:
+      Utils.debug "rehashing"
+
       @recognition_keys  = build_recognition_keys
       @recognition_graph = build_recognition_graph
       @generation_keys   = build_generation_keys
       @generation_graph  = build_generation_graph
+
+      self
     end
 
     # Finalizes the set and builds optimized data structures. You *must*
@@ -337,7 +341,9 @@ module Rack::Mount
       end
 
       def build_recognition_keys
-        @recognition_key_analyzer.report
+        keys = @recognition_key_analyzer.report
+        Utils.debug "recognition keys - #{keys.inspect}"
+        keys
       end
 
       def build_generation_graph
@@ -353,7 +359,9 @@ module Rack::Mount
       end
 
       def build_generation_keys
-        @generation_key_analyzer.report
+        keys = @generation_key_analyzer.report
+        Utils.debug "generation keys - #{keys.inspect}"
+        keys
       end
 
       def extract_params!(*args)

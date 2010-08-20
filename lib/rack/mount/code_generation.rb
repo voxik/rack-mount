@@ -25,6 +25,8 @@ module Rack::Mount
       end
 
       def optimize_container_iterator(container)
+        Utils.debug "optimizing container - size #{container.size}"
+
         body = []
 
         container.each_with_index { |route, i|
@@ -67,6 +69,8 @@ module Rack::Mount
       end
 
       def optimize_recognize!
+        Utils.debug "optimizing recognize"
+
         keys = @recognition_keys.map { |key|
           if key.respond_to?(:call_source)
             key.call_source(:cache, :obj)

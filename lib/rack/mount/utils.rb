@@ -22,6 +22,11 @@ module Rack::Mount
     end
     module_function :silence_debug
 
+    def debug(msg)
+      warn "Rack::Mount #{msg}" if $DEBUG
+    end
+    module_function :debug
+
     # Normalizes URI path.
     #
     # Strips off trailing slash and ensures there is a leading slash.

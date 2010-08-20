@@ -22,7 +22,7 @@ module Rack::Mount
         end
 
         def inspect
-          "#{method}[#{index}]"
+          "#{method}[#{index}].split(#{separators.inspect})"
         end
       end
 
