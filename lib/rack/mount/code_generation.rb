@@ -105,7 +105,7 @@ module Rack::Mount
       # has not been defined in the metaclass yet.
       def remove_metaclass_method(symbol)
         metaclass = class << self; self; end
-        metaclass.send(:remove_method, symbol)
+        Utils.silence_debug { metaclass.send(:remove_method, symbol) }
       rescue NameError => e
         nil
       end

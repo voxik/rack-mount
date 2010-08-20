@@ -14,6 +14,14 @@ module Rack::Mount
   # more appropriate contexts.
   #++
   module Utils
+    def silence_debug
+      old_debug, $DEBUG = $DEBUG, nil
+      yield
+    ensure
+      $DEBUG = old_debug
+    end
+    module_function :silence_debug
+
     # Normalizes URI path.
     #
     # Strips off trailing slash and ensures there is a leading slash.
