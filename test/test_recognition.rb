@@ -449,6 +449,33 @@ class TestRecognition < Test::Unit::TestCase
     assert_success
   end
 
+  def test_set_with_leading_split_char
+    @app = new_route_set do |set|
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/sa'), :request_method => 'POST')
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/s(.:format)'), :request_method => 'POST')
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/as(.:format)'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bs/:id'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/:section'))
+    end
+
+    keys = @app.instance_variable_get('@recognition_keys')
+
+    if recognition_keys = keys[0]
+      assert_equal %w( / \. s ), recognition_keys[-1].source.split('|').sort
+    end
+
+    get '/sa'
+    assert_success
+    assert_equal({ :section => 'sa' }, routing_args)
+
+    get '/s'
+    assert_success
+    assert_equal({ :section => 's' }, routing_args)
+
+    get '/as'
+    assert_success
+  end
+
   def test_set_without_slash_in_seperators
     @app = new_route_set do |set|
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo.:format'))

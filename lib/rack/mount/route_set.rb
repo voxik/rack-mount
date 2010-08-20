@@ -327,7 +327,7 @@ module Rack::Mount
           catch(:skip) do
             k = keys.map { |key| block.call(key, index) }
             Utils.pop_trailing_nils!(k)
-            k.map! { |key| key || /.+/ }
+            k.map! { |key| key || /.*/ }
             graph[*k] = route
           end
         end
