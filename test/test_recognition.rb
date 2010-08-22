@@ -477,12 +477,15 @@ class TestRecognitionSplitKeyEdgeCases < Test::Unit::TestCase
 
   def test_set_with_leading_split_char
     @app = new_route_set do |set|
-      induce_recognition_keys(set, %w( / . s ))
+      induce_recognition_keys(set, %w( . / s ), 1, [:request_method])
 
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/sa'), :request_method => 'POST')
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/s(.:format)'), :request_method => 'POST')
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/:section'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/:section', {}, %w( . / )), :request_method => 'GET')
     end
+
+    post '/sa'
+    assert_success
+    assert_equal({}, routing_args)
 
     get '/sa'
     assert_success
@@ -583,7 +586,7 @@ class TestRecognitionSplitKeyEdgeCases < Test::Unit::TestCase
     end
 
     SplitKey = Rack::Mount::Analysis::Splitting::Key
-    def induce_recognition_keys(set, separators, count = 1)
+    def induce_recognition_keys(set, separators, count = 1, extras = [])
       keys = []
       separators_hash = {}
 
@@ -595,6 +598,8 @@ class TestRecognitionSplitKeyEdgeCases < Test::Unit::TestCase
       else
         keys << separators
       end
+
+      keys += extras
 
       (class << set; self; end).instance_eval do
         define_method :build_recognition_keys do
