@@ -353,13 +353,11 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_path_prefix_without_split_keys
     @app = new_route_set do |set|
+      induce_recognition_keys(set, %r{\.})
+
       set.add_route(EchoApp, :path_info => %r{^/foo})
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
-    end
-
-    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
-      assert_equal %w( \. ), recognition_keys[-1].source.split('|').sort
     end
 
     get '/foo'
@@ -420,14 +418,12 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_small_set_with_ambiguous_splitting
     @app = new_route_set do |set|
+      induce_recognition_keys(set, %r{/|\.|s})
+
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/signin'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/posts(.:format)'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
-    end
-
-    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
-      assert_equal %w( / \. s ), recognition_keys[-1].source.split('|').sort
     end
 
     get '/signin'
@@ -451,17 +447,11 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_set_with_leading_split_char
     @app = new_route_set do |set|
+      induce_recognition_keys(set, %r{/|\.|s})
+
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/sa'), :request_method => 'POST')
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/s(.:format)'), :request_method => 'POST')
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/as(.:format)'))
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bs/:id'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/:section'))
-    end
-
-    keys = @app.instance_variable_get('@recognition_keys')
-
-    if recognition_keys = keys[0]
-      assert_equal %w( / \. s ), recognition_keys[-1].source.split('|').sort
     end
 
     get '/sa'
@@ -471,21 +461,16 @@ class TestRecognition < Test::Unit::TestCase
     get '/s'
     assert_success
     assert_equal({ :section => 's' }, routing_args)
-
-    get '/as'
-    assert_success
   end
 
   def test_set_without_slash_in_seperators
     @app = new_route_set do |set|
+      induce_recognition_keys(set, %r{\.})
+
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
-    end
-
-    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
-      assert_equal %w( \. ), recognition_keys[-1].source.split('|').sort
     end
 
     get '/foo.html'
@@ -506,14 +491,12 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_set_without_split_keys
     @app = new_route_set do |set|
+      induce_recognition_keys(set, nil)
+
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/blog', {}, [], false))
-    end
-
-    if recognition_keys = @app.instance_variable_get('@recognition_keys')[0]
-      assert_equal :path_info, recognition_keys
     end
 
     get '/foo'
@@ -548,6 +531,25 @@ class TestRecognition < Test::Unit::TestCase
   private
     def new_route_set(*args, &block)
       Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
+    end
+
+    SplitKey = Rack::Mount::Analysis::Splitting::Key
+    def induce_recognition_keys(set, *separators)
+      keys = []
+
+      separators.each_with_index do |separator, index|
+        if separator
+          keys << SplitKey.new(:path_info, index, separator)
+        else
+          keys << :path_info
+        end
+      end
+
+      (class << set; self; end).instance_eval do
+        define_method :build_recognition_keys do
+          keys
+        end
+      end
     end
 end
 
