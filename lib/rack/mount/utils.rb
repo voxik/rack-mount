@@ -46,16 +46,17 @@ module Rack::Mount
 
     # Removes trailing nils from array.
     #
-    #   pop_trailing_nils!([1, 2, 3])           # => [1, 2, 3]
-    #   pop_trailing_nils!([1, 2, 3, nil, nil]) # => [1, 2, 3]
-    #   pop_trailing_nils!([nil])               # => []
-    def pop_trailing_nils!(ary)
-      while ary.length > 0 && ary.last.nil?
+    #   pop_trailing_blanks!([1, 2, 3])           # => [1, 2, 3]
+    #   pop_trailing_blanks!([1, 2, 3, nil, ""])  # => [1, 2, 3]
+    #   pop_trailing_blanks!([nil])               # => []
+    #   pop_trailing_blanks!([""])                # => []
+    def pop_trailing_blanks!(ary)
+      while ary.length > 0 && (ary.last.nil? || ary.last == '')
         ary.pop
       end
       ary
     end
-    module_function :pop_trailing_nils!
+    module_function :pop_trailing_blanks!
 
     RESERVED_PCHAR = ':@&=+$,;%'
     SAFE_PCHAR = "#{URI::REGEXP::PATTERN::UNRESERVED}#{RESERVED_PCHAR}"

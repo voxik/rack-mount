@@ -463,6 +463,25 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :section => 's' }, routing_args)
   end
 
+  def test_double_split_char_is_last
+    @app = new_route_set do |set|
+      induce_recognition_keys(set, %w( . / s ), 3)
+
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo/as'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foos/bs'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo/css'))
+    end
+
+    get '/foo/as'
+    assert_success
+
+    get '/foos/bs'
+    assert_success
+
+    get '/foo/css'
+    assert_success
+  end
+
   def test_set_without_slash_in_seperators
     @app = new_route_set do |set|
       induce_recognition_keys(set, %w( . ))
@@ -534,12 +553,14 @@ class TestRecognition < Test::Unit::TestCase
     end
 
     SplitKey = Rack::Mount::Analysis::Splitting::Key
-    def induce_recognition_keys(set, separators)
+    def induce_recognition_keys(set, separators, count = 1)
       keys = []
       separators_hash = {}
 
       if separators.is_a?(Array)
-        keys << SplitKey.new(:path_info, 0, Regexp.union(*separators))
+        count.times do |index|
+          keys << SplitKey.new(:path_info, index, Regexp.union(*separators))
+        end
         separators_hash[:path_info] = separators
       else
         keys << separators
@@ -574,5 +595,8 @@ class TestLinearRecognition < TestRecognition
   private
     def new_route_set(*args, &block)
       Rack::Mount::RouteSet.new_with_linear_graph(*args, &block)
+    end
+
+    def induce_recognition_keys(*args)
     end
 end

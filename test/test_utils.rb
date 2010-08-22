@@ -11,9 +11,11 @@ class TestUtils < Test::Unit::TestCase
   end
 
   def test_pop_trailing_nils
-    assert_equal [1, 2, 3], pop_trailing_nils!([1, 2, 3])
-    assert_equal [1, 2, 3], pop_trailing_nils!([1, 2, 3, nil, nil])
-    assert_equal [], pop_trailing_nils!([nil])
+    assert_equal [1, 2, 3], pop_trailing_blanks!([1, 2, 3])
+    assert_equal [1, 2, 3], pop_trailing_blanks!([1, 2, 3, nil, nil])
+    assert_equal [1, 2, 3], pop_trailing_blanks!([1, 2, 3, nil, ''])
+    assert_equal [], pop_trailing_blanks!([nil])
+    assert_equal [], pop_trailing_blanks!([''])
   end
 
   def test_build_nested_query
