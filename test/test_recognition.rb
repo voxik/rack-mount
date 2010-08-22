@@ -351,28 +351,6 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal '/prefix2', @env['SCRIPT_NAME']
   end
 
-  def test_path_prefix_without_split_keys
-    @app = new_route_set do |set|
-      induce_recognition_keys(set, %w( . ))
-
-      set.add_route(EchoApp, :path_info => %r{^/foo})
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
-      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
-    end
-
-    get '/foo'
-    assert_success
-
-    get '/foo/bar'
-    assert_success
-
-    get '/bar.html'
-    assert_success
-
-    get '/baz.xml'
-    assert_success
-  end
-
   def test_case_insensitive_path
     get '/ignorecase/foo'
     assert_success
@@ -414,6 +392,58 @@ class TestRecognition < Test::Unit::TestCase
     get '/uri_escaping/%E2%88%9E'
     assert_success
     assert_equal({ :controller => 'uri_escaping', :value => '∞' }, routing_args)
+  end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
+    end
+end
+
+class TestOptimizedRecognition < TestRecognition
+  def setup
+    @app = OptimizedBasicSet
+    assert set_included_modules.include?(Rack::Mount::CodeGeneration)
+  end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new(*args, &block)
+    end
+end
+
+class TestLinearRecognition < TestRecognition
+  def setup
+    @app = LinearBasicSet
+  end
+
+  private
+    def new_route_set(*args, &block)
+      Rack::Mount::RouteSet.new_with_linear_graph(*args, &block)
+    end
+end
+
+class TestRecognitionSplitKeyEdgeCases < Test::Unit::TestCase
+  def test_path_prefix_without_split_keys
+    @app = new_route_set do |set|
+      induce_recognition_keys(set, %w( . ))
+
+      set.add_route(EchoApp, :path_info => %r{^/foo})
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
+      set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/baz.:format'))
+    end
+
+    get '/foo'
+    assert_success
+
+    get '/foo/bar'
+    assert_success
+
+    get '/bar.html'
+    assert_success
+
+    get '/baz.xml'
+    assert_success
   end
 
   def test_small_set_with_ambiguous_splitting
@@ -549,7 +579,7 @@ class TestRecognition < Test::Unit::TestCase
 
   private
     def new_route_set(*args, &block)
-      Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
+      Rack::Mount::RouteSet.new(*args, &block)
     end
 
     SplitKey = Rack::Mount::Analysis::Splitting::Key
@@ -572,31 +602,5 @@ class TestRecognition < Test::Unit::TestCase
           keys
         end
       end
-    end
-end
-
-class TestOptimizedRecognition < TestRecognition
-  def setup
-    @app = OptimizedBasicSet
-    assert set_included_modules.include?(Rack::Mount::CodeGeneration)
-  end
-
-  private
-    def new_route_set(*args, &block)
-      Rack::Mount::RouteSet.new(*args, &block)
-    end
-end
-
-class TestLinearRecognition < TestRecognition
-  def setup
-    @app = LinearBasicSet
-  end
-
-  private
-    def new_route_set(*args, &block)
-      Rack::Mount::RouteSet.new_with_linear_graph(*args, &block)
-    end
-
-    def induce_recognition_keys(*args)
     end
 end
