@@ -39,6 +39,12 @@ module Rack::Mount
       end
 
       def separators(key)
+        @separators ||= {}
+        @separators[key] ||= lookup_separators(key)
+      end
+      attr_writer :separators
+
+      def lookup_separators(key)
         @boundaries[key].keys_in_upper_quartile
       end
 

@@ -353,7 +353,7 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_path_prefix_without_split_keys
     @app = new_route_set do |set|
-      induce_recognition_keys(set, %r{\.})
+      induce_recognition_keys(set, %w( . ))
 
       set.add_route(EchoApp, :path_info => %r{^/foo})
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
@@ -418,7 +418,7 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_small_set_with_ambiguous_splitting
     @app = new_route_set do |set|
-      induce_recognition_keys(set, %r{/|\.|s})
+      induce_recognition_keys(set, %w( / . s ))
 
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/signin'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/messages/:id'))
@@ -447,7 +447,7 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_set_with_leading_split_char
     @app = new_route_set do |set|
-      induce_recognition_keys(set, %r{/|\.|s})
+      induce_recognition_keys(set, %w( / . s ))
 
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/sa'), :request_method => 'POST')
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/s(.:format)'), :request_method => 'POST')
@@ -465,7 +465,7 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_set_without_slash_in_seperators
     @app = new_route_set do |set|
-      induce_recognition_keys(set, %r{\.})
+      induce_recognition_keys(set, %w( . ))
 
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo.:format'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar.:format'))
@@ -491,7 +491,7 @@ class TestRecognition < Test::Unit::TestCase
 
   def test_set_without_split_keys
     @app = new_route_set do |set|
-      induce_recognition_keys(set, nil)
+      induce_recognition_keys(set, :path_info)
 
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/foo'))
       set.add_route(EchoApp, :path_info => Rack::Mount::Strexp.compile('/bar'))
@@ -534,19 +534,20 @@ class TestRecognition < Test::Unit::TestCase
     end
 
     SplitKey = Rack::Mount::Analysis::Splitting::Key
-    def induce_recognition_keys(set, *separators)
+    def induce_recognition_keys(set, separators)
       keys = []
+      separators_hash = {}
 
-      separators.each_with_index do |separator, index|
-        if separator
-          keys << SplitKey.new(:path_info, index, separator)
-        else
-          keys << :path_info
-        end
+      if separators.is_a?(Array)
+        keys << SplitKey.new(:path_info, 0, Regexp.union(*separators))
+        separators_hash[:path_info] = separators
+      else
+        keys << separators
       end
 
       (class << set; self; end).instance_eval do
         define_method :build_recognition_keys do
+          @recognition_key_analyzer.separators = separators_hash
           keys
         end
       end
