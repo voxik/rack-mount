@@ -45,7 +45,13 @@ class Regin::Parser < Racc::Parser
 
   def next_token
     return if @ss.eos?
+    
+    # skips empty actions
+    until token = _next_token or @ss.eos?; end
+    token
+  end
 
+  def _next_token
     text = @ss.peek(1)
     @lineno  +=  1  if text == "\n"
     token = case @state
@@ -133,11 +139,25 @@ class Regin::Parser < Racc::Parser
 
     when :CCLASS
       case
+      when (text = @ss.scan(/\[/))
+         action { [:LBRACK,  text] }
+
       when (text = @ss.scan(/\]/))
          action { @state = nil; [:RBRACK, text] }
 
       when (text = @ss.scan(/\^/))
          action { [@ss.string[@ss.pos-2, 1] == '[' ? :NEGATE : :CHAR, text] }
+
+      when (text = @ss.scan(/:/))
+         action {
+    if @ss.string[@ss.pos-2, 1] == '['
+      @state = :POSIX_CCLASS
+      [:COLON, text]
+    else
+      [:CHAR, text]
+    end
+  }
+
 
       when (text = @ss.scan(/\\-/))
          action { [:CHAR, text] }
@@ -147,6 +167,22 @@ class Regin::Parser < Racc::Parser
 
       when (text = @ss.scan(/./))
          action { [:CHAR, text] }
+
+      else
+        text = @ss.string[@ss.pos .. -1]
+        raise  ScanError, "can not match: '" + text + "'"
+      end  # if
+
+    when :POSIX_CCLASS
+      case
+      when (text = @ss.scan(/\w+/))
+         action { [text, text] }
+
+      when (text = @ss.scan(/:/))
+         action { [:COLON, text] }
+
+      when (text = @ss.scan(/\]/))
+         action { @state = :CCLASS; [:RBRACK, text] }
 
       else
         text = @ss.string[@ss.pos .. -1]
@@ -205,6 +241,6 @@ class Regin::Parser < Racc::Parser
       raise  ScanError, "undefined state: '" + state.to_s + "'"
     end  # case state
     token
-  end  # def next_token
+  end  # def _next_token
 
 end # class
