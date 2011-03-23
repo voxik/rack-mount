@@ -12,8 +12,8 @@ rule
          }
        | GLOB {
            name = val[0].to_sym
-           requirement = requirements[name]
-           result = REGEXP_NAMED_CAPTURE % [name, '.+' || requirement]
+           requirement = requirements.key?(name) ? requirements[name] : '.+'
+           result = REGEXP_NAMED_CAPTURE % [name, requirement]
          }
        | LPAREN expr RPAREN { result = "(?:#{val[1]})?" }
        | CHAR { result = Regexp.escape(val[0]) }
