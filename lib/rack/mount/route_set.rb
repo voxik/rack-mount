@@ -25,7 +25,9 @@ module Rack::Mount
       @named_routes = {}
 
       @recognition_key_analyzer = Analysis::Splitting.new
-      @generation_key_analyzer  = Analysis::Frequency.new
+
+      @generation_keys = [:controller, :action]
+      @generation_route_keys = []
 
       @request_class = options.delete(:request_class) || Rack::Request
       @valid_conditions = @request_class.public_instance_methods.map! { |m| m.to_sym }
@@ -69,7 +71,7 @@ module Rack::Mount
       @recognition_key_analyzer << route.conditions
 
       @named_routes[route.name] = route if route.name
-      @generation_key_analyzer << route.generation_keys
+      @generation_route_keys << route.generation_keys
 
       expire!
       route
@@ -249,7 +251,6 @@ module Rack::Mount
 
       @recognition_keys  = build_recognition_keys
       @recognition_graph = build_recognition_graph
-      @generation_keys   = build_generation_keys
       @generation_graph  = build_generation_graph
 
       self
@@ -263,7 +264,7 @@ module Rack::Mount
         rehash
 
         @recognition_key_analyzer = nil
-        @generation_key_analyzer  = nil
+        @generation_route_keys    = nil
         @valid_conditions         = nil
 
         @routes.each { |route| route.freeze }
@@ -307,8 +308,7 @@ module Rack::Mount
         @recognition_keys = @recognition_graph = nil
         @recognition_key_analyzer.expire!
 
-        @generation_keys = @generation_graph = nil
-        @generation_key_analyzer.expire!
+        @generation_graph = nil
       end
 
       def instance_variables_to_serialize
@@ -350,18 +350,12 @@ module Rack::Mount
         build_nested_route_set(@generation_keys) { |k, i|
           throw :skip unless @routes[i].significant_params?
 
-          if k = @generation_key_analyzer.possible_keys[i][k]
+          if k = @generation_route_keys[i][k]
             k.to_s
           else
             nil
           end
         }
-      end
-
-      def build_generation_keys
-        keys = @generation_key_analyzer.report
-        Utils.debug "generation keys - #{keys.inspect}"
-        keys
       end
 
       def extract_params!(*args)
