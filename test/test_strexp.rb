@@ -130,6 +130,14 @@ class TestStrexp < Test::Unit::TestCase
     assert_equal %r{\Asrc/\*files\Z}, Strexp.compile('src/\*files')
   end
 
+  def test_glob_uses_requirements
+    if supports_named_captures?
+      assert_equal eval('%r{\Asrc/(?<files>.+?)\Z}'), Strexp.compile('src/*files', {:files => /.+?/})
+    else
+      assert_equal %r{\Asrc/(?:<files>.+?)\Z}, Strexp.compile('src/*files', {:files => /.+?/})
+    end
+  end
+
   def test_optional_segment
     assert_equal %r{\A/foo(?:/bar)?\Z}, Strexp.compile('/foo(/bar)')
   end
