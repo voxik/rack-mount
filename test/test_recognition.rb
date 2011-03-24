@@ -603,7 +603,6 @@ class TestRecognitionSplitKeyEdgeCases < Test::Unit::TestCase
 
       (class << set; self; end).instance_eval do
         define_method :build_recognition_keys do
-          @recognition_key_analyzer.separators = separators_hash
           keys
         end
       end

@@ -3,7 +3,7 @@ require 'rack/mount/utils'
 module Rack::Mount
   module Analysis
     class Splitting < Frequency
-      NULL = "\0".freeze
+      NULL = "\0"
 
       class Key < Struct.new(:method, :index, :separators)
         def self.split(value, separator_pattern)
@@ -26,26 +26,8 @@ module Rack::Mount
         end
       end
 
-      def clear
-        @boundaries = {}
-        super
-      end
-
-      def <<(key)
-        super
-        key.each_pair do |k, v|
-          analyze_capture_boundaries(v, @boundaries[k] ||= Histogram.new)
-        end
-      end
-
       def separators(key)
-        @separators ||= {}
-        @separators[key] ||= lookup_separators(key)
-      end
-      attr_writer :separators
-
-      def lookup_separators(key)
-        @boundaries[key].keys_in_upper_quartile
+        key == :path_info ? ["/", "."] : []
       end
 
       def process_key(requirements, method, requirement)
@@ -60,37 +42,6 @@ module Rack::Mount
       end
 
       private
-        def analyze_capture_boundaries(regexp, boundaries) #:nodoc:
-          return boundaries unless regexp.is_a?(Regexp)
-
-          parts = Utils.parse_regexp(regexp)
-          parts.each_with_index do |part, index|
-            if part.is_a?(Regin::Group)
-              if index > 0
-                previous = parts[index-1]
-                if previous.is_a?(Regin::Character) && previous.literal?
-                  boundaries << previous.to_s
-                end
-              end
-
-              if inside = part.expression[0]
-                if inside.is_a?(Regin::Character) && inside.literal?
-                  boundaries << inside.to_s
-                end
-              end
-
-              if index < parts.length
-                following = parts[index+1]
-                if following.is_a?(Regin::Character) && following.literal?
-                  boundaries << following.to_s
-                end
-              end
-            end
-          end
-
-          boundaries
-        end
-
         def generate_split_keys(regexp, separators) #:nodoc:
           segments = []
           buf = nil
