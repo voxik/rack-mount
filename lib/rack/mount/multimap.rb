@@ -1,12 +1,16 @@
-begin
-  require 'nested_multimap'
-rescue LoadError
-  $: << File.expand_path(File.join(File.dirname(__FILE__), 'vendor/multimap'))
-  require 'nested_multimap'
-end
-
 module Rack::Mount
-  class Multimap < NestedMultimap #:nodoc:
+  class Multimap #:nodoc:
+    def initialize(default = [])
+      @hash = Hash.new(default)
+    end
+
+    def initialize_copy(original)
+      @hash = Hash.new(original.default.dup)
+      original.hash.each_pair do |key, container|
+        @hash[key] = container.dup
+      end
+    end
+
     def store(*args)
       keys  = args.dup
       value = keys.pop
@@ -26,7 +30,7 @@ module Rack::Mount
           @hash.each_pair { |k, _|
             if k =~ key
               args[0] = k
-              super(*args)
+              _store(*args)
             end
           }
 
@@ -34,12 +38,19 @@ module Rack::Mount
           default[*keys.dup] = value
         end
       else
-        super(*args)
+        _store(*args)
       end
     end
     alias_method :[]=, :store
 
-    undef :index, :invert
+    def [](*keys)
+      i, l, r, k = 0, keys.length, self, self.class
+      while r.is_a?(k)
+        r = i < l ? r.hash[keys[i]] : r.default
+        i += 1
+      end
+      r
+    end
 
     def height
       containers_with_default.max { |a, b| a.length <=> b.length }.length
@@ -49,5 +60,78 @@ module Rack::Mount
       lengths = containers_with_default.map { |e| e.length }
       lengths.inject(0) { |sum, len| sum += len }.to_f / lengths.size
     end
+
+    def containers_with_default
+      containers = []
+      each_container_with_default { |container| containers << container }
+      containers
+    end
+
+    protected
+      def _store(*args)
+        keys  = args
+        value = args.pop
+
+        raise ArgumentError, 'wrong number of arguments (1 for 2)' unless value
+
+        if keys.length > 1
+          update_container(keys.shift) do |container|
+            container = self.class.new(container) unless container.is_a?(self.class)
+            container[*keys] = value
+            container
+          end
+        elsif keys.length == 1
+          update_container(keys.first) do |container|
+            container << value
+            container
+          end
+        else
+          self << value
+        end
+      end
+
+      def <<(value)
+        @hash.each_value { |container| container << value }
+        self.default << value
+        self
+      end
+
+      def each_container_with_default(&block)
+        @hash.each_value do |container|
+          iterate_over_container(container, &block)
+        end
+        iterate_over_container(default, &block)
+        self
+      end
+
+      def default
+        @hash.default
+      end
+
+      def default=(value)
+        @hash.default = value
+      end
+
+      def hash
+        @hash
+      end
+
+    private
+      def update_container(key)
+        container = @hash[key]
+        container = container.dup if container.equal?(default)
+        container = yield(container)
+        @hash[key] = container
+      end
+
+      def iterate_over_container(container)
+        if container.respond_to?(:each_container_with_default)
+          container.each_container_with_default do |value|
+            yield value
+          end
+        else
+          yield container
+        end
+      end
   end
 end

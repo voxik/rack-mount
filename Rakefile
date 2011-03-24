@@ -24,7 +24,7 @@ file 'lib/rack/mount/strexp/tokenizer.rb' => 'lib/rack/mount/strexp/tokenizer.re
 end
 
 namespace :vendor do
-  task :update => [:update_regin, :update_multimap]
+  task :update => [:update_regin]
 
   task :update_regin do
     system 'git clone git://github.com/josh/regin.git'
@@ -34,12 +34,5 @@ namespace :vendor do
 
     FileUtils.rm_rf('lib/rack/mount/vendor/regin/regin/parser.y')
     FileUtils.rm_rf('lib/rack/mount/vendor/regin/regin/tokenizer.rex')
-  end
-
-  task :update_multimap do
-    system 'git clone git://github.com/josh/multimap.git'
-    FileUtils.rm_rf('lib/rack/mount/vendor/multimap')
-    FileUtils.cp_r('multimap/lib', 'lib/rack/mount/vendor/multimap')
-    FileUtils.rm_rf('multimap')
   end
 end
