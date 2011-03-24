@@ -274,26 +274,6 @@ module Rack::Mount
       super
     end
 
-    def marshal_dump #:nodoc:
-      hash = {}
-
-      instance_variables_to_serialize.each do |ivar|
-        hash[ivar] = instance_variable_get(ivar)
-      end
-
-      if graph = hash[:@recognition_graph]
-        hash[:@recognition_graph] = graph.dup
-      end
-
-      hash
-    end
-
-    def marshal_load(hash) #:nodoc:
-      hash.each do |ivar, value|
-        instance_variable_set(ivar, value)
-      end
-    end
-
     protected
       def recognition_stats
         { :keys => @recognition_keys,
@@ -309,10 +289,6 @@ module Rack::Mount
         @recognition_key_analyzer.expire!
 
         @generation_graph = nil
-      end
-
-      def instance_variables_to_serialize
-        instance_variables.map { |ivar| ivar.to_sym } - [:@stubbed_request_class, :@optimized_recognize_defined]
       end
 
       # An internal helper method for constructing a nested set from
