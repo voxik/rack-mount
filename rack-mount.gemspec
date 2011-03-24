@@ -11,7 +11,6 @@ Gem::Specification.new do |s|
 
   s.files = [
    "lib/rack/mount.rb",
-   "lib/rack/mount/analysis/frequency.rb",
    "lib/rack/mount/analysis/histogram.rb",
    "lib/rack/mount/analysis/splitting.rb",
    "lib/rack/mount/code_generation.rb",
@@ -27,9 +26,6 @@ Gem::Specification.new do |s|
    "lib/rack/mount/strexp/tokenizer.rb",
    "lib/rack/mount/strexp/tokenizer.rex",
    "lib/rack/mount/utils.rb",
-   "lib/rack/mount/vendor/multimap/multimap.rb",
-   "lib/rack/mount/vendor/multimap/multiset.rb",
-   "lib/rack/mount/vendor/multimap/nested_multimap.rb",
    "lib/rack/mount/vendor/regin/regin.rb",
    "lib/rack/mount/vendor/regin/regin/alternation.rb",
    "lib/rack/mount/vendor/regin/regin/anchor.rb",
