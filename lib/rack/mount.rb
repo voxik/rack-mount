@@ -24,7 +24,6 @@ module Rack #:nodoc:
     autoload :Version, 'rack/mount/version'
 
     module Analysis #:nodoc:
-      autoload :Frequency, 'rack/mount/analysis/frequency'
       autoload :Histogram, 'rack/mount/analysis/histogram'
       autoload :Splitting, 'rack/mount/analysis/splitting'
     end

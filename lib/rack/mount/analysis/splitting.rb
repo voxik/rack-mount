@@ -2,7 +2,7 @@ require 'rack/mount/utils'
 
 module Rack::Mount
   module Analysis
-    class Splitting < Frequency
+    class Splitting
       NULL = "\0"
 
       class Key < Struct.new(:method, :index, :separators)
@@ -26,8 +26,44 @@ module Rack::Mount
         end
       end
 
-      def separators(key)
-        key == :path_info ? ["/", "."] : []
+      def initialize(*keys)
+        clear
+        keys.each { |key| self << key }
+      end
+
+      def clear
+        @raw_keys = []
+        @key_frequency = Analysis::Histogram.new
+        self
+      end
+
+      def <<(key)
+        raise ArgumentError unless key.is_a?(Hash)
+        @raw_keys << key
+        nil
+      end
+
+      def possible_keys
+        @possible_keys ||= begin
+          @raw_keys.map do |key|
+            key.inject({}) { |requirements, (method, requirement)|
+              process_key(requirements, method, requirement)
+              requirements
+            }
+          end
+        end
+      end
+
+      def report
+        @report ||= begin
+          possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
+          return [] if @key_frequency.count <= 1
+          @key_frequency.keys_in_upper_quartile
+        end
+      end
+
+      def expire!
+        @possible_keys = @report = nil
       end
 
       def process_key(requirements, method, requirement)
@@ -37,11 +73,24 @@ module Rack::Mount
             requirements[Key.new(method, index, Regexp.union(*separators))] = value
           end
         else
-          super
+          if requirement.is_a?(Regexp)
+            expression = Utils.parse_regexp(requirement)
+
+            if expression.is_a?(Regin::Expression) && expression.anchored_to_line?
+              expression = Regin::Expression.new(expression.reject { |e| e.is_a?(Regin::Anchor) })
+              return requirements[method] = expression.to_s if expression.literal?
+            end
+          end
+
+          requirements[method] = requirement
         end
       end
 
       private
+        def separators(key)
+          key == :path_info ? ["/", "."] : []
+        end
+
         def generate_split_keys(regexp, separators) #:nodoc:
           segments = []
           buf = nil
