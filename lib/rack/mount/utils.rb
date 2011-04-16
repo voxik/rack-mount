@@ -116,7 +116,7 @@ module Rack::Mount
     module_function :regexp_anchored?
 
     def normalize_extended_expression(regexp)
-      return regexp unless regexp.options & Regexp::EXTENDED != 0
+      return regexp if (regexp.options & Regexp::EXTENDED) == 0
       source = regexp.source
       source.gsub!(/#.+$/, '')
       source.gsub!(/\s+/, '')
