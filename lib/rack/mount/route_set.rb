@@ -162,7 +162,7 @@ module Rack::Mount
     # Additional parameters can be passed in as a hash
     #   url(env, :people, :id => "1") # => "/people/1"
     #
-    # If no name route is given, it will fall back to a slower
+    # If no named route is given, it will fall back to a slower
     # generation search.
     #   url(env, :controller => "people", :action => "show", :id => "1")
     #     # => "/people/1"
