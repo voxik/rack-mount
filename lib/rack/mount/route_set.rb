@@ -127,7 +127,7 @@ module Rack::Mount
 
     # Rack compatible recognition and dispatching method. Routes are
     # tried until one returns a non-catch status code. If no routes
-    # match, the catch status code is returned.
+    # match, then catch status code is returned.
     #
     # This method can only be invoked after the RouteSet has been
     # finalized.
