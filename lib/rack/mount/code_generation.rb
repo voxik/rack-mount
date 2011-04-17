@@ -110,7 +110,7 @@ module Rack::Mount
       def remove_metaclass_method(symbol)
         metaclass = class << self; self; end
         Utils.silence_debug { metaclass.send(:remove_method, symbol) }
-      rescue NameError => e
+      rescue NameError
         nil
       end
   end
