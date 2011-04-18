@@ -54,10 +54,9 @@ module Rack::Mount
       @named_captures = {}
       @conditions.map { |method, condition|
         next unless condition.respond_to?(:named_captures)
-        @named_captures[method] = condition.named_captures.inject({}) { |named_captures, (k, v)|
-          named_captures[k.to_sym] = v.last - 1
-          named_captures
-        }.freeze
+        @named_captures[method] = Hash[condition.named_captures.map { |k, v|
+          [k.to_sym, v.last - 1]
+        }].freeze
       }
       @named_captures.freeze
 
