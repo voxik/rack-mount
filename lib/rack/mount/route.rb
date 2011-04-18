@@ -97,12 +97,9 @@ module Rack::Mount
 
     def generate(method, params = {}, recall = {}, options = {})
       if method.nil?
-        result = @conditions.inject({}) { |h, (m, condition)|
-          if condition.respond_to?(:generate)
-            h[m] = condition.generate(params, recall, options)
-          end
-          h
-        }
+        result = Hash[@conditions.map { |m, condition|
+          [m, condition.generate(params, recall, options)] if condition.respond_to?(:generate)
+        }]
         return nil if result.values.compact.empty?
       else
         if condition = @conditions[method]
