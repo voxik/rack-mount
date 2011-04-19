@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name      = 'rack-mount'
-  s.version   = '0.7.1'
+  s.version   = '0.7.2'
   s.date      = '2011-03-23'
 
   s.homepage    = "https://github.com/josh/rack-mount"
