@@ -95,9 +95,11 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(lambda { |env| [404, {'X-Cascade' => 'pass'}, []] }, { :path_info => %r{^/prefix} })
   set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
-  set.add_route(DefaultSet, { :path_info => %r{^/segmented_prefix/(?<xyz>[a-z0-9]+)} }, {}, :segmented_prefix)
 
   set.add_route(EchoApp, { :path_info => %r{^/prefix2} }, {}, :prefix2)
 
   set.add_route(EchoApp, { :path_info => %r{^/(.*)/star$} }, { :controller => 'star' })
+  
+  set.add_route(NestedSet, { :path_info => %r{^/nested/(?<id>[0-9]+)}}, {})
+  set.add_route(EchoApp, { :path_info => %r{^/nested/(?<id>[0-9]+)}}, {})
 end

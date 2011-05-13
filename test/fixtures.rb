@@ -3,6 +3,7 @@ autoload :BasicSetMap, 'fixtures/basic_set_map'
 autoload :DefaultSet, 'fixtures/default_set'
 autoload :EchoApp, 'fixtures/echo_app'
 autoload :LinearBasicSet, 'fixtures/linear_basic_set'
+autoload :NestedSet, 'fixtures/nested_set'
 autoload :OptimizedBasicSet, 'fixtures/optimized_basic_set'
 
 module ControllerConstants

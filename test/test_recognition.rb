@@ -349,10 +349,6 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({}, routing_args)
     assert_equal '.foo/bar/1', @env['PATH_INFO']
     assert_equal '/prefix2', @env['SCRIPT_NAME']
-    
-    get '/segmented_prefix/xyz/foo/bar/1'
-    assert_success
-    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1', :xyz => 'xyz' }, routing_args)
   end
 
   def test_case_insensitive_path
@@ -396,6 +392,19 @@ class TestRecognition < Test::Unit::TestCase
     get '/uri_escaping/%E2%88%9E'
     assert_success
     assert_equal({ :controller => 'uri_escaping', :value => '∞' }, routing_args)
+  end
+
+  def test_nested_routing_parameters_are_merged_with_parents  
+    get '/nested/123/ok'
+    assert_success
+    assert_equal({ :id => '123' }, routing_args)
+  end
+
+  def test_nested_routing_parameters_after_cascade
+    get '/nested/123/pass'
+    assert_success
+    assert_equal({ :id => '123' }, routing_args)
+    assert !routing_args.key?(:cascaded)
   end
 
   private
