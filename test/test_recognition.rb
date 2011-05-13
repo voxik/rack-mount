@@ -349,6 +349,10 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({}, routing_args)
     assert_equal '.foo/bar/1', @env['PATH_INFO']
     assert_equal '/prefix2', @env['SCRIPT_NAME']
+    
+    get '/segmented_prefix/xyz/foo/bar/1'
+    assert_success
+    assert_equal({ :controller => 'foo', :action => 'bar', :id => '1', :xyz => 'xyz' }, routing_args)
   end
 
   def test_case_insensitive_path

@@ -95,6 +95,7 @@ BasicSetMap = Proc.new do |set|
 
   set.add_route(lambda { |env| [404, {'X-Cascade' => 'pass'}, []] }, { :path_info => %r{^/prefix} })
   set.add_route(DefaultSet, { :path_info => %r{^/prefix} }, {}, :prefix)
+  set.add_route(DefaultSet, { :path_info => %r{^/segmented_prefix/(?<xyz>[a-z0-9]+)} }, {}, :segmented_prefix)
 
   set.add_route(EchoApp, { :path_info => %r{^/prefix2} }, {}, :prefix2)
 

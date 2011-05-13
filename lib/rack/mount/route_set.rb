@@ -146,9 +146,13 @@ module Rack::Mount
           env[Prefix::KEY] = matches[:path_info].to_s
         end
 
-        env[@parameters_key] = params
+        existing_params = env[@parameters_key] || {}
+        env[@parameters_key] = existing_params.merge(params)
+        
         result = route.app.call(env)
         return result unless result[1][X_CASCADE] == PASS
+        
+        env[@parameters_key] = existing_params
       end
 
       request || [404, {'Content-Type' => 'text/html', 'X-Cascade' => 'pass'}, ['Not Found']]
