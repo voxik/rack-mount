@@ -403,7 +403,7 @@ class TestRecognition < Test::Unit::TestCase
   def test_nested_routing_parameters_after_cascade
     get '/nested/123/pass'
     assert_success
-    assert_equal({ :set => 'B', :id => '123', :response => 'pass' }, routing_args)
+    assert_equal({ :set => 'B', :id => '123' }, routing_args)
   end
 
   private
