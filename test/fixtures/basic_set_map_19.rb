@@ -99,8 +99,4 @@ BasicSetMap = Proc.new do |set|
   set.add_route(EchoApp, { :path_info => %r{^/prefix2} }, {}, :prefix2)
 
   set.add_route(EchoApp, { :path_info => %r{^/(.*)/star$} }, { :controller => 'star' })
-
-  set.add_route(NestedSetA, { :path_info => %r{^/nested/(?<id>[0-9]+)}}, { :set => 'A' })
-  set.add_route(NestedSetB, { :path_info => %r{^/nested/(?<id>[0-9]+)}}, { :set => 'B' })
-  set.add_route(EchoApp, { :path_info => %r{^/nested/(?<id>[0-9]+)}}, {})
 end
