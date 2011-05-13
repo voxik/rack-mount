@@ -394,6 +394,18 @@ class TestRecognition < Test::Unit::TestCase
     assert_equal({ :controller => 'uri_escaping', :value => '∞' }, routing_args)
   end
 
+  def test_nested_routing_parameters_are_merged_with_parents
+    get '/nested/123/ok'
+    assert_success
+    assert_equal({ :set => 'A', :id => '123', :response => 'ok' }, routing_args)
+  end
+
+  def test_nested_routing_parameters_after_cascade
+    get '/nested/123/pass'
+    assert_success
+    assert_equal({ :set => 'B', :id => '123', :response => 'pass' }, routing_args)
+  end
+
   private
     def new_route_set(*args, &block)
       Rack::Mount::RouteSet.new_without_optimizations(*args, &block)
