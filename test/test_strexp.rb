@@ -78,6 +78,14 @@ class TestStrexp < Test::Unit::TestCase
     end
   end
 
+  def test_dynamic_segment_with_negative_lookbehind_requirement
+    if supports_named_captures?
+      assert_equal eval('%r{\Afoo/(?<bar>(?!baz).*)\Z}'), Strexp.compile('foo/:bar', {:bar => /(?!baz).*/}, ['/'])
+    else
+      assert_equal %r{\Afoo/(?:<bar>(?!baz).*)\Z}, Strexp.compile('foo/:bar', {:bar => /(?!baz).*/}, ['/'])
+    end
+  end
+
   def test_dynamic_segment_inside_optional_segment
     if supports_named_captures?
       assert_equal eval('%r{\Afoo(?:\.(?<extension>.+))?\Z}'), Strexp.compile('foo(.:extension)')
