@@ -146,14 +146,15 @@ module Rack::Mount
           env[Prefix::KEY] = matches[:path_info].to_s
         end
 
-        begin
-          old_params = env[@parameters_key]
-          env[@parameters_key] = (old_params || {}).merge(params)
+        old_params = env[@parameters_key]
+        env[@parameters_key] = (old_params || {}).merge(params)
 
-          result = route.app.call(env)
-          return result unless result[1][X_CASCADE] == PASS
-        ensure
+        result = route.app.call(env)
+
+        if result[1][X_CASCADE] == PASS
           env[@parameters_key] = old_params
+        else
+          return result
         end
       end
 
