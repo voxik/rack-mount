@@ -269,6 +269,7 @@ module Rack::Mount
     def freeze
       unless frozen?
         rehash
+        stubbed_request_class
 
         @recognition_key_analyzer = nil
         @generation_route_keys    = nil
