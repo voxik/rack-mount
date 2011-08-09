@@ -82,7 +82,7 @@ module Rack::Mount
 
 
     def generation_keys
-      @conditions.inject({}) { |keys, (method, condition)|
+      @conditions.inject({}) { |keys, (_, condition)|
         if condition.respond_to?(:required_defaults)
           keys.merge!(condition.required_defaults)
         else

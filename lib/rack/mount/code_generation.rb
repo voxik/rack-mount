@@ -71,8 +71,11 @@ module Rack::Mount
       def optimize_recognize!
         Utils.debug "optimizing recognize"
 
+        uses_cache = false
+
         keys = @recognition_keys.map { |key|
           if key.respond_to?(:call_source)
+            uses_cache = true
             key.call_source(:cache, :obj)
           else
             "obj.#{key}"
@@ -85,7 +88,7 @@ module Rack::Mount
 
         instance_eval(<<-RUBY, __FILE__, __LINE__)
           def recognize(obj)
-            cache = {}
+            #{"cache = {}" if uses_cache}
             container = @recognition_graph[#{keys}]
             optimize_container_iterator(container) unless container.respond_to?(:optimized_each)
 
