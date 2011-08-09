@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rexical'
 
-  s.authors           = ["Joshua Peek"]
-  s.email             = "josh@joshpeek.com"
-  s.rubyforge_project = 'rack-mount'
+  s.authors = ["Joshua Peek"]
+  s.email   = "josh@joshpeek.com"
 end
