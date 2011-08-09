@@ -46,6 +46,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rack', '>=1.0.0'
   s.add_development_dependency 'racc'
+  s.add_development_dependency 'rack'
   s.add_development_dependency 'rexical'
 
   s.authors           = ["Joshua Peek"]
