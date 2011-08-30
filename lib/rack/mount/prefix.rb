@@ -10,7 +10,8 @@ module Rack::Mount
     KEY = 'rack.mount.prefix'.freeze
 
     def initialize(app, prefix = nil)
-      @app, @prefix = app, prefix.freeze
+      @app, @prefix = app, prefix
+      prefix.freeze if prefix
       freeze
     end
 
