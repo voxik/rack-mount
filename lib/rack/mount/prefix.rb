@@ -11,7 +11,6 @@ module Rack::Mount
 
     def initialize(app, prefix = nil)
       @app, @prefix = app, prefix
-      prefix.freeze if prefix
       freeze
     end
 
