@@ -6,7 +6,7 @@ class TestSplitting < Test::Unit::TestCase
     splitting << {:a => "/a"}
     splitting << {:b => "/b"}
     splitting << {:c => "/c"}
-    assert_equal([:a, :b, :c], splitting.report.sort)
+    assert_equal([:a, :b, :c], splitting.report.sort_by(&:to_s))
 
     splitting.expire!
     splitting << {:d => "/d"}
