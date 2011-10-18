@@ -33,7 +33,6 @@ module Rack::Mount
 
       def clear
         @raw_keys = []
-        @key_frequency = Analysis::Histogram.new
         self
       end
 
@@ -56,9 +55,10 @@ module Rack::Mount
 
       def report
         @report ||= begin
-          possible_keys.each { |keys| keys.each_pair { |key, _| @key_frequency << key } }
-          return [] if @key_frequency.count <= 1
-          @key_frequency.keys_in_upper_quartile
+          key_frequency = Analysis::Histogram.new
+          possible_keys.each { |keys| keys.each_pair { |key, _| key_frequency << key } }
+          return [] if key_frequency.count <= 1
+          key_frequency.keys_in_upper_quartile
         end
       end
 
