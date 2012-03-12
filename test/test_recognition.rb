@@ -136,6 +136,15 @@ class TestRecognition < Test::Unit::TestCase
     assert_not_found
   end
 
+  def test_nil_condition
+    get '/nil', 'HTTP_REFERER' => 'http://github.com'
+    assert_success
+    assert_equal({ :controller => 'nil', :action => 'index' }, routing_args)
+
+    get '/nil', 'HTTP_REFERER' => nil
+    assert_not_found
+  end
+
   def test_slashes
     get '/slashes/trailing/'
     assert_success

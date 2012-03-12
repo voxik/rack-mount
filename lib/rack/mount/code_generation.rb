@@ -38,7 +38,8 @@ module Rack::Mount
           route.conditions.each do |method, condition|
             b = []
             if condition.is_a?(Regexp)
-              b << "if m = obj.#{method}.match(#{condition.inspect})"
+              b << "value = obj.#{method}"
+              b << "if value.respond_to?(:match) && m = value.match(#{condition.inspect})"
               b << "matches[:#{method}] = m"
               if (named_captures = route.named_captures[method]) && named_captures.any?
                 b << 'captures = m.captures'
