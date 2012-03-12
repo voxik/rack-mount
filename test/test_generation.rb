@@ -35,6 +35,9 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal nil, @app.url(@env, :complex_regexp_fail, :only_path => true)
 
     assert_equal '/prefix', @app.url(@env, :prefix, :only_path => true)
+
+    assert_equal '/!', @app.url(@env, :bang, :only_path => true)
+    assert_equal '/!/about', @app.url(@env, :bang, :action => 'about', :only_path => true)
   end
 
   def test_url_with_hash
@@ -63,6 +66,9 @@ class TestGeneration < Test::Unit::TestCase
     assert_equal ['/default/users/show/1', {}], @app.generate(:path_info, :controller => 'users', :action => 'show', :id => '1')
     assert_equal ['/default/users/show/1', {}], @app.generate(:path_info, {:action => 'show', :id => '1'}, {:controller => 'users'})
     assert_equal ['/default/users/show/1', {}], @app.generate(:path_info, {:controller => 'users', :id => '1'}, {:action => 'show'})
+
+    assert_equal '/!', @app.url(@env, :controller => 'bang', :only_path => true)
+    assert_equal '/!/about', @app.url(@env, :controller => 'bang', :action => 'about', :only_path => true)
 
     assert_raise(Rack::Mount::RoutingError) { @app.url(@env, {}) }
   end
