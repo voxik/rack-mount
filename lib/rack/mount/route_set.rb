@@ -95,7 +95,7 @@ module Rack::Mount
 
         if route.conditions.all? { |method, condition|
             value = obj.send(method)
-            if condition.is_a?(Regexp) && (m = value.match(condition))
+            if condition.is_a?(Regexp) && value.respond_to?(:match) && (m = value.match(condition))
               matches[method] = m
               captures = m.captures
               route.named_captures[method].each do |k, i|
