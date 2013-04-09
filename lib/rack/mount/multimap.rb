@@ -125,7 +125,7 @@ module Rack::Mount
       end
 
       def iterate_over_container(container)
-        if container.respond_to?(:each_container_with_default)
+        if container.respond_to?(:each_container_with_default, true)
           container.each_container_with_default do |value|
             yield value
           end
